@@ -167,7 +167,7 @@
                 </div>
             </div>
             <!-- 手機版搖一搖提示 -->
-            <p class="text-xs text-slate-400 mt-2 sm:hidden">📱 搖一搖手機可 隨機翻牌 / 關閉答案</p>
+            <p class="text-xs text-slate-400 mt-2 sm:hidden">📱 搖一搖手機可隨機翻牌</p>
         </header>
 
         <main id="cardsGrid">
@@ -184,7 +184,7 @@
         </footer>
     </div>
 
-    <!-- 答案顯示視窗 - 加大四邊距離 -->
+    <!-- 答案顯示視窗 -->
     <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/70 z-[999] hidden items-center justify-center p-10 md:p-20 cursor-pointer backdrop-blur-sm">
         <div id="answerContent" class="bg-white w-full max-w-2xl h-auto min-h-[40vh] rounded-[2.5rem] shadow-[0_0_50px_rgba(79,70,229,0.4)] flex flex-col items-center justify-center p-8 md:p-12 border-[10px] border-indigo-500 relative">
             <div class="relative z-20 flex flex-col items-center w-full text-center">
@@ -271,36 +271,73 @@
 
         // 音效系統
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
+            const now = audioCtx.currentTime;
+            
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
+            const volumeBase = 0.15; 
+
             if (type === 'pop') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
-            } else if (type === 'close') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(660, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                switch (currentCategory) {
+                    case '永續農耕':
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(150, now);
+                        osc.frequency.exponentialRampToValueAtTime(80, now + 0.1);
+                        gain.gain.setValueAtTime(volumeBase, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                        break;
+                    case '日用品':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(800, now);
+                        osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+                        gain.gain.setValueAtTime(volumeBase * 0.8, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                        break;
+                    case '創業思維':
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(200, now);
+                        osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+                        gain.gain.setValueAtTime(volumeBase * 0.5, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                        break;
+                    case '回答異議':
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(220, now);
+                        osc.frequency.setValueAtTime(180, now + 0.1);
+                        gain.gain.setValueAtTime(volumeBase * 0.4, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                        break;
+                    case '美麗':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(1200, now);
+                        osc.frequency.exponentialRampToValueAtTime(1800, now + 0.05);
+                        osc.frequency.exponentialRampToValueAtTime(1500, now + 0.15);
+                        gain.gain.setValueAtTime(volumeBase * 0.6, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                        break;
+                    default:
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                        gain.gain.setValueAtTime(volumeBase, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                }
+                osc.start(now);
+                osc.stop(now + 0.5);
             }
         }
 
         // 搖一搖相關變數
         let lastShakeUpdate = 0;
         let lastX, lastY, lastZ;
-        const SHAKE_THRESHOLD = 50; // 調高門檻，必須很用力搖晃
+        const SHAKE_THRESHOLD = 50; 
         const SHAKE_COOLDOWN = 1200; 
         let isShakeInitialized = false;
 
@@ -346,10 +383,8 @@
                     const overlay = document.getElementById('answerOverlay');
                     const isOverlayVisible = !overlay.classList.contains('hidden');
 
-                    if (isOverlayVisible) {
-                        closeAnswer();
-                        lastShakeUpdate = curTime + SHAKE_COOLDOWN;
-                    } else if (!isShuffling && !isAnimating) {
+                    // 僅在答案隱藏時，搖動觸發隨機翻牌 (移除搖動關閉功能)
+                    if (!isOverlayVisible && !isShuffling && !isAnimating) {
                         flipRandomCard();
                         lastShakeUpdate = curTime + SHAKE_COOLDOWN;
                     }
@@ -499,7 +534,7 @@
             const idx = currentCardIndex;
             const cardInner = document.getElementById(`card-${idx}`);
             if (cardInner) cardInner.classList.remove('is-flipped');
-            playSound('close');
+            // 移除關閉音效
             setTimeout(() => {
                 if (idx !== null && !categoryProgress[currentCategory].has(idx)) {
                     categoryProgress[currentCategory].add(idx);
