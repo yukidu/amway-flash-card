@@ -135,7 +135,7 @@
         }
     </style>
 </head>
-<body>
+<body onclick="enableShake()">
     <div id="aiLoading" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600 mb-4"></div>
         <p id="loadingMsg" class="text-indigo-900 font-bold text-lg">正在處理數據...</p>
@@ -163,6 +163,8 @@
                     <p id="statPercent" class="text-2xl font-black text-slate-700">0%</p>
                 </div>
             </div>
+            <!-- 手機版搖一搖提示 -->
+            <p class="text-xs text-slate-400 mt-2 sm:hidden">📱 搖一搖手機可隨機翻牌</p>
         </header>
 
         <main id="cardsGrid">
@@ -264,6 +266,13 @@
         let isShuffling = false;
         let isAnimating = false;
 
+        // 搖一搖相關變數
+        let lastShakeUpdate = 0;
+        let lastX, lastY, lastZ;
+        const SHAKE_THRESHOLD = 15; // 搖晃強度閾值
+        const SHAKE_COOLDOWN = 1500; // 冷卻時間 (ms)
+        let isShakeInitialized = false;
+
         window.onload = () => {
             checkMandatoryCards();
             initProgress();
@@ -271,6 +280,54 @@
             switchCategory(Object.keys(gameData)[0]);
             initKeyboardSupport();
         };
+
+        // 啟動搖一搖功能 (需使用者點擊觸發)
+        function enableShake() {
+            if (isShakeInitialized) return;
+            
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('devicemotion', handleMotion, false);
+                            isShakeInitialized = true;
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                window.addEventListener('devicemotion', handleMotion, false);
+                isShakeInitialized = true;
+            }
+        }
+
+        function handleMotion(event) {
+            let curTime = new Date().getTime();
+            if ((curTime - lastShakeUpdate) > 100) {
+                let diffTime = curTime - lastShakeUpdate;
+                lastShakeUpdate = curTime;
+
+                let acceleration = event.accelerationIncludingGravity;
+                let x = acceleration.x;
+                let y = acceleration.y;
+                let z = acceleration.z;
+
+                let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
+
+                if (speed > SHAKE_THRESHOLD) {
+                    // 檢查冷卻時間，避免翻開視窗時或洗牌時觸發
+                    const isOverlayHidden = document.getElementById('answerOverlay').classList.contains('hidden');
+                    if (isOverlayHidden && !isShuffling && !isAnimating) {
+                        // 執行隨機翻牌
+                        flipRandomCard();
+                        // 設定較長的冷卻時間，防止連翻
+                        lastShakeUpdate = curTime + SHAKE_COOLDOWN;
+                    }
+                }
+                lastX = x;
+                lastY = y;
+                lastZ = z;
+            }
+        }
 
         // 強制注入創辦人卡片到所有分類
         function checkMandatoryCards() {
@@ -465,7 +522,6 @@
         }
 
         async function callGeminiAI(base64Image) {
-            // 強化提示詞，要求絕對包含第一欄
             const prompt = "請辨識截圖中的 Excel 表格。規則：從最左邊的第一欄(Column A)開始，每一欄都是一個分類。第一行為標題，第二行開始是內容文字。請轉換為 JSON 物件：{ '分類標題': ['答案1', '答案2', ...] }。務必包含所有直欄。只回傳 JSON。";
             let retries = 0;
             const maxRetries = 5;
@@ -516,7 +572,6 @@
                 const newData = {};
                 if (rows.length > 0) {
                     const headerRow = rows[0];
-                    // 確保從 colIdx 0 (第一欄) 開始遍歷
                     headerRow.forEach((catName, colIdx) => {
                         const cat = catName ? catName.trim() : "";
                         if (cat) {
@@ -544,7 +599,7 @@
 
         function applyNewGameData(newData) {
             gameData = newData;
-            checkMandatoryCards(); // 確保每個分類都有創辦人卡
+            checkMandatoryCards(); 
             categoryProgress = {};
             Object.keys(gameData).forEach(cat => {
                 if (!categoryColors[cat]) {
@@ -553,7 +608,6 @@
                 categoryProgress[cat] = new Set();
             });
             renderTabs();
-            // 隨機打亂所有分類的順序
             Object.keys(gameData).forEach(cat => {
                 gameData[cat].sort(() => Math.random() - 0.5);
             });
