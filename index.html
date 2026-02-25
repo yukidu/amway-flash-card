@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動翻牌遊戲 - 直欄分類強化版</title>
+    <title>互動翻牌遊戲</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -82,7 +82,7 @@
             background-color: white !important;
             transform: rotateY(180deg);
             border: 3px solid #e2e8f0;
-            padding: 4px 10px; 
+            padding: 4px 2px; /* 左右邊距縮窄至 2px */
             font-size: 1.6rem;
             font-weight: 800;
             text-align: center;
@@ -186,7 +186,8 @@
         <div id="answerContent" class="bg-white w-full max-w-2xl h-[40vh] rounded-[2rem] shadow-2xl flex flex-col items-center justify-center p-10 border-[10px] border-indigo-500 relative">
             <div class="relative z-20 flex flex-col items-center w-full text-center">
                 <div id="answerCategoryTag" class="text-xl font-bold tracking-widest uppercase mb-6 opacity-60">ANSWER</div>
-                <div id="overlayText" class="text-4xl md:text-6xl font-black text-center leading-tight transition-colors duration-300 break-words w-full px-[10px]"></div>
+                <!-- 左右邊距縮窄至 2px -->
+                <div id="overlayText" class="text-4xl md:text-6xl font-black text-center leading-tight transition-colors duration-300 break-words w-full px-[2px]"></div>
             </div>
         </div>
     </div>
