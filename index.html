@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動翻牌遊戲</title>
+    <title>互動翻牌遊戲 - 直欄分類強化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -82,7 +82,7 @@
             background-color: white !important;
             transform: rotateY(180deg);
             border: 3px solid #e2e8f0;
-            padding: 4px 2px; /* 左右邊距縮窄至 2px */
+            padding: 4px 2px;
             font-size: 1.6rem;
             font-weight: 800;
             text-align: center;
@@ -101,12 +101,15 @@
             pointer-events: none;
         }
 
-        @keyframes answerPop {
-            0% { transform: scale(0.6); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        /* 華麗酷炫彈窗動畫 */
+        @keyframes coolPop {
+            0% { transform: scale(0.3) rotate(-15deg); opacity: 0; filter: blur(20px); }
+            50% { transform: scale(1.08) rotate(5deg); opacity: 1; filter: blur(0px); }
+            75% { transform: scale(0.96) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
         .animate-answer-pop {
-            animation: answerPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: coolPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         @keyframes dealCard {
@@ -164,7 +167,7 @@
                 </div>
             </div>
             <!-- 手機版搖一搖提示 -->
-            <p class="text-xs text-slate-400 mt-2 sm:hidden">📱 搖一搖手機可隨機翻牌</p>
+            <p class="text-xs text-slate-400 mt-2 sm:hidden">📱 搖一搖手機可 隨機翻牌 / 關閉答案</p>
         </header>
 
         <main id="cardsGrid">
@@ -181,12 +184,11 @@
         </footer>
     </div>
 
-    <!-- 答案顯示視窗 -->
-    <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/70 z-[999] hidden items-center justify-center p-6 cursor-pointer backdrop-blur-sm">
-        <div id="answerContent" class="bg-white w-full max-w-2xl h-[40vh] rounded-[2rem] shadow-2xl flex flex-col items-center justify-center p-10 border-[10px] border-indigo-500 relative">
+    <!-- 答案顯示視窗 - 加大四邊距離 -->
+    <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/70 z-[999] hidden items-center justify-center p-10 md:p-20 cursor-pointer backdrop-blur-sm">
+        <div id="answerContent" class="bg-white w-full max-w-2xl h-auto min-h-[40vh] rounded-[2.5rem] shadow-[0_0_50px_rgba(79,70,229,0.4)] flex flex-col items-center justify-center p-8 md:p-12 border-[10px] border-indigo-500 relative">
             <div class="relative z-20 flex flex-col items-center w-full text-center">
                 <div id="answerCategoryTag" class="text-xl font-bold tracking-widest uppercase mb-6 opacity-60">ANSWER</div>
-                <!-- 左右邊距縮窄至 2px -->
                 <div id="overlayText" class="text-4xl md:text-6xl font-black text-center leading-tight transition-colors duration-300 break-words w-full px-[2px]"></div>
             </div>
         </div>
@@ -267,11 +269,39 @@
         let isShuffling = false;
         let isAnimating = false;
 
+        // 音效系統
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'pop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'close') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(660, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
         // 搖一搖相關變數
         let lastShakeUpdate = 0;
         let lastX, lastY, lastZ;
-        const SHAKE_THRESHOLD = 15; // 搖晃強度閾值
-        const SHAKE_COOLDOWN = 1500; // 冷卻時間 (ms)
+        const SHAKE_THRESHOLD = 50; // 調高門檻，必須很用力搖晃
+        const SHAKE_COOLDOWN = 1200; 
         let isShakeInitialized = false;
 
         window.onload = () => {
@@ -282,10 +312,8 @@
             initKeyboardSupport();
         };
 
-        // 啟動搖一搖功能 (需使用者點擊觸發)
         function enableShake() {
             if (isShakeInitialized) return;
-            
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                 DeviceMotionEvent.requestPermission()
                     .then(permissionState => {
@@ -315,12 +343,14 @@
                 let speed = Math.abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000;
 
                 if (speed > SHAKE_THRESHOLD) {
-                    // 檢查冷卻時間，避免翻開視窗時或洗牌時觸發
-                    const isOverlayHidden = document.getElementById('answerOverlay').classList.contains('hidden');
-                    if (isOverlayHidden && !isShuffling && !isAnimating) {
-                        // 執行隨機翻牌
+                    const overlay = document.getElementById('answerOverlay');
+                    const isOverlayVisible = !overlay.classList.contains('hidden');
+
+                    if (isOverlayVisible) {
+                        closeAnswer();
+                        lastShakeUpdate = curTime + SHAKE_COOLDOWN;
+                    } else if (!isShuffling && !isAnimating) {
                         flipRandomCard();
-                        // 設定較長的冷卻時間，防止連翻
                         lastShakeUpdate = curTime + SHAKE_COOLDOWN;
                     }
                 }
@@ -330,7 +360,6 @@
             }
         }
 
-        // 強制注入創辦人卡片到所有分類
         function checkMandatoryCards() {
             Object.keys(gameData).forEach(cat => {
                 if (!gameData[cat].includes(MANDATORY_CARD)) {
@@ -457,6 +486,7 @@
                 textEl.style.color = categoryColors[currentCategory] || '#4F46E5';
                 overlay.classList.replace('hidden', 'flex');
                 document.getElementById('answerContent').classList.add('animate-answer-pop');
+                playSound('pop');
                 isAnimating = false;
             }, 350);
         }
@@ -469,6 +499,7 @@
             const idx = currentCardIndex;
             const cardInner = document.getElementById(`card-${idx}`);
             if (cardInner) cardInner.classList.remove('is-flipped');
+            playSound('close');
             setTimeout(() => {
                 if (idx !== null && !categoryProgress[currentCategory].has(idx)) {
                     categoryProgress[currentCategory].add(idx);
