@@ -101,6 +101,7 @@
             pointer-events: none;
         }
 
+        /* 華麗酷炫彈窗動畫 */
         @keyframes coolPop {
             0% { transform: scale(0.3) rotate(-15deg); opacity: 0; filter: blur(20px); }
             50% { transform: scale(1.08) rotate(5deg); opacity: 1; filter: blur(0px); }
@@ -257,50 +258,102 @@
         let isShuffling = false;
         let isAnimating = false;
 
+        // 音效系統
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             const now = audioCtx.currentTime;
+            
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            const volumeBase = 0.15; 
+
+            // 基礎音量再降低 50% (原 0.15 -> 0.075)
+            const volumeBase = 0.075; 
+
             if (type === 'pop') {
                 switch (currentCategory) {
-                    case '永續農耕': osc.type = 'triangle'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(80, now + 0.1); gain.gain.setValueAtTime(volumeBase, now); gain.gain.linearRampToValueAtTime(0, now + 0.2); break;
-                    case '日用品': osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.05); gain.gain.setValueAtTime(volumeBase * 0.8, now); gain.gain.linearRampToValueAtTime(0, now + 0.1); break;
-                    case '創業思維': osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.2); gain.gain.setValueAtTime(volumeBase * 0.5, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); break;
-                    case '回答異議': osc.type = 'square'; osc.frequency.setValueAtTime(220, now); osc.frequency.setValueAtTime(180, now + 0.1); gain.gain.setValueAtTime(volumeBase * 0.4, now); gain.gain.linearRampToValueAtTime(0, now + 0.2); break;
-                    case '美麗': osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(1800, now + 0.05); osc.frequency.exponentialRampToValueAtTime(1500, now + 0.15); gain.gain.setValueAtTime(volumeBase * 0.6, now); gain.gain.linearRampToValueAtTime(0, now + 0.4); break;
-                    default: osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.1); gain.gain.setValueAtTime(volumeBase, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    case '永續農耕':
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(150, now);
+                        osc.frequency.exponentialRampToValueAtTime(80, now + 0.1);
+                        gain.gain.setValueAtTime(volumeBase, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                        break;
+                    case '日用品':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(800, now);
+                        osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+                        gain.gain.setValueAtTime(volumeBase * 0.8, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                        break;
+                    case '創業思維':
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(200, now);
+                        osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+                        gain.gain.setValueAtTime(volumeBase * 0.5, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                        break;
+                    case '回答異議':
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(220, now);
+                        osc.frequency.setValueAtTime(180, now + 0.1);
+                        gain.gain.setValueAtTime(volumeBase * 0.4, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                        break;
+                    case '美麗':
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(1200, now);
+                        osc.frequency.exponentialRampToValueAtTime(1800, now + 0.05);
+                        osc.frequency.exponentialRampToValueAtTime(1500, now + 0.15);
+                        gain.gain.setValueAtTime(volumeBase * 0.6, now);
+                        gain.gain.linearRampToValueAtTime(0, now + 0.4);
+                        break;
+                    default:
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, now);
+                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                        gain.gain.setValueAtTime(volumeBase, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 }
-                osc.start(now); osc.stop(now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'victory') {
+                // 特別的勝利音效：三連上升音階
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.4); // C6
+                
+                gain.gain.setValueAtTime(volumeBase * 1.5, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                
+                osc.start(now);
+                osc.stop(now + 0.6);
             }
         }
 
-        // 優化版搖一搖：計算單軸絕對位移差
+        // 優化版搖一搖
         let lastShakeUpdate = 0;
         let lastX = 0, lastY = 0, lastZ = 0;
-        const SHAKE_THRESHOLD = 65; // 調高門檻並改進算法
+        const SHAKE_THRESHOLD = 65; 
         const SHAKE_COOLDOWN = 1200; 
         let isShakeInitialized = false;
 
         function handleMotion(event) {
             let curTime = new Date().getTime();
-            if ((curTime - lastShakeUpdate) > 80) { // 縮短取樣間隔增加精準度
+            if ((curTime - lastShakeUpdate) > 80) {
                 let diffTime = curTime - lastShakeUpdate;
                 let acc = event.accelerationIncludingGravity;
                 if (!acc) return;
-
-                // 改用絕對位移變化量，過濾掉緩慢的傾斜
                 let deltaX = Math.abs(acc.x - lastX);
                 let deltaY = Math.abs(acc.y - lastY);
                 let deltaZ = Math.abs(acc.z - lastZ);
-
-                // 計算單次移動的綜合強度
                 let movement = (deltaX + deltaY + deltaZ) / diffTime * 1000;
-
                 if (movement > SHAKE_THRESHOLD) {
                     const overlay = document.getElementById('answerOverlay');
                     if (overlay.classList.contains('hidden') && !isShuffling && !isAnimating) {
@@ -308,7 +361,6 @@
                         lastShakeUpdate = curTime + SHAKE_COOLDOWN;
                     }
                 }
-                
                 lastX = acc.x; lastY = acc.y; lastZ = acc.z;
                 if (curTime > lastShakeUpdate) lastShakeUpdate = curTime;
             }
@@ -433,7 +485,15 @@
                 document.getElementById('overlayText').textContent = text;
                 overlay.classList.replace('hidden', 'flex');
                 document.getElementById('answerContent').classList.add('animate-answer-pop');
-                playSound('pop'); isAnimating = false;
+                
+                // 判斷是否為杜杜龍卡片，播放不同音效
+                if (text === MANDATORY_CARD) {
+                    playSound('victory');
+                } else {
+                    playSound('pop');
+                }
+                
+                isAnimating = false;
             }, 350);
         }
 
@@ -530,7 +590,7 @@
             btn.disabled = true;
             cards.forEach((card, i) => {
                 const relX = grid.offsetWidth / 2 - (card.offsetLeft + card.offsetWidth / 2);
-                const relY = grid.offsetHeight / 2 - (card.offsetTop + card.offsetHeight / 2);
+                const relY = grid.offsetHeight / 2 - (card.offsetTop + card.offsetTop + card.offsetHeight / 2);
                 card.classList.add('is-shuffling-active');
                 card.style.transform = `translate3d(${relX}px, ${relY}px, 0) rotate(${1080 + i * 20}deg) scale(0)`;
                 card.style.opacity = '0';
