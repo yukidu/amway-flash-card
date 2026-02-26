@@ -7,25 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global variables provided by environment
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'better-you-book';
-
-        window.db = db;
-        window.auth = auth;
-        window.appId = appId;
-        window.firestoreUtils = { doc, setDoc, getDoc, collection, onSnapshot, updateDoc, arrayUnion };
-    </script>
-
     <style>
         :root {
             --primary: #FFD700;
@@ -97,15 +78,14 @@
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; position: relative; }
         .card-back { background-color: white !important; transform: rotateY(180deg); padding: 4px; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; }
 
-        /* --- 修改已完成卡片的淡化效果 --- */
         .card-completed .card-front { 
-            background-color: #e5e7eb !important; /* 稍微深一點的灰色 */
+            background-color: #e5e7eb !important;
             color: #6b7280 !important; 
             border-color: #d1d5db !important; 
             box-shadow: 2px 2px 0px rgba(0,0,0,0.1) !important; 
-            opacity: 0.85; /* 調高透明度，原本是 0.5 */
-            filter: grayscale(0.2); /* 降低灰階感 */
-            cursor: pointer; /* 恢復指針手勢 */
+            opacity: 0.85; 
+            filter: grayscale(0.2); 
+            cursor: pointer;
         }
         .card-completed { transform: scale(0.98); }
 
@@ -124,8 +104,12 @@
         .star-rating { display: flex; gap: 0.5rem; font-size: 2rem; cursor: pointer; }
         .star { color: #ccc; transition: transform 0.2s; }
         .star.active { color: #FFD700; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
-        
         .star-filled { color: #fbbf24; }
+        
+        .list-star { color: #ccc; cursor: pointer; font-size: 1.5rem; transition: transform 0.2s; }
+        .list-star.active { color: #fbbf24; }
+        .list-star:hover { transform: scale(1.2); }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
         .nav-btn {
@@ -134,7 +118,6 @@
         }
         .nav-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
 
-        /* Cloud Status UI */
         #cloudStatus { position: fixed; bottom: 20px; left: 20px; z-index: 50; display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 900; color: #666; background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 99px; border: 1px solid #ddd; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
         .status-online { background: #10b981; box-shadow: 0 0 5px #10b981; }
@@ -166,9 +149,9 @@
             </div>
 
             <div class="flex items-center gap-3 w-full md:w-auto">
-                <button onclick="randomStyle()" class="nav-btn bg-indigo-100 whitespace-nowrap text-sm">切換視覺 🎨</button>
+                <button onclick="window.randomStyle()" class="nav-btn bg-indigo-100 whitespace-nowrap text-sm">切換視覺 🎨</button>
                 <div class="relative flex-grow md:flex-grow-0">
-                    <select id="categorySelect" class="w-full text-sm" onchange="switchCategory(this.value)">
+                    <select id="categorySelect" class="w-full text-sm" onchange="window.switchCategory(this.value)">
                         <option disabled selected>載入中...</option>
                     </select>
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -183,14 +166,14 @@
         <main id="cardsGrid"></main>
 
         <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-6">
-            <button onclick="shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">重新洗牌 🔀</button>
-            <button onclick="openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">我的最愛 🌟</button>
-            <button onclick="shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2">分享 🚀</button>
+            <button onclick="window.shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">重新洗牌 🔀</button>
+            <button onclick="window.openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">我的最愛 🌟</button>
+            <button onclick="window.shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2">分享網頁 🚀</button>
         </footer>
     </div>
 
     <!-- 答案彈窗 -->
-    <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-sm cursor-pointer">
+    <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-sm cursor-pointer">
         <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative overflow-hidden cursor-default">
             <div class="relative z-20 flex flex-col items-center w-full text-center mt-4">
                 <div id="answerCategoryTag" class="text-2xl font-black uppercase mb-6 bg-black text-white px-6 py-2 skew-x-[-12deg]">分類</div>
@@ -199,23 +182,23 @@
             <div id="ratingSection" onclick="event.stopPropagation()" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
                 <p class="font-black text-black italic uppercase">給予星級評分 (自動收藏)</p>
                 <div class="star-rating" id="starRatingContainer">
-                    <span class="star" onclick="updateRatingFromUI(1)">★</span>
-                    <span class="star" onclick="updateRatingFromUI(2)">★</span>
-                    <span class="star" onclick="updateRatingFromUI(3)">★</span>
-                    <span class="star" onclick="updateRatingFromUI(4)">★</span>
-                    <span class="star" onclick="updateRatingFromUI(5)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(1)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(2)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(3)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(4)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(5)">★</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 我的最愛視窗 -->
-    <div id="favoriteModal" onclick="closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
+    <div id="favoriteModal" onclick="window.closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
         <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
             <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-black uppercase italic text-black">我的最愛 🌟</h2>
-                    <button onclick="shareListAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white uppercase">分享圖片 📸</button>
+                    <button onclick="window.shareListAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white uppercase flex items-center gap-1">分享圖片 📸</button>
                 </div>
             </div>
             <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
@@ -225,8 +208,17 @@
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black text-white px-8 py-4 font-black text-lg border-4 border-white shadow-2xl z-[1000] transition-all opacity-0 pointer-events-none uppercase"></div>
 
     <script type="module">
-        import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Config
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'better-you-book';
+
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
@@ -244,76 +236,77 @@
         let currentCategory = '', currentCardIndex = null, isAnimating = false, currentThemeId = 'pop';
         let currentUser = null;
 
-        // --- Firebase Data Sync Logic ---
+        // --- Firebase Sync ---
 
         async function syncProgress(cat, idx) {
             if (!currentUser) return;
-            const { doc, setDoc, updateDoc, arrayUnion } = window.firestoreUtils;
-            const userDocRef = doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'settings', 'progress');
-            try {
-                await setDoc(userDocRef, { [cat]: arrayUnion(idx) }, { merge: true });
-            } catch (err) { console.error("Sync Failed", err); }
+            const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'progress');
+            try { await setDoc(userDocRef, { [cat]: arrayUnion(idx) }, { merge: true }); } catch (err) { console.error(err); }
         }
 
         async function syncRating(text, category, stars) {
             if (!currentUser) return;
-            const { doc, setDoc } = window.firestoreUtils;
-            const ratingDocRef = doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'ratings', 'all');
+            const ratingDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'ratings', 'all');
             try {
                 cardMetadata[text] = { rating: stars, category };
                 await setDoc(ratingDocRef, { [text]: { rating: stars, category } }, { merge: true });
-            } catch (err) { console.error("Rating Sync Failed", err); }
+            } catch (err) { console.error(err); }
         }
 
         function setupSyncListeners() {
-            if (!currentUser) return;
-            const { doc, onSnapshot } = window.firestoreUtils;
-
-            onSnapshot(doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'settings', 'progress'), (snapshot) => {
+            onSnapshot(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'progress'), (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.data();
-                    Object.keys(data).forEach(cat => {
-                        categoryProgress[cat] = new Set(data[cat]);
-                    });
-                    renderCards(true);
-                    updateStats();
+                    Object.keys(data).forEach(cat => { categoryProgress[cat] = new Set(data[cat]); });
                 }
-            }, (err) => console.error("Progress listener error", err));
+                renderCards(true);
+                updateStats();
+                updateCloudStatus(true);
+            });
 
-            onSnapshot(doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'ratings', 'all'), (snapshot) => {
-                if (snapshot.exists()) {
-                    cardMetadata = snapshot.data();
-                }
-            }, (err) => console.error("Ratings listener error", err));
-
-            document.getElementById('statusDot').classList.add('status-online');
-            document.getElementById('statusText').textContent = "雲端同步中";
-            document.getElementById('userIdDisplay').textContent = `ID: ${currentUser.uid.substring(0, 8)}...`;
+            onSnapshot(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'ratings', 'all'), (snapshot) => {
+                if (snapshot.exists()) { cardMetadata = snapshot.data(); }
+                if (!document.getElementById('favoriteModal').classList.contains('hidden')) filterFavs();
+                updateCloudStatus(true);
+            });
         }
 
-        // --- Core App Logic ---
+        function updateCloudStatus(online) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            const idDisp = document.getElementById('userIdDisplay');
+            if (online && currentUser) {
+                dot.classList.add('status-online');
+                text.textContent = "雲端同步中";
+                idDisp.textContent = `ID: ${currentUser.uid.substring(0, 8)}...`;
+            }
+        }
+
+        // --- Core Functions ---
 
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
             loading.style.display = 'flex';
 
-            const initAuth = async () => {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(window.auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(window.auth);
-                }
-            };
-
-            onAuthStateChanged(window.auth, (user) => {
+            onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
                     setupSyncListeners();
+                } else {
+                    signInAnonymously(auth).catch(err => {
+                        console.error("Auth failed", err);
+                        renderCards(false); // 失敗也要顯示牌卡
+                    });
                 }
             });
 
-            await initAuth();
-            randomStyle();
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            window.randomStyle();
             await autoImportFromGoogleSheets();
             loading.style.display = 'none';
         };
@@ -333,11 +326,15 @@
                     });
                     applyNewGameData(newData);
                 }
-            } catch (err) { showToast("連線異常"); }
+            } catch (err) { 
+                showToast("連線異常，顯示預設卡片");
+                renderCards(false);
+            }
         }
 
         function applyNewGameData(newData) {
-            gameData = newData; checkMandatory();
+            gameData = newData; 
+            Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
             const palette = ["#FF4500", "#1E90FF", "#DA70D6", "#00CED1", "#32CD32", "#FF6347", "#FFD700", "#7CFC00", "#FF69B4", "#48D1CC"];
             const select = document.getElementById('categorySelect');
             select.innerHTML = '<option value="all">✨ 全部解答之書 ✨</option>';
@@ -349,18 +346,19 @@
                 opt.value = cat; opt.textContent = cat;
                 select.appendChild(opt);
             });
-            switchCategory('all');
+            window.switchCategory('all');
         }
 
-        function switchCategory(cat) {
+        window.switchCategory = (cat) => {
             currentCategory = cat;
             document.documentElement.style.setProperty('--primary', cat === 'all' ? '#cbd5e1' : categoryColors[cat]);
             renderCards(false);
             updateStats();
-        }
+        };
 
         function renderCards(skip = true) {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
+            if (Object.keys(gameData).length === 0) return;
             const cats = currentCategory === 'all' ? Object.keys(gameData) : [currentCategory];
             let displayCounter = 1;
             cats.forEach(cat => {
@@ -381,20 +379,19 @@
                                 <div style="font-size:3rem;">${mandatory ? '🐲' : '💎'}</div>
                             </div>
                         </div>`;
-                    
-                    container.onclick = () => handleCardClick(cat, i);
+                    container.onclick = () => window.handleCardClick(cat, i);
                     grid.appendChild(container);
                     displayCounter++;
                 });
             });
         }
 
-        window.handleCardClick = function(cat, idx) {
-            if (isAnimating) return; // 移除點擊限制，允許重複翻開
+        window.handleCardClick = (cat, idx) => {
+            if (isAnimating) return;
             isAnimating = true;
-            document.getElementById(`card-${cat}-${idx}`).classList.add('is-flipped');
+            const el = document.getElementById(`card-${cat}-${idx}`);
+            if (el) el.classList.add('is-flipped');
             const text = gameData[cat][idx], mandatory = (text === MANDATORY_CARD);
-            
             setTimeout(() => {
                 document.getElementById('overlayText').textContent = text;
                 document.getElementById('answerCategoryTag').textContent = cat;
@@ -406,22 +403,24 @@
             }, 350);
         };
 
-        window.updateRatingFromUI = function(s) {
+        window.updateRatingFromUI = (s) => {
             const info = currentCardIndex;
             const text = gameData[info.cat][info.idx];
             syncRating(text, info.cat, s);
             updateStarUI(s);
         };
 
+        window.updateRatingFromFav = (text, cat, s) => { syncRating(text, cat, s); };
+
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
 
-        window.closeAnswer = function() {
+        window.closeAnswer = () => {
             const overlay = document.getElementById('answerOverlay');
             if (overlay.classList.contains('hidden')) return;
             overlay.classList.replace('flex', 'hidden');
             const info = currentCardIndex;
-            document.getElementById(`card-${info.cat}-${info.idx}`).classList.remove('is-flipped');
-            
+            const el = document.getElementById(`card-${info.cat}-${info.idx}`);
+            if (el) el.classList.remove('is-flipped');
             if (!categoryProgress[info.cat]?.has(info.idx)) {
                 categoryProgress[info.cat].add(info.idx);
                 syncProgress(info.cat, info.idx);
@@ -431,20 +430,15 @@
             currentCardIndex = null;
         };
 
-        window.randomStyle = function() {
+        window.randomStyle = () => {
             let newTheme; do { newTheme = THEMES[Math.floor(Math.random() * THEMES.length)]; } while (newTheme.id === currentThemeId);
             currentThemeId = newTheme.id; document.body.className = `theme-${currentThemeId}`;
             showToast(`風格：${newTheme.name}`);
         };
 
-        window.shuffleGame = function() {
-            Object.keys(gameData).forEach(cat => {
-                gameData[cat].sort(() => Math.random() - 0.5);
-                categoryProgress[cat].clear();
-            });
-            renderCards(false);
-            updateStats();
-            showToast("已重新洗牌");
+        window.shuffleGame = () => {
+            Object.keys(gameData).forEach(cat => { gameData[cat].sort(() => Math.random() - 0.5); categoryProgress[cat].clear(); });
+            renderCards(false); updateStats(); showToast("已重新洗牌");
         };
 
         function updateStats() {
@@ -457,25 +451,59 @@
             document.getElementById('statRemaining').textContent = total - done;
         }
 
-        window.openFavoriteModal = function() { document.getElementById('favoriteModal').classList.replace('hidden', 'flex'); filterFavs(); };
-        window.closeFavoriteModal = function() { document.getElementById('favoriteModal').classList.replace('flex', 'hidden'); };
+        window.openFavoriteModal = () => { document.getElementById('favoriteModal').classList.replace('hidden', 'flex'); filterFavs(); };
+        window.closeFavoriteModal = () => { document.getElementById('favoriteModal').classList.replace('flex', 'hidden'); };
         
         function filterFavs() {
             const list = document.getElementById('favoriteList'); list.innerHTML = '';
-            const items = Object.keys(cardMetadata).filter(t => cardMetadata[t].rating > 0 && t !== MANDATORY_CARD);
+            const items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.rating > 0 && i.text !== MANDATORY_CARD);
             if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">尚無收藏</p>'; return; }
-            items.forEach(t => {
-                const item = cardMetadata[t];
+            items.sort((a, b) => b.rating - a.rating).forEach(item => {
                 const div = document.createElement('div');
                 div.className = "bg-gray-50 border-4 border-black p-4 shadow-[4px_4px_0px_#000]";
-                div.innerHTML = `<span class="text-[10px] font-black bg-black text-white px-2 py-0.5 uppercase italic">${item.category}</span><p class="font-black text-lg mt-1">${t}</p><p class="text-yellow-500 font-black">★ ${item.rating}</p>`;
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<span class="list-star ${i <= item.rating ? 'active' : ''}" onclick="window.updateRatingFromFav('${item.text.replace(/'/g, "\\'")}', '${item.category}', ${i})">★</span>`;
+                }
+                div.innerHTML = `<div class="flex justify-between items-start mb-2"><span class="text-[10px] font-black bg-black text-white px-2 py-0.5 uppercase italic">${item.category}</span><div class="flex gap-1">${starsHtml}</div></div><p class="font-black text-lg text-black leading-snug">${item.text}</p>`;
                 list.appendChild(div);
             });
         }
 
-        function parseCSV(text) {
-            let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
-            for (l of text) {
+        window.shareApp = async () => {
+            const data = { title: '改變生命未來式', text: '這是一個解答之書，快來試試！', url: window.location.href };
+            if (navigator.share) { try { await navigator.share(data); } catch (e) { copyToClipboard(window.location.href); } }
+            else { copyToClipboard(window.location.href); }
+        };
+
+        window.shareListAsImage = async () => {
+            showToast("正在產生圖片...");
+            const temp = document.createElement('div');
+            Object.assign(temp.style, { position: 'fixed', top: '0', left: '-5000px', width: '500px', background: 'white', padding: '40px' });
+            temp.innerHTML = `<div style="border: 8px solid black; padding: 30px;"><h1 style="font-size: 24px; font-weight: 900; text-align: center; margin-bottom: 30px;">改變生命未來式</h1><div id="tempContent"></div></div>`;
+            const content = temp.querySelector('#tempContent');
+            const items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.rating > 0 && i.text !== MANDATORY_CARD);
+            items.sort((a,b) => b.rating - a.rating).forEach(i => {
+                content.innerHTML += `<div style="border-left: 10px solid black; padding: 15px; margin-bottom: 20px; background: #f9fafb;"><div style="font-size: 10px; font-weight: 900; background: black; color: white; display: inline-block; padding: 2px 8px; margin-bottom: 8px;">${i.category}</div><div style="font-size: 18px; font-weight: 800; color: black;">${i.text}</div><div style="color: #fbbf24; font-size: 20px;">${'★'.repeat(i.rating)}</div></div>`;
+            });
+            document.body.appendChild(temp);
+            const canvas = await html2canvas(temp, { scale: 2 });
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], 'Favorites.png', { type: 'image/png' });
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file] }); } catch (e) { downloadImage(canvas); } }
+                else { downloadImage(canvas); }
+            });
+            document.body.removeChild(temp);
+        };
+
+        function copyToClipboard(t) {
+            const i = document.createElement('input'); i.value = t; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i);
+            showToast("連結已複製");
+        }
+        function downloadImage(c) { const l = document.createElement('a'); l.download = 'Favorites.png'; l.href = c.toDataURL(); l.click(); showToast("已下載"); }
+        function parseCSV(t) {
+            let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0;
+            for (let l of t) {
                 if ('"' === l) { if (s && l === p) row[i] += l; s = !s; }
                 else if (',' === l && s) l = row[++i] = '';
                 else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; }
@@ -484,22 +512,9 @@
             }
             return ret;
         }
+        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2500); }
 
-        function checkMandatory() { Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); }); }
-        function showToast(msg) {
-            const t = document.getElementById('toast'); t.textContent = msg;
-            t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2000);
-        }
-        window.shareApp = function() { showToast("已複製連結"); };
-
-        window.onload = () => {
-            const checker = setInterval(() => {
-                if (window.db) {
-                    clearInterval(checker);
-                    window.initApp();
-                }
-            }, 100);
-        };
+        window.initApp();
     </script>
 </body>
 </html>
