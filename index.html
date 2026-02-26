@@ -118,12 +118,18 @@
         }
         .nav-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
 
+        .tab-btn {
+            padding: 0.5rem 1rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
+            white-space: nowrap; font-size: 0.75rem; transition: all 0.2s;
+        }
+        .tab-btn.active { background: black; color: white; }
+
         #cloudStatus { position: fixed; bottom: 20px; left: 20px; z-index: 50; display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 900; color: #666; background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 99px; border: 1px solid #ddd; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
         .status-online { background: #10b981; box-shadow: 0 0 5px #10b981; }
     </style>
 </head>
-<body class="theme-pop">
+<body class="theme-pop" onclick="window.initAudio()">
     <div id="aiLoading" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-8 border-black mb-4"></div>
         <p class="text-black font-black text-2xl italic">數據同步中...</p>
@@ -167,7 +173,7 @@
 
         <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-6">
             <button onclick="window.shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">重新洗牌 🔀</button>
-            <button onclick="window.openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">我的最愛 🌟</button>
+            <button onclick="window.openRecordModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">翻牌紀錄 🌟</button>
             <button onclick="window.shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2">分享網頁 🚀</button>
         </footer>
     </div>
@@ -180,7 +186,7 @@
                 <div id="overlayText" class="text-3xl md:text-5xl font-black leading-tight text-black mb-8"></div>
             </div>
             <div id="ratingSection" onclick="event.stopPropagation()" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
-                <p class="font-black text-black italic uppercase">給予星級評分 (自動收藏)</p>
+                <p class="font-black text-black italic uppercase">給予星級評分 (加入收藏)</p>
                 <div class="star-rating" id="starRatingContainer">
                     <span class="star" onclick="window.updateRatingFromUI(1)">★</span>
                     <span class="star" onclick="window.updateRatingFromUI(2)">★</span>
@@ -192,13 +198,22 @@
         </div>
     </div>
 
-    <!-- 我的最愛視窗 -->
-    <div id="favoriteModal" onclick="window.closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
+    <!-- 翻牌紀錄視窗 -->
+    <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
         <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
             <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-black uppercase italic text-black">我的最愛 🌟</h2>
-                    <button onclick="window.shareListAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white uppercase flex items-center gap-1">分享圖片 📸</button>
+                    <h2 class="text-2xl font-black uppercase italic text-black">翻牌紀錄 📜</h2>
+                    <button onclick="window.shareRecordAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white uppercase flex items-center gap-1">匯出圖片 📸</button>
+                </div>
+                <div class="flex gap-2 overflow-x-auto no-scrollbar py-1" id="recordTabs">
+                    <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部紀錄</button>
+                    <button onclick="window.changeRecordTab('rated')" class="tab-btn" data-tab="rated">所有已評價</button>
+                    <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5星級</button>
+                    <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4星級</button>
+                    <button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3星級</button>
+                    <button onclick="window.changeRecordTab('star2')" class="tab-btn" data-tab="star2">2星級</button>
+                    <button onclick="window.changeRecordTab('star1')" class="tab-btn" data-tab="star1">1星級</button>
                 </div>
             </div>
             <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
@@ -235,25 +250,62 @@
         let gameData = {}, categoryProgress = {}, categoryColors = {}, cardMetadata = {};
         let currentCategory = '', currentCardIndex = null, isAnimating = false, currentThemeId = 'pop';
         let currentUser = null;
+        let audioCtx = null;
+        let currentTab = 'all';
+
+        // --- 音效系統 ---
+        window.initAudio = () => {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        };
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), now = audioCtx.currentTime;
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if (type === 'pop') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
+                gain.gain.setValueAtTime(0.02, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            }
+        }
 
         // --- Firebase Sync ---
-
-        async function syncProgress(cat, idx) {
+        async function syncProgress(cat, idx, text) {
             if (!currentUser) return;
             const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'progress');
-            try { await setDoc(userDocRef, { [cat]: arrayUnion(idx) }, { merge: true }); } catch (err) { console.error(err); }
+            const metadataDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'ratings', 'all');
+            const flipTime = Date.now();
+            try { 
+                await setDoc(userDocRef, { [cat]: arrayUnion(idx) }, { merge: true });
+                if (!cardMetadata[text]) {
+                    await setDoc(metadataDocRef, { [text]: { category: cat, flipTimestamp: flipTime, rating: 0 } }, { merge: true });
+                }
+            } catch (err) { console.error(err); }
         }
 
         async function syncRating(text, category, stars) {
             if (!currentUser) return;
             const ratingDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'ratings', 'all');
+            const timestamp = Date.now(); 
             try {
-                cardMetadata[text] = { rating: stars, category };
-                await setDoc(ratingDocRef, { [text]: { rating: stars, category } }, { merge: true });
+                const currentMeta = cardMetadata[text] || {};
+                const updateData = { 
+                    rating: stars, 
+                    category, 
+                    timestamp, 
+                    flipTimestamp: currentMeta.flipTimestamp || timestamp 
+                };
+                cardMetadata[text] = updateData;
+                await setDoc(ratingDocRef, { [text]: updateData }, { merge: true });
             } catch (err) { console.error(err); }
         }
 
         function setupSyncListeners() {
+            if (!currentUser) return;
+
+            // 重要：即使文檔不存在也要觸發更新，解決新使用者「一直連線中」的問題
             onSnapshot(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'settings', 'progress'), (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.data();
@@ -262,12 +314,18 @@
                 renderCards(true);
                 updateStats();
                 updateCloudStatus(true);
+            }, (err) => {
+                console.error("Progress listener error", err);
+                updateCloudStatus(false);
             });
 
             onSnapshot(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'ratings', 'all'), (snapshot) => {
                 if (snapshot.exists()) { cardMetadata = snapshot.data(); }
-                if (!document.getElementById('favoriteModal').classList.contains('hidden')) filterFavs();
+                if (!document.getElementById('recordModal').classList.contains('hidden')) filterFavs();
                 updateCloudStatus(true);
+            }, (err) => {
+                console.error("Ratings listener error", err);
+                updateCloudStatus(false);
             });
         }
 
@@ -279,35 +337,43 @@
                 dot.classList.add('status-online');
                 text.textContent = "雲端同步中";
                 idDisp.textContent = `ID: ${currentUser.uid.substring(0, 8)}...`;
+            } else {
+                dot.classList.remove('status-online');
+                text.textContent = "連線異常/離線";
             }
         }
 
         // --- Core Functions ---
-
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
             loading.style.display = 'flex';
 
+            // 先加載基本數據（即使沒聯網也要能看）
+            await autoImportFromGoogleSheets();
+            window.randomStyle();
+
+            // 處理身份驗證
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
                     setupSyncListeners();
                 } else {
+                    // 如果沒登入則嘗試匿名登入
                     signInAnonymously(auth).catch(err => {
                         console.error("Auth failed", err);
-                        renderCards(false); // 失敗也要顯示牌卡
+                        updateCloudStatus(false);
                     });
                 }
             });
 
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch(e) { console.error("Initial auth error", e); }
 
-            window.randomStyle();
-            await autoImportFromGoogleSheets();
             loading.style.display = 'none';
         };
 
@@ -327,7 +393,7 @@
                     applyNewGameData(newData);
                 }
             } catch (err) { 
-                showToast("連線異常，顯示預設卡片");
+                showToast("連線異常");
                 renderCards(false);
             }
         }
@@ -379,6 +445,7 @@
                                 <div style="font-size:3rem;">${mandatory ? '🐲' : '💎'}</div>
                             </div>
                         </div>`;
+                    
                     container.onclick = () => window.handleCardClick(cat, i);
                     grid.appendChild(container);
                     displayCounter++;
@@ -399,6 +466,7 @@
                 updateStarUI(cardMetadata[text]?.rating || 0);
                 currentCardIndex = { cat, idx };
                 document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
+                playSound('pop');
                 isAnimating = false;
             }, 350);
         };
@@ -421,9 +489,10 @@
             const info = currentCardIndex;
             const el = document.getElementById(`card-${info.cat}-${info.idx}`);
             if (el) el.classList.remove('is-flipped');
+            
             if (!categoryProgress[info.cat]?.has(info.idx)) {
                 categoryProgress[info.cat].add(info.idx);
-                syncProgress(info.cat, info.idx);
+                syncProgress(info.cat, info.idx, gameData[info.cat][info.idx]);
                 renderCards(true);
                 updateStats();
             }
@@ -451,14 +520,35 @@
             document.getElementById('statRemaining').textContent = total - done;
         }
 
-        window.openFavoriteModal = () => { document.getElementById('favoriteModal').classList.replace('hidden', 'flex'); filterFavs(); };
-        window.closeFavoriteModal = () => { document.getElementById('favoriteModal').classList.replace('flex', 'hidden'); };
+        window.openRecordModal = () => { document.getElementById('recordModal').classList.replace('hidden', 'flex'); filterFavs(); };
+        window.closeRecordModal = () => { document.getElementById('recordModal').classList.replace('flex', 'hidden'); };
         
+        window.changeRecordTab = (tab) => {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+            });
+            filterFavs();
+        }
+
         function filterFavs() {
             const list = document.getElementById('favoriteList'); list.innerHTML = '';
-            const items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.rating > 0 && i.text !== MANDATORY_CARD);
-            if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">尚無收藏</p>'; return; }
-            items.sort((a, b) => b.rating - a.rating).forEach(item => {
+            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
+
+            if (currentTab === 'all') {
+                items.sort((a, b) => (b.flipTimestamp || 0) - (a.flipTimestamp || 0));
+            } else if (currentTab === 'rated') {
+                items = items.filter(i => i.rating > 0);
+                items.sort((a, b) => b.rating - a.rating || (b.timestamp || 0) - (a.timestamp || 0));
+            } else if (currentTab.startsWith('star')) {
+                const starCount = parseInt(currentTab.replace('star', ''));
+                items = items.filter(i => i.rating === starCount);
+                items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            }
+            
+            if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">尚無紀錄</p>'; return; }
+            
+            items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = "bg-gray-50 border-4 border-black p-4 shadow-[4px_4px_0px_#000]";
                 let starsHtml = '';
@@ -476,31 +566,46 @@
             else { copyToClipboard(window.location.href); }
         };
 
-        window.shareListAsImage = async () => {
-            showToast("正在產生圖片...");
+        window.shareRecordAsImage = async () => {
+            showToast("正在匯出當前頁面...");
             const temp = document.createElement('div');
             Object.assign(temp.style, { position: 'fixed', top: '0', left: '-5000px', width: '500px', background: 'white', padding: '40px' });
-            temp.innerHTML = `<div style="border: 8px solid black; padding: 30px;"><h1 style="font-size: 24px; font-weight: 900; text-align: center; margin-bottom: 30px;">改變生命未來式</h1><div id="tempContent"></div></div>`;
+            
+            let tabName = "翻牌紀錄";
+            if (currentTab === 'rated') tabName = "所有已評價紀錄";
+            else if (currentTab.startsWith('star')) tabName = `${currentTab.replace('star', '')} 星級紀錄`;
+
+            temp.innerHTML = `<div style="border: 8px solid black; padding: 30px;"><h1 style="font-size: 24px; font-weight: 900; text-align: center; margin-bottom: 5px;">改變生命未來式</h1><p style="text-align:center; font-weight:bold; opacity:0.6; margin-bottom:25px;">[ ${tabName} ]</p><div id="tempContent"></div></div>`;
             const content = temp.querySelector('#tempContent');
-            const items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.rating > 0 && i.text !== MANDATORY_CARD);
-            items.sort((a,b) => b.rating - a.rating).forEach(i => {
-                content.innerHTML += `<div style="border-left: 10px solid black; padding: 15px; margin-bottom: 20px; background: #f9fafb;"><div style="font-size: 10px; font-weight: 900; background: black; color: white; display: inline-block; padding: 2px 8px; margin-bottom: 8px;">${i.category}</div><div style="font-size: 18px; font-weight: 800; color: black;">${i.text}</div><div style="color: #fbbf24; font-size: 20px;">${'★'.repeat(i.rating)}</div></div>`;
+            
+            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
+            if (currentTab === 'all') { items.sort((a, b) => (b.flipTimestamp || 0) - (a.flipTimestamp || 0)); }
+            else if (currentTab === 'rated') { items = items.filter(i => i.rating > 0); items.sort((a, b) => b.rating - a.rating || (b.timestamp || 0) - (a.timestamp || 0)); }
+            else if (currentTab.startsWith('star')) { const starCount = parseInt(currentTab.replace('star', '')); items = items.filter(i => i.rating === starCount); items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); }
+
+            if (items.length === 0) { showToast("無內容可匯出"); return; }
+            items.forEach(i => {
+                const stars = i.rating > 0 ? '★'.repeat(i.rating) : '未評價';
+                content.innerHTML += `<div style="border-left: 10px solid black; padding: 15px; margin-bottom: 20px; background: #f9fafb;"><div style="font-size: 10px; font-weight: 900; background: black; color: white; display: inline-block; padding: 2px 8px; margin-bottom: 8px;">${i.category}</div><div style="font-size: 18px; font-weight: 800; color: black; line-height:1.4;">${i.text}</div><div style="color: #fbbf24; font-size: 20px; margin-top:5px;">${stars}</div></div>`;
             });
+            
             document.body.appendChild(temp);
-            const canvas = await html2canvas(temp, { scale: 2 });
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], 'Favorites.png', { type: 'image/png' });
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file] }); } catch (e) { downloadImage(canvas); } }
-                else { downloadImage(canvas); }
-            });
-            document.body.removeChild(temp);
+            try {
+                const canvas = await html2canvas(temp, { scale: 2 });
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], `Record_${currentTab}.png`, { type: 'image/png' });
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { 
+                        try { await navigator.share({ files: [file], title: tabName }); } catch (e) { downloadImage(canvas, currentTab); } 
+                    } else { downloadImage(canvas, currentTab); }
+                });
+            } catch (e) { showToast("圖片產生失敗"); } finally { document.body.removeChild(temp); }
         };
 
         function copyToClipboard(t) {
             const i = document.createElement('input'); i.value = t; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i);
             showToast("連結已複製");
         }
-        function downloadImage(c) { const l = document.createElement('a'); l.download = 'Favorites.png'; l.href = c.toDataURL(); l.click(); showToast("已下載"); }
+        function downloadImage(c, tab) { const l = document.createElement('a'); l.download = `Record_${tab}.png`; l.href = c.toDataURL(); l.click(); showToast("已下載圖片"); }
         function parseCSV(t) {
             let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0;
             for (let l of t) {
