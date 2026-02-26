@@ -94,14 +94,61 @@
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.2rem; opacity: 0.25; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
-        .custom-select-wrapper { position: relative; max-width: 140px; width: 100%; }
-        #categorySelect {
-            appearance: none; width: 100%; padding: 0.5rem 2rem 0.5rem 1rem;
-            background: #fff; border: 3px solid #000; box-shadow: 4px 4px 0px #000;
-            font-size: 1.1rem; font-weight: 900; border-radius: 12px; cursor: pointer;
-            outline: none; transition: all 0.2s;
+        /* 自定義選單外觀 */
+        .custom-dropdown {
+            position: relative;
+            width: 130px;
+            font-weight: 900;
+            z-index: 50;
         }
-        #categorySelect:active { transform: translate(2px, 2px); box-shadow: 0px 0px 0px #000; }
+        .dropdown-trigger {
+            background: #fff;
+            border: 4px solid #000;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            box-shadow: 4px 4px 0px #000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 180px;
+            background: #fff;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0px #000;
+            border-radius: 16px;
+            max-height: 350px;
+            overflow-y: auto;
+            display: none;
+            padding: 8px 0;
+        }
+        .dropdown-options.active {
+            display: block;
+            animation: dropdownSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 1.1rem;
+        }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background: #000; color: #fff; }
+        .dropdown-item.selected { background: #FFD700; color: #000; }
+
+        @keyframes dropdownSlide {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
 
         footer button { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         footer button:active { transform: scale(0.9) rotate(-5deg); }
@@ -151,11 +198,16 @@
                 </div>
 
                 <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <button onclick="window.randomStyle()" class="nav-btn text-xs px-3 py-2 bg-yellow-400">變身！✨</button>
-                    <div class="custom-select-wrapper">
-                        <select id="categorySelect" onchange="window.switchCategory(this.value)">
-                            <option disabled selected>載入中</option>
-                        </select>
+                    <button onclick="window.randomStyle()" class="nav-btn text-xs px-3 py-2 bg-yellow-400 font-black rounded-lg border-2 border-black">變身！✨</button>
+                    <!-- 自定義下拉選單 -->
+                    <div class="custom-dropdown" id="categoryDropdownContainer">
+                        <div class="dropdown-trigger" id="dropdownTrigger" onclick="window.toggleDropdown()">
+                            <span id="dropdownLabel">🌟 全部</span>
+                            <span class="text-xs ml-1">▼</span>
+                        </div>
+                        <div class="dropdown-options no-scrollbar" id="dropdownOptions">
+                            <!-- 選項會在此自動生成 -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -220,7 +272,7 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <!-- 匯出模板 (優化隱藏與靜態呈現) -->
+    <!-- 匯出模板 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background:white; font-family:'PingFang TC', sans-serif; color:black; z-index: -1;">
         <div id="exportInner" style="padding: 60px;">
             <div style="text-align:center;">
@@ -248,12 +300,29 @@
         ];
 
         let gameData = {}, categoryProgress = {}, cardMetadata = {}, allCategoryItems = [];
-        let currentCategory = 'all', currentCardIndex = null, currentThemeId = 'jelly', audioCtx = null, currentTab = 'all';
+        let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all';
 
         window.initInteraction = () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
         };
+
+        // 自定義下拉選單邏輯
+        window.toggleDropdown = (e) => {
+            if (e) e.stopPropagation();
+            document.getElementById('dropdownOptions').classList.toggle('active');
+        };
+
+        window.closeDropdown = () => {
+            document.getElementById('dropdownOptions').classList.remove('active');
+        };
+
+        // 監聽外部點擊以關閉選單
+        window.addEventListener('click', (e) => {
+            if (!document.getElementById('categoryDropdownContainer').contains(e.target)) {
+                window.closeDropdown();
+            }
+        });
 
         function playSound(type) {
             if (!audioCtx) return;
@@ -293,7 +362,6 @@
 
         window.randomStyle = (skip) => {
             const next = THEMES[Math.floor(Math.random() * THEMES.length)];
-            currentThemeId = next.id;
             document.body.className = `theme-${next.id}`;
             const h = Math.floor(Math.random() * 360);
             document.documentElement.style.setProperty('--primary', `hsl(${h}, 95%, 75%)`);
@@ -321,19 +389,47 @@
                     });
                     gameData = newData;
                     Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
-                    const s = document.getElementById('categorySelect');
-                    s.innerHTML = '<option value="all">🌟 全部</option>';
+                    
+                    // 更新自定義下拉選單選項
+                    const optionsContainer = document.getElementById('dropdownOptions');
+                    optionsContainer.innerHTML = '';
+                    
+                    const createItem = (val, label) => {
+                        const div = document.createElement('div');
+                        div.className = `dropdown-item ${currentCategory === val ? 'selected' : ''}`;
+                        div.textContent = label;
+                        div.onclick = (e) => {
+                            e.stopPropagation();
+                            window.switchCategory(val);
+                            window.closeDropdown();
+                        };
+                        return div;
+                    };
+                    
+                    optionsContainer.appendChild(createItem('all', '🌟 全部'));
                     Object.keys(gameData).forEach(cat => {
                         if (!categoryProgress[cat]) categoryProgress[cat] = new Set();
-                        const opt = document.createElement('option'); opt.value = cat; opt.textContent = cat; s.appendChild(opt);
+                        optionsContainer.appendChild(createItem(cat, cat));
                     });
+                    
                     allCategoryItems = [];
                     window.switchCategory('all');
                 }
             } catch (e) { showToast("訊號微弱..."); }
         }
 
-        window.switchCategory = (cat) => { currentCategory = cat; renderCards(); updateStats(); };
+        window.switchCategory = (cat) => { 
+            currentCategory = cat; 
+            document.getElementById('dropdownLabel').textContent = cat === 'all' ? '🌟 全部' : cat;
+            
+            // 更新選項的高亮狀態
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.toggle('selected', item.textContent === (cat === 'all' ? '🌟 全部' : cat));
+            });
+            
+            renderCards(); 
+            updateStats(); 
+        };
 
         function renderCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
@@ -418,7 +514,6 @@
             updateStarUI(s); showToast(`${s} 星好評！`);
         };
 
-        // 紀錄中點擊星星更新評價
         window.updateRatingFromFav = (text, cat, s) => {
             cardMetadata[text] = { rating: s, category: cat, flipTimestamp: Date.now() };
             localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
@@ -481,24 +576,18 @@
             showToast("生成圖片中...");
             const temp = document.getElementById('exportTemplate');
             try {
-                // 強制將樣式設為可見以進行擷取
                 temp.style.left = "0";
                 temp.style.zIndex = "10000";
-                
                 const canvas = await html2canvas(temp, { 
                     scale: 2, 
                     useCORS: true,
                     backgroundColor: 'white',
                     logging: false
                 });
-                
-                // 還原隱藏
                 temp.style.left = "-5000px";
                 temp.style.zIndex = "-1";
-
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
                 const file = new File([blob], 'BetterYou.png', { type: 'image/png' });
-                
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({ files: [file], title: '改變生命未來式' });
                 } else {
@@ -509,7 +598,6 @@
                     showToast("已下載 💾");
                 }
             } catch (e) { 
-                console.error(e);
                 showToast("生成失敗");
                 temp.style.left = "-5000px";
             }
