@@ -241,6 +241,17 @@
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
+        // 定義視覺風格清單
+        const THEMES = [
+            { id: "pop", name: "普普風" }, { id: "cloud", name: "雲朵風" }, { id: "leaf", name: "自然風" },
+            { id: "gem", name: "鑽石風" }, { id: "stamp", name: "郵票風" }, { id: "bold", name: "粗獷風" },
+            { id: "pill", name: "藥丸風" }, { id: "slanted", name: "歪斜風" }, { id: "double", name: "經典風" },
+            { id: "organic", name: "有機風" }, { id: "ticket", name: "票券風" }, { id: "shadow", name: "立體風" },
+            { id: "retro-lcd", name: "懷舊風" }, { id: "frame", name: "畫框風" }, { id: "bubble", name: "泡泡風" },
+            { id: "blueprint", name: "藍圖風" }, { id: "origami", name: "摺紙風" }, { id: "candy-cane", name: "糖果風" },
+            { id: "tech-light", name: "科技風" }, { id: "notebook", name: "筆記風" }
+        ];
+
         let gameData = {}, categoryProgress = {}, categoryColors = {}, cardMetadata = {};
         let currentCategory = '', currentCardIndex = null, isAnimating = false, currentThemeId = 'pop';
         let audioCtx = null, currentTab = 'all';
@@ -272,9 +283,15 @@
 
         function updateWelcomeUI(name) {
             const msg = `歡迎 ${name} 一起改變生命未來式`;
-            document.getElementById('welcomeMsg').textContent = msg;
-            document.getElementById('welcomeMsg').classList.remove('hidden');
-            document.getElementById('welcomeMsgMobile').textContent = msg;
+            const welcomeMsg = document.getElementById('welcomeMsg');
+            const welcomeMsgMobile = document.getElementById('welcomeMsgMobile');
+            if (welcomeMsg) {
+                welcomeMsg.textContent = msg;
+                welcomeMsg.classList.remove('hidden');
+            }
+            if (welcomeMsgMobile) {
+                welcomeMsgMobile.textContent = msg;
+            }
         }
 
         window.saveUserName = () => {
@@ -372,7 +389,8 @@
             if (overlay.classList.contains('hidden')) return;
             overlay.classList.replace('flex', 'hidden');
             const info = currentCardIndex;
-            document.getElementById(`card-${info.cat}-${info.idx}`).classList.remove('is-flipped');
+            const el = document.getElementById(`card-${info.cat}-${info.idx}`);
+            if (el) el.classList.remove('is-flipped');
             if (!categoryProgress[info.cat]?.has(info.idx)) {
                 categoryProgress[info.cat].add(info.idx);
                 if (!cardMetadata[info.text]) cardMetadata[info.text] = { category: info.cat, flipTimestamp: Date.now(), rating: 0 };
@@ -393,7 +411,8 @@
                 total += gameData[cat].filter(t => t !== MANDATORY_CARD).length;
                 gameData[cat].forEach((t, i) => { if (t !== MANDATORY_CARD && categoryProgress[cat].has(i)) done++; });
             });
-            document.getElementById('statCompleted').textContent = done;
+            const statCompleted = document.getElementById('statCompleted');
+            if (statCompleted) statCompleted.textContent = done;
         }
 
         window.openRecordModal = () => {
