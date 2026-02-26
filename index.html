@@ -6,6 +6,26 @@
     <title>改變生命未來式 Be A Better You</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by environment
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'better-you-book';
+
+        window.db = db;
+        window.auth = auth;
+        window.appId = appId;
+        window.firestoreUtils = { doc, setDoc, getDoc, collection, onSnapshot, updateDoc, arrayUnion };
+    </script>
+
     <style>
         :root {
             --primary: #FFD700;
@@ -20,7 +40,7 @@
             --bg-size: 20px 20px;
         }
 
-        /* --- 20 種極大差異的明亮風格 --- */
+        /* --- 20 種風格樣式 --- */
         body.theme-pop { --bg: #f3f4f6; --dark: #000; --card-border: 4px solid #000; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --card-rotate: -2deg; }
         body.theme-cloud { --bg: #f0f9ff; --dark: #0369a1; --card-border: 6px solid #fff; --card-shadow: 0 15px 30px rgba(0,0,0,0.1); --card-radius: 50%; }
         body.theme-leaf { --bg: #f0fdf4; --dark: #166534; --card-border: 3px solid #166534; --card-shadow: 4px 4px 0px #bbf7d0; --card-radius: 0 2rem 0 2rem; }
@@ -31,7 +51,7 @@
         body.theme-slanted { --bg: #fffcf0; --dark: #451a03; --card-border: 3px solid #451a03; --card-shadow: 10px 10px 0px #fef3c7; --card-radius: 0; --card-rotate: 5deg; }
         body.theme-double { --bg: #f8fafc; --dark: #1e293b; --card-border: 8px double #1e293b; --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); --card-radius: 1.5rem; }
         body.theme-organic { --bg: #fffafb; --dark: #9f1239; --card-border: 3px solid #fb7185; --card-shadow: 0 10px 20px rgba(251,113,133,0.2); --card-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-        body.theme-ticket { --bg: #ffffff; --dark: #1d4ed8; --card-border: 2px dashed #1d4ed8; --card-shadow: 5px 5px 0px #dbeafe; --card-radius: 0.5rem; --card-clip: path('M 0,20 A 20,20 0 0 1 20,0 H 130 A 20,20 0 0 1 150,20 V 55 A 15,15 0 0 0 150,85 V 130 A 20,20 0 0 1 130,150 H 20 A 20,20 0 0 1 0,130 V 85 A 15,15 0 0 0 0,55 Z'); }
+        body.theme-ticket { --bg: #ffffff; --dark: #1d4ed8; --card-border: 2px dashed #1d4ed8; --card-shadow: 5px 5px 0px #dbeafe; --card-radius: 0.5rem; }
         body.theme-shadow { --bg: #f9fafb; --dark: #111827; --card-border: 1px solid #e5e7eb; --card-shadow: 20px 20px 60px #d1d5db, -20px -20px 60px #ffffff; --card-radius: 2rem; }
         body.theme-retro-lcd { --bg: #e2e8f0; --dark: #0f172a; --card-border: 10px ridge #94a3b8; --card-shadow: inset 0 0 10px rgba(0,0,0,0.2); --card-radius: 0; }
         body.theme-frame { --bg: #fafaf9; --dark: #444; --card-border: 2px solid #ccc; --card-shadow: 0 0 0 10px #fff, 0 0 0 12px #ccc, 0 15px 30px rgba(0,0,0,0.1); --card-radius: 0; }
@@ -77,18 +97,18 @@
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; position: relative; }
         .card-back { background-color: white !important; transform: rotateY(180deg); padding: 4px; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; }
 
+        /* --- 修改已完成卡片的淡化效果 --- */
         .card-completed .card-front { 
-            background-color: #f3f4f6 !important; 
-            color: #9ca3af !important; 
-            border-color: #e5e7eb !important; 
-            box-shadow: none !important; 
-            opacity: 0.5; /* 調高一點基礎透明度 */
-            filter: grayscale(0.5); /* 降低灰階感，讓圖示更清楚 */
-            cursor: default;
+            background-color: #e5e7eb !important; /* 稍微深一點的灰色 */
+            color: #6b7280 !important; 
+            border-color: #d1d5db !important; 
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.1) !important; 
+            opacity: 0.85; /* 調高透明度，原本是 0.5 */
+            filter: grayscale(0.2); /* 降低灰階感 */
+            cursor: pointer; /* 恢復指針手勢 */
         }
-        .card-completed { transform: scale(0.95); }
+        .card-completed { transform: scale(0.98); }
 
-        /* 圖示強化：提高透明度與層級 */
         .card-icon-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.7; pointer-events: none; z-index: 30; font-size: 3.5rem; }
         .card-number-text { position: relative; z-index: 20; letter-spacing: -0.05em; line-height: 1; }
         .card-bg-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.4; z-index: 5; pointer-events: none; font-size: 3.5rem; }
@@ -113,12 +133,23 @@
             font-weight: 900; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.2s;
         }
         .nav-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0px #000; }
+
+        /* Cloud Status UI */
+        #cloudStatus { position: fixed; bottom: 20px; left: 20px; z-index: 50; display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 900; color: #666; background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 99px; border: 1px solid #ddd; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+        .status-online { background: #10b981; box-shadow: 0 0 5px #10b981; }
     </style>
 </head>
-<body class="theme-pop" onclick="handleUserInteraction()">
+<body class="theme-pop">
     <div id="aiLoading" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-8 border-black mb-4"></div>
-        <p class="text-black font-black text-2xl italic">讀取靈感中...</p>
+        <p class="text-black font-black text-2xl italic">數據同步中...</p>
+    </div>
+
+    <div id="cloudStatus">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="statusText">正在連線雲端...</span>
+        <span id="userIdDisplay" class="ml-2 opacity-50"></span>
     </div>
 
     <nav class="sticky-nav">
@@ -158,6 +189,7 @@
         </footer>
     </div>
 
+    <!-- 答案彈窗 -->
     <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-sm cursor-pointer">
         <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative overflow-hidden cursor-default">
             <div class="relative z-20 flex flex-col items-center w-full text-center mt-4">
@@ -177,6 +209,7 @@
         </div>
     </div>
 
+    <!-- 我的最愛視窗 -->
     <div id="favoriteModal" onclick="closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
         <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
             <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
@@ -184,7 +217,6 @@
                     <h2 class="text-2xl font-black uppercase italic text-black">我的最愛 🌟</h2>
                     <button onclick="shareListAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white uppercase">分享圖片 📸</button>
                 </div>
-                <div id="favFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
             </div>
             <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
         </div>
@@ -192,7 +224,9 @@
 
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black text-white px-8 py-4 font-black text-lg border-4 border-white shadow-2xl z-[1000] transition-all opacity-0 pointer-events-none uppercase"></div>
 
-    <script>
+    <script type="module">
+        import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
@@ -208,27 +242,83 @@
 
         let gameData = {}, categoryProgress = {}, categoryColors = {}, cardMetadata = {};
         let currentCategory = '', currentCardIndex = null, isAnimating = false, currentThemeId = 'pop';
-        let audioCtx = null;
+        let currentUser = null;
 
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        function playSound(type) {
-            if (!audioCtx) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), now = audioCtx.currentTime;
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            if (type === 'pop') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
-                gain.gain.setValueAtTime(0.02, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-                osc.start(now); osc.stop(now + 0.2);
-            }
+        // --- Firebase Data Sync Logic ---
+
+        async function syncProgress(cat, idx) {
+            if (!currentUser) return;
+            const { doc, setDoc, updateDoc, arrayUnion } = window.firestoreUtils;
+            const userDocRef = doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'settings', 'progress');
+            try {
+                await setDoc(userDocRef, { [cat]: arrayUnion(idx) }, { merge: true });
+            } catch (err) { console.error("Sync Failed", err); }
         }
 
-        function handleUserInteraction() { initAudio(); }
+        async function syncRating(text, category, stars) {
+            if (!currentUser) return;
+            const { doc, setDoc } = window.firestoreUtils;
+            const ratingDocRef = doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'ratings', 'all');
+            try {
+                cardMetadata[text] = { rating: stars, category };
+                await setDoc(ratingDocRef, { [text]: { rating: stars, category } }, { merge: true });
+            } catch (err) { console.error("Rating Sync Failed", err); }
+        }
 
-        window.onload = async () => { randomStyle(); await autoImportFromGoogleSheets(); };
+        function setupSyncListeners() {
+            if (!currentUser) return;
+            const { doc, onSnapshot } = window.firestoreUtils;
+
+            onSnapshot(doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'settings', 'progress'), (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    Object.keys(data).forEach(cat => {
+                        categoryProgress[cat] = new Set(data[cat]);
+                    });
+                    renderCards(true);
+                    updateStats();
+                }
+            }, (err) => console.error("Progress listener error", err));
+
+            onSnapshot(doc(window.db, 'artifacts', window.appId, 'users', currentUser.uid, 'ratings', 'all'), (snapshot) => {
+                if (snapshot.exists()) {
+                    cardMetadata = snapshot.data();
+                }
+            }, (err) => console.error("Ratings listener error", err));
+
+            document.getElementById('statusDot').classList.add('status-online');
+            document.getElementById('statusText').textContent = "雲端同步中";
+            document.getElementById('userIdDisplay').textContent = `ID: ${currentUser.uid.substring(0, 8)}...`;
+        }
+
+        // --- Core App Logic ---
+
+        window.initApp = async () => {
+            const loading = document.getElementById('aiLoading');
+            loading.style.display = 'flex';
+
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(window.auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(window.auth);
+                }
+            };
+
+            onAuthStateChanged(window.auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    setupSyncListeners();
+                }
+            });
+
+            await initAuth();
+            randomStyle();
+            await autoImportFromGoogleSheets();
+            loading.style.display = 'none';
+        };
 
         async function autoImportFromGoogleSheets() {
-            document.getElementById('aiLoading').style.display = 'flex';
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL);
                 const csv = await response.text();
@@ -243,7 +333,7 @@
                     });
                     applyNewGameData(newData);
                 }
-            } catch (err) { showToast("連線異常"); } finally { document.getElementById('aiLoading').style.display = 'none'; }
+            } catch (err) { showToast("連線異常"); }
         }
 
         function applyNewGameData(newData) {
@@ -253,7 +343,7 @@
             select.innerHTML = '<option value="all">✨ 全部解答之書 ✨</option>';
             Object.keys(gameData).forEach((cat, idx) => {
                 categoryColors[cat] = palette[idx % palette.length];
-                categoryProgress[cat] = new Set();
+                if (!categoryProgress[cat]) categoryProgress[cat] = new Set();
                 gameData[cat].sort(() => Math.random() - 0.5);
                 const opt = document.createElement('option');
                 opt.value = cat; opt.textContent = cat;
@@ -276,12 +366,12 @@
             cats.forEach(cat => {
                 gameData[cat].forEach((text, i) => {
                     const mandatory = (text === MANDATORY_CARD);
-                    const done = categoryProgress[cat].has(i);
+                    const done = categoryProgress[cat]?.has(i);
                     const numStr = (currentCategory === 'all' ? displayCounter : (i + 1)).toString();
                     const container = document.createElement('div');
                     container.className = `card-container ${done ? 'card-completed' : ''}`;
                     container.innerHTML = `
-                        <div class="card-inner" id="card-${cat}-${i}" onclick="handleCardClick('${cat}', ${i})">
+                        <div class="card-inner" id="card-${cat}-${i}">
                             <div class="card-face card-front">
                                 <span class="card-number-text" style="font-size: ${numStr.length > 2 ? '2rem' : '2.5rem'}">${numStr}</span>
                                 <div class="card-bg-icon">${mandatory ? '🐲' : '💎'}</div>
@@ -291,56 +381,71 @@
                                 <div style="font-size:3rem;">${mandatory ? '🐲' : '💎'}</div>
                             </div>
                         </div>`;
+                    
+                    container.onclick = () => handleCardClick(cat, i);
                     grid.appendChild(container);
                     displayCounter++;
                 });
             });
         }
 
-        function handleCardClick(cat, idx) {
-            if (isAnimating || categoryProgress[cat].has(idx)) return;
+        window.handleCardClick = function(cat, idx) {
+            if (isAnimating) return; // 移除點擊限制，允許重複翻開
             isAnimating = true;
             document.getElementById(`card-${cat}-${idx}`).classList.add('is-flipped');
             const text = gameData[cat][idx], mandatory = (text === MANDATORY_CARD);
-            if (!cardMetadata[text]) cardMetadata[text] = { rating: 0, category: cat };
+            
             setTimeout(() => {
                 document.getElementById('overlayText').textContent = text;
                 document.getElementById('answerCategoryTag').textContent = cat;
                 document.getElementById('ratingSection').style.display = mandatory ? 'none' : 'flex';
-                updateStarUI(cardMetadata[text].rating);
+                updateStarUI(cardMetadata[text]?.rating || 0);
                 currentCardIndex = { cat, idx };
                 document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
-                playSound('pop'); isAnimating = false;
+                isAnimating = false;
             }, 350);
-        }
+        };
 
-        function updateRating(text, category, stars) {
-            cardMetadata[text].rating = stars;
-            if (!document.getElementById('answerOverlay').classList.contains('hidden')) updateStarUI(stars);
-            showToast(`已評價 ${stars} 星`);
-        }
+        window.updateRatingFromUI = function(s) {
+            const info = currentCardIndex;
+            const text = gameData[info.cat][info.idx];
+            syncRating(text, info.cat, s);
+            updateStarUI(s);
+        };
 
-        function updateRatingFromUI(s) { const info = currentCardIndex; updateRating(gameData[info.cat][info.idx], info.cat, s); }
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
 
-        function closeAnswer() {
-            const overlay = document.getElementById('answerOverlay'); if (overlay.classList.contains('hidden')) return;
+        window.closeAnswer = function() {
+            const overlay = document.getElementById('answerOverlay');
+            if (overlay.classList.contains('hidden')) return;
             overlay.classList.replace('flex', 'hidden');
-            const info = currentCardIndex; document.getElementById(`card-${info.cat}-${info.idx}`).classList.remove('is-flipped');
-            if (!categoryProgress[info.cat].has(info.idx)) { categoryProgress[info.cat].add(info.idx); renderCards(true); updateStats(); }
+            const info = currentCardIndex;
+            document.getElementById(`card-${info.cat}-${info.idx}`).classList.remove('is-flipped');
+            
+            if (!categoryProgress[info.cat]?.has(info.idx)) {
+                categoryProgress[info.cat].add(info.idx);
+                syncProgress(info.cat, info.idx);
+                renderCards(true);
+                updateStats();
+            }
             currentCardIndex = null;
-        }
+        };
 
-        function randomStyle() {
+        window.randomStyle = function() {
             let newTheme; do { newTheme = THEMES[Math.floor(Math.random() * THEMES.length)]; } while (newTheme.id === currentThemeId);
             currentThemeId = newTheme.id; document.body.className = `theme-${currentThemeId}`;
-            showToast(`切換風格：${newTheme.name}`);
-        }
+            showToast(`風格：${newTheme.name}`);
+        };
 
-        function shuffleGame() {
-            Object.keys(gameData).forEach(cat => { gameData[cat].sort(() => Math.random() - 0.5); categoryProgress[cat].clear(); });
-            renderCards(false); updateStats(); showToast("已重新洗牌");
-        }
+        window.shuffleGame = function() {
+            Object.keys(gameData).forEach(cat => {
+                gameData[cat].sort(() => Math.random() - 0.5);
+                categoryProgress[cat].clear();
+            });
+            renderCards(false);
+            updateStats();
+            showToast("已重新洗牌");
+        };
 
         function updateStats() {
             let total = 0, done = 0;
@@ -350,6 +455,22 @@
             });
             document.getElementById('statCompleted').textContent = done;
             document.getElementById('statRemaining').textContent = total - done;
+        }
+
+        window.openFavoriteModal = function() { document.getElementById('favoriteModal').classList.replace('hidden', 'flex'); filterFavs(); };
+        window.closeFavoriteModal = function() { document.getElementById('favoriteModal').classList.replace('flex', 'hidden'); };
+        
+        function filterFavs() {
+            const list = document.getElementById('favoriteList'); list.innerHTML = '';
+            const items = Object.keys(cardMetadata).filter(t => cardMetadata[t].rating > 0 && t !== MANDATORY_CARD);
+            if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">尚無收藏</p>'; return; }
+            items.forEach(t => {
+                const item = cardMetadata[t];
+                const div = document.createElement('div');
+                div.className = "bg-gray-50 border-4 border-black p-4 shadow-[4px_4px_0px_#000]";
+                div.innerHTML = `<span class="text-[10px] font-black bg-black text-white px-2 py-0.5 uppercase italic">${item.category}</span><p class="font-black text-lg mt-1">${t}</p><p class="text-yellow-500 font-black">★ ${item.rating}</p>`;
+                list.appendChild(div);
+            });
         }
 
         function parseCSV(text) {
@@ -365,25 +486,20 @@
         }
 
         function checkMandatory() { Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); }); }
-        function openFavoriteModal() { document.getElementById('favoriteModal').classList.replace('hidden', 'flex'); filterFavs('all'); }
-        function closeFavoriteModal() { document.getElementById('favoriteModal').classList.replace('flex', 'hidden'); }
-        function filterFavs(f) {
-            const list = document.getElementById('favoriteList'); list.innerHTML = '';
-            const items = Object.keys(cardMetadata).filter(t => cardMetadata[t].rating > 0 && t !== MANDATORY_CARD);
-            if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">尚無收藏</p>'; return; }
-            items.forEach(t => {
-                const item = cardMetadata[t];
-                const div = document.createElement('div');
-                div.className = "bg-gray-50 border-4 border-black p-4 shadow-[4px_4px_0px_#000]";
-                div.innerHTML = `<span class="text-[10px] font-black bg-black text-white px-2 py-0.5 uppercase">${item.category}</span><p class="font-black text-lg mt-1">${t}</p><p class="text-yellow-500">★ ${item.rating}</p>`;
-                list.appendChild(div);
-            });
-        }
         function showToast(msg) {
             const t = document.getElementById('toast'); t.textContent = msg;
             t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2000);
         }
-        function shareApp() { showToast("連結已複製 (模擬)"); }
+        window.shareApp = function() { showToast("已複製連結"); };
+
+        window.onload = () => {
+            const checker = setInterval(() => {
+                if (window.db) {
+                    clearInterval(checker);
+                    window.initApp();
+                }
+            }, 100);
+        };
     </script>
 </body>
 </html>
