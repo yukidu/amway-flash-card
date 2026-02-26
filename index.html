@@ -58,7 +58,6 @@
         body {
             background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
             color: var(--dark); margin: 0; padding: 0; 
-            /* 調慢切換風格的動畫時間 */
             transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-x: hidden;
         }
@@ -86,7 +85,6 @@
             backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
             border-radius: var(--card-radius); border: var(--card-border);
             box-shadow: var(--card-shadow); overflow: hidden;
-            /* 調慢牌卡變身的過渡動畫時間 */
             transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -96,7 +94,6 @@
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.2rem; opacity: 0.25; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
-        /* 分類選單優化 */
         .custom-select-wrapper { position: relative; max-width: 140px; width: 100%; }
         #categorySelect {
             appearance: none; width: 100%; padding: 0.5rem 2rem 0.5rem 1rem;
@@ -112,7 +109,19 @@
         .star-rating .star { color: #ccc; cursor: pointer; font-size: 1.8rem; }
         .star-rating .star.active { color: #FFD700; }
 
+        .tab-btn {
+            padding: 0.3rem 0.75rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
+            white-space: nowrap; font-size: 0.7rem; transition: all 0.2s; background: white; color: black;
+        }
+        .tab-btn.active { background: black !important; color: white !important; }
+
         .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-close-btn {
+            position: absolute; top: -15px; right: -15px; width: 36px; height: 36px;
+            background: black; color: white; border: 3px solid white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: 900;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1100; cursor: pointer;
+        }
     </style>
 </head>
 <body class="theme-jelly" onclick="window.initInteraction()">
@@ -211,6 +220,18 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
+    <!-- 匯出模板 (優化隱藏與靜態呈現) -->
+    <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background:white; font-family:'PingFang TC', sans-serif; color:black; z-index: -1;">
+        <div id="exportInner" style="padding: 60px;">
+            <div style="text-align:center;">
+                <h1 style="font-size: 48px; font-weight: 900; margin: 0; letter-spacing: 2px;">改變生命未來式 Be A Better You</h1>
+                <p id="exportSenderInfo" style="font-size: 28px; color: #666; font-weight: bold; margin: 20px 0 30px 0;">寄送人：安安 | 2026年02月27日</p>
+            </div>
+            <div style="height: 6px; background: black; width: 100%; margin-bottom: 80px;"></div>
+            <div id="exportCardsList"></div>
+        </div>
+    </div>
+
     <script>
         const STORAGE_KEYS = { PROGRESS: 'better_you_progress_v3', METADATA: 'better_you_metadata_v3', USERNAME: 'better_you_user_name' };
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
@@ -227,7 +248,7 @@
         ];
 
         let gameData = {}, categoryProgress = {}, cardMetadata = {}, allCategoryItems = [];
-        let currentCategory = 'all', currentCardIndex = null, currentThemeId = 'jelly', audioCtx = null;
+        let currentCategory = 'all', currentCardIndex = null, currentThemeId = 'jelly', audioCtx = null, currentTab = 'all';
 
         window.initInteraction = () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -397,13 +418,21 @@
             updateStarUI(s); showToast(`${s} 星好評！`);
         };
 
+        // 紀錄中點擊星星更新評價
+        window.updateRatingFromFav = (text, cat, s) => {
+            cardMetadata[text] = { rating: s, category: cat, flipTimestamp: Date.now() };
+            localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
+            filterFavs(currentTab);
+            showToast("評分已更新");
+        };
+
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
 
         window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME) || ""; document.getElementById('nameModal').classList.remove('hidden'); };
         window.saveUserName = () => { const v = document.getElementById('userNameInput').value.trim(); if (v) { localStorage.setItem(STORAGE_KEYS.USERNAME, v); updateWelcomeUI(v); document.getElementById('nameModal').classList.add('hidden'); } };
-        window.openRecordModal = () => { document.getElementById('recordModal').classList.replace('hidden', 'flex'); filterFavs(); };
+        window.openRecordModal = () => { document.getElementById('recordModal').classList.replace('hidden', 'flex'); filterFavs('all'); };
         window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
-        window.changeRecordTab = (t) => { document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
+        window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
         function filterFavs(tab = 'all') {
             const list = document.getElementById('favoriteList'); list.innerHTML = '';
@@ -413,17 +442,77 @@
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp);
             items.forEach(i => {
                 const d = document.createElement('div'); d.className = "bg-gray-100 p-3 rounded-2xl border-2 border-black";
-                
-                // 修正：在紀錄中顯示 5 顆星星並區分顏色
                 let starsHTML = '';
                 for (let n = 1; n <= 5; n++) {
                     const activeClass = n <= (i.rating || 0) ? 'text-yellow-500' : 'text-gray-300';
-                    starsHTML += `<span class="${activeClass}">★</span>`;
+                    starsHTML += `<span class="${activeClass} cursor-pointer" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">★</span>`;
                 }
-
                 d.innerHTML = `<div class="flex justify-between text-[10px] font-black mb-1"><span>${i.category}</span><div class="flex gap-0.5">${starsHTML}</div></div><p class="font-black text-sm">${i.text}</p>`;
                 list.appendChild(d);
             });
+        }
+
+        const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME) || "安安";
+
+        window.shareSingleCard = async () => {
+            const info = currentCardIndex; if (!info) return;
+            const time = new Date().toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\//g,'年').replace(' ','日 ');
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
+            document.getElementById('exportCardsList').innerHTML = `<div style="display:flex; align-items:flex-start;"><div style="width: 15px; height: 160px; background: black; margin-right: 30px;"></div><div><div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${info.cat} ]</div><div style="font-size: 52px; font-weight: 900; line-height: 1.3;">${info.text}</div></div></div>`;
+            captureAndShare();
+        };
+
+        window.shareRecordAsImage = async () => {
+            const time = new Date().toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\//g,'年').replace(' ','日 ');
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
+            const listEl = document.getElementById('exportCardsList'); listEl.innerHTML = '';
+            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
+            if (currentTab === 'unrated') items = items.filter(i => !i.rating);
+            else if (currentTab.startsWith('star')) items = items.filter(i => i.rating === parseInt(currentTab.replace('star','')));
+            if(items.length === 0) { showToast("無內容可匯出"); return; }
+            items.sort((a,b) => b.flipTimestamp - a.flipTimestamp);
+            items.forEach(i => {
+                listEl.innerHTML += `<div style="display:flex; align-items:flex-start; margin-bottom: 60px;"><div style="width: 12px; height: 120px; background: black; margin-right: 25px;"></div><div><div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 10px;">[ ${i.category} ]</div><div style="font-size: 38px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
+            });
+            captureAndShare();
+        };
+
+        async function captureAndShare() {
+            showToast("生成圖片中...");
+            const temp = document.getElementById('exportTemplate');
+            try {
+                // 強制將樣式設為可見以進行擷取
+                temp.style.left = "0";
+                temp.style.zIndex = "10000";
+                
+                const canvas = await html2canvas(temp, { 
+                    scale: 2, 
+                    useCORS: true,
+                    backgroundColor: 'white',
+                    logging: false
+                });
+                
+                // 還原隱藏
+                temp.style.left = "-5000px";
+                temp.style.zIndex = "-1";
+
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                const file = new File([blob], 'BetterYou.png', { type: 'image/png' });
+                
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: '改變生命未來式' });
+                } else {
+                    const l = document.createElement('a'); 
+                    l.download = 'BeABetterYou.png'; 
+                    l.href = canvas.toDataURL('image/png'); 
+                    l.click();
+                    showToast("已下載 💾");
+                }
+            } catch (e) { 
+                console.error(e);
+                showToast("生成失敗");
+                temp.style.left = "-5000px";
+            }
         }
 
         window.shareApp = () => { navigator.share?.({ title: '改變生命未來式', url: location.href }) || showToast("連結已複製"); };
