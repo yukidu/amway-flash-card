@@ -20,6 +20,15 @@
             --bg-size: 20px 20px;
         }
 
+        /* 誇張的歡迎動畫 */
+        @keyframes welcomePop {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            50% { transform: scale(1.5) rotate(10deg); }
+            70% { transform: scale(0.9) rotate(-5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .animate-welcome { animation: welcomePop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
         /* --- 20 種風格樣式 --- */
         body.theme-pop { --bg: #f3f4f6; --dark: #000; --card-border: 4px solid #000; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --card-rotate: -2deg; }
         body.theme-cloud { --bg: #f0f9ff; --dark: #0369a1; --card-border: 6px solid #fff; --card-shadow: 0 15px 30px rgba(0,0,0,0.1); --card-radius: 50%; }
@@ -50,7 +59,7 @@
 
         html { overflow-y: scroll; scrollbar-gutter: stable !important; }
 
-        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.75rem 0; border-bottom: 2px solid rgba(0,0,0,0.1); transition: background 0.5s ease; }
+        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 1rem 0; border-bottom: 2px solid rgba(0,0,0,0.1); transition: background 0.5s ease; }
 
         #cardsGrid { display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem; }
         @media (min-width: 640px) { #cardsGrid { grid-template-columns: repeat(4, 1fr); } }
@@ -113,6 +122,12 @@
             white-space: nowrap; font-size: 0.7rem; transition: all 0.2s;
         }
         .tab-btn.active { background: black; color: white; }
+
+        /* 放大數據框 */
+        .stat-box {
+            background: #fff; border: 4px solid #000; padding: 0.75rem 1.25rem; box-shadow: 4px 4px 0px #000;
+            min-width: 110px; text-align: center;
+        }
     </style>
 </head>
 <body class="theme-pop" onclick="window.initAudio()">
@@ -123,28 +138,29 @@
 
     <nav class="sticky-nav">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white border-2 border-black p-2 shadow-[2px_2px_0px_#000] min-w-[80px] text-center">
-                        <p class="text-[9px] font-black uppercase opacity-60 leading-none">已翻開</p>
-                        <p id="statCompleted" class="text-xl font-black">0</p>
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="stat-box">
+                        <p class="text-[10px] font-black uppercase opacity-60 leading-none mb-1">已翻開</p>
+                        <p id="statCompleted" class="text-3xl font-black">0</p>
                     </div>
-                    <div id="welcomeMsg" class="text-sm font-black hidden md:block">
-                        歡迎您一起改變生命未來式
+                    <div class="stat-box">
+                        <p class="text-[10px] font-black uppercase opacity-60 leading-none mb-1">剩餘牌卡</p>
+                        <p id="statRemaining" class="text-3xl font-black">0</p>
+                    </div>
+                    <div id="welcomeContainer" class="hidden">
+                         <div id="welcomeMsg" class="text-lg font-black bg-white px-4 py-2 border-2 border-black shadow-[2px_2px_0px_black] opacity-0"></div>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <button onclick="window.randomStyle()" class="nav-btn bg-indigo-100 whitespace-nowrap text-xs">切換視覺 🎨</button>
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <button onclick="window.randomStyle()" class="nav-btn bg-indigo-100 whitespace-nowrap text-sm">切換視覺 🎨</button>
                     <div class="relative flex-grow md:flex-grow-0">
-                        <select id="categorySelect" class="w-full text-xs" onchange="window.switchCategory(this.value)">
+                        <select id="categorySelect" class="w-full text-sm" onchange="window.switchCategory(this.value)">
                             <option disabled selected>載入中...</option>
                         </select>
                     </div>
                 </div>
-            </div>
-            <div id="welcomeMsgMobile" class="text-center text-[10px] font-black mt-2 md:hidden">
-                歡迎您一起改變生命未來式
             </div>
         </div>
     </nav>
@@ -153,32 +169,32 @@
         <main id="cardsGrid"></main>
 
         <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-4">
-            <button onclick="window.shuffleGame()" class="bg-black text-white px-6 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#444] text-sm">重新洗牌 🔀</button>
-            <button onclick="window.openRecordModal()" class="bg-pink-500 text-white px-6 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#000] text-sm">翻牌紀錄 📜</button>
-            <button onclick="window.shareApp()" class="bg-emerald-500 text-white px-6 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#000] text-sm">分享網頁 🚀</button>
+            <button onclick="window.shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] text-sm">重新洗牌 🔀</button>
+            <button onclick="window.openRecordModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] text-sm">翻牌紀錄 📜</button>
+            <button onclick="window.shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] text-sm">分享網頁 🚀</button>
         </footer>
     </div>
 
     <!-- 姓名輸入視窗 -->
-    <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden items-center justify-center p-6 backdrop-blur-md">
-        <div class="bg-white border-8 border-black p-8 w-full max-w-md shadow-[10px_10px_0px_#FFD700]">
-            <h2 class="text-3xl font-black italic mb-6">你是誰？</h2>
-            <p class="font-bold mb-4">輸入您的名字，開啟改變之旅：</p>
-            <input type="text" id="userNameInput" placeholder="輸入名字..." class="w-full border-4 border-black p-4 text-xl font-black outline-none mb-6">
-            <button onclick="window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl uppercase shadow-[4px_4px_0px_#888]">確認 🎯</button>
+    <div id="nameModal" class="fixed inset-0 bg-black/95 z-[2000] hidden items-center justify-center p-6 backdrop-blur-md">
+        <div class="bg-white border-8 border-black p-10 w-full max-w-md shadow-[12px_12px_0px_#FFD700]">
+            <h2 class="text-4xl font-black italic mb-6 uppercase">改變生命未來式</h2>
+            <p class="font-bold mb-6 text-lg">輸入您的名字，開始這段改變之旅：</p>
+            <input type="text" id="userNameInput" placeholder="在此輸入大名..." class="w-full border-4 border-black p-4 text-2xl font-black outline-none mb-8 bg-gray-50 focus:bg-white">
+            <button onclick="window.saveUserName()" class="w-full bg-black text-white p-5 font-black text-2xl uppercase shadow-[6px_6px_0px_#888] active:translate-y-1 active:shadow-none transition-all">開啟大門 🎯</button>
         </div>
     </div>
 
     <!-- 答案彈窗 -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-sm cursor-pointer">
-        <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative overflow-hidden cursor-default" onclick="event.stopPropagation()">
+        <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative cursor-default" onclick="event.stopPropagation()">
             <div class="relative z-20 flex flex-col items-center w-full text-center mt-4">
                 <div id="answerCategoryTag" class="text-2xl font-black uppercase mb-4 bg-black text-white px-6 py-1 skew-x-[-12deg]">分類</div>
-                <div id="overlayText" class="text-3xl md:text-5xl font-black leading-tight text-black mb-8"></div>
-                <button onclick="window.shareSingleCard()" class="bg-black text-white px-4 py-2 font-black text-xs border-2 border-white mb-4">分享此卡 📸</button>
+                <div id="overlayText" class="text-3xl md:text-5xl font-black leading-tight text-black mb-10"></div>
+                <button onclick="window.shareSingleCard()" class="bg-black text-white px-6 py-2 font-black text-xs border-2 border-white mb-6 uppercase tracking-widest hover:bg-gray-800">分享此卡 📸</button>
             </div>
             <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
-                <p class="font-black text-black italic text-xs uppercase">給予星級評分 (加入紀錄)</p>
+                <p class="font-black text-black italic text-xs uppercase">給予星級評分 (記錄本次解答)</p>
                 <div class="star-rating" id="starRatingContainer">
                     <span class="star" onclick="window.updateRatingFromUI(1)">★</span>
                     <span class="star" onclick="window.updateRatingFromUI(2)">★</span>
@@ -193,10 +209,10 @@
     <!-- 翻牌紀錄視窗 -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
         <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
-            <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-black uppercase italic text-black">翻牌紀錄 📜</h2>
-                    <button onclick="window.shareRecordAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white uppercase">匯出目前清單 📸</button>
+            <div class="p-6 border-b-8 border-black flex flex-col bg-pink-400">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-black uppercase italic text-black">翻牌紀錄 📜</h2>
+                    <button onclick="window.shareRecordAsImage()" class="bg-black text-white text-xs px-6 py-3 font-black border-2 border-white uppercase hover:bg-gray-800">匯出目前清單 📸</button>
                 </div>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar py-1" id="recordTabs">
                     <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部紀錄</button>
@@ -222,17 +238,8 @@
                 <h1 style="font-size: 48px; font-weight: 900; margin: 0; letter-spacing: 2px;">改變生命未來式 Be A Better You</h1>
                 <p id="exportSenderInfo" style="font-size: 28px; color: #666; font-weight: bold; margin: 20px 0 30px 0;">寄送人：杜杜龍 | 2026年02月27日 01:56</p>
             </div>
-            <div style="height: 4px; background: black; width: 100%; margin-bottom: 80px;"></div>
-            <div id="exportCardsList">
-                <!-- 單張卡片格式 -->
-                <div style="display:flex; align-items:flex-start; margin-bottom: 60px;">
-                    <div style="width: 12px; height: 120px; background: black; margin-right: 30px; margin-top: 10px;"></div>
-                    <div>
-                        <div style="font-size: 24px; color: #666; font-weight: bold; margin-bottom: 15px;">[ 相信 ]</div>
-                        <div style="font-size: 42px; font-weight: 900; line-height: 1.4;">勇氣不是不害怕，而是害怕卻依然向前走</div>
-                    </div>
-                </div>
-            </div>
+            <div style="height: 6px; background: black; width: 100%; margin-bottom: 80px;"></div>
+            <div id="exportCardsList"></div>
         </div>
     </div>
 
@@ -241,7 +248,6 @@
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        // 定義視覺風格清單
         const THEMES = [
             { id: "pop", name: "普普風" }, { id: "cloud", name: "雲朵風" }, { id: "leaf", name: "自然風" },
             { id: "gem", name: "鑽石風" }, { id: "stamp", name: "郵票風" }, { id: "bold", name: "粗獷風" },
@@ -267,9 +273,8 @@
             const loading = document.getElementById('aiLoading');
             loading.style.display = 'flex';
             
-            // 載入本地與歡迎語
             const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
-            if (name) updateWelcomeUI(name);
+            if (name) updateWelcomeUI(name, true);
             
             const prog = localStorage.getItem(STORAGE_KEYS.PROGRESS);
             if (prog) { const data = JSON.parse(prog); Object.keys(data).forEach(cat => { categoryProgress[cat] = new Set(data[cat]); }); }
@@ -281,24 +286,22 @@
             loading.style.display = 'none';
         };
 
-        function updateWelcomeUI(name) {
-            const msg = `歡迎 ${name} 一起改變生命未來式`;
+        function updateWelcomeUI(name, isInitial) {
+            const welcomeContainer = document.getElementById('welcomeContainer');
             const welcomeMsg = document.getElementById('welcomeMsg');
-            const welcomeMsgMobile = document.getElementById('welcomeMsgMobile');
-            if (welcomeMsg) {
-                welcomeMsg.textContent = msg;
-                welcomeMsg.classList.remove('hidden');
-            }
-            if (welcomeMsgMobile) {
-                welcomeMsgMobile.textContent = msg;
+            if (name && welcomeContainer && welcomeMsg) {
+                welcomeMsg.textContent = `歡迎 ${name} 一起改變生命未來式`;
+                welcomeContainer.classList.remove('hidden');
+                welcomeMsg.classList.add('animate-welcome');
+                welcomeMsg.classList.remove('opacity-0');
             }
         }
 
         window.saveUserName = () => {
             const val = document.getElementById('userNameInput').value.trim();
-            if (!val) { showToast("請輸入名字"); return; }
+            if (!val) { showToast("請輸入您的名字"); return; }
             localStorage.setItem(STORAGE_KEYS.USERNAME, val);
-            updateWelcomeUI(val);
+            updateWelcomeUI(val, false);
             document.getElementById('nameModal').classList.add('hidden');
             window.openRecordModal();
         };
@@ -317,10 +320,13 @@
         }
 
         function applyNewGameData(newData) {
-            gameData = newData; Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
+            gameData = newData; 
+            // 強制杜杜龍牌出現在各個分門別類，但在「全部」中只顯示一次的邏輯放在 renderCards
+            Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
+            
             const palette = ["#FF4500", "#1E90FF", "#DA70D6", "#00CED1", "#32CD32", "#FF6347", "#FFD700", "#7CFC00", "#FF69B4", "#48D1CC"];
             const select = document.getElementById('categorySelect');
-            select.innerHTML = '<option value="all">✨ 全部解答 ✨</option>';
+            select.innerHTML = '<option value="all">✨ 全部解答之書 ✨</option>';
             Object.keys(gameData).forEach((cat, idx) => {
                 categoryColors[cat] = palette[idx % palette.length];
                 if (!categoryProgress[cat]) categoryProgress[cat] = new Set();
@@ -338,32 +344,66 @@
         function renderCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
             if (Object.keys(gameData).length === 0) return;
-            const cats = currentCategory === 'all' ? Object.keys(gameData) : [currentCategory];
-            let displayCounter = 1;
-            cats.forEach(cat => {
-                gameData[cat].forEach((text, i) => {
-                    const done = categoryProgress[cat]?.has(i);
-                    const numStr = (currentCategory === 'all' ? displayCounter : (i + 1)).toString();
-                    const container = document.createElement('div');
-                    container.className = `card-container ${done ? 'card-completed' : ''}`;
-                    container.innerHTML = `<div class="card-inner" id="card-${cat}-${i}"><div class="card-face card-front"><span class="card-number-text" style="font-size: ${numStr.length > 2 ? '1.5rem' : '2rem'}">${numStr}</span><div class="card-bg-icon">💎</div></div><div class="card-face card-back" style="border-color: ${categoryColors[cat]}"><div style="font-size:3rem;">🐲</div></div></div>`;
-                    container.onclick = () => window.handleCardClick(cat, i);
-                    grid.appendChild(container);
-                    displayCounter++;
+            
+            let catsToRender = [];
+            if (currentCategory === 'all') {
+                // 如果是全部，合併所有文字並確保 MANDATORY_CARD 只有一個
+                let allTexts = [];
+                Object.keys(gameData).forEach(cat => {
+                    gameData[cat].forEach((txt, idx) => {
+                        if (txt === MANDATORY_CARD) return; // 先跳過
+                        allTexts.push({ cat, idx, text: txt });
+                    });
                 });
+                // 把杜杜龍牌放最後面或最前面
+                allTexts.unshift({ cat: '宇宙指引', idx: -1, text: MANDATORY_CARD });
+                catsToRender = allTexts;
+            } else {
+                gameData[currentCategory].forEach((txt, idx) => {
+                    catsToRender.push({ cat: currentCategory, idx, text: txt });
+                });
+            }
+
+            catsToRender.forEach((item, i) => {
+                const isDragon = (item.text === MANDATORY_CARD);
+                // 進度判斷邏輯
+                const done = (isDragon) ? (categoryProgress[item.cat]?.has(item.idx) || false) : (categoryProgress[item.cat]?.has(item.idx) || false);
+                const numStr = (i + 1).toString();
+                
+                const container = document.createElement('div');
+                container.className = `card-container ${done ? 'card-completed' : ''}`;
+                container.innerHTML = `
+                    <div class="card-inner" id="card-${item.cat}-${item.idx}-${i}">
+                        <div class="card-face card-front">
+                            <span class="card-number-text" style="font-size: ${numStr.length > 2 ? '1.5rem' : '2.5rem'}">${numStr}</span>
+                            <div class="card-bg-icon">${isDragon ? '🐲' : '💎'}</div>
+                        </div>
+                        <div class="card-face card-back" style="border-color: ${isDragon ? '#FF4500' : categoryColors[item.cat]}">
+                            <div style="font-size:3rem;">🐲</div>
+                        </div>
+                    </div>`;
+                container.onclick = () => window.handleCardClick(item.cat, item.idx, i);
+                grid.appendChild(container);
             });
         }
 
-        window.handleCardClick = (cat, idx) => {
+        window.handleCardClick = (cat, idx, displayIdx) => {
             if (isAnimating) return; isAnimating = true;
-            document.getElementById(`card-${cat}-${idx}`).classList.add('is-flipped');
-            const text = gameData[cat][idx], mandatory = (text === MANDATORY_CARD);
+            const el = document.getElementById(`card-${cat}-${idx}-${displayIdx}`);
+            if(el) el.classList.add('is-flipped');
+            
+            // 獲取正確文字
+            let text = "";
+            if (idx === -1) text = MANDATORY_CARD;
+            else text = gameData[cat][idx];
+            
+            const mandatory = (text === MANDATORY_CARD);
             setTimeout(() => {
                 document.getElementById('overlayText').textContent = text;
                 document.getElementById('answerCategoryTag').textContent = cat;
                 document.getElementById('ratingSection').style.display = mandatory ? 'none' : 'flex';
                 updateStarUI(cardMetadata[text]?.rating || 0);
-                currentCardIndex = { cat, idx, text };
+                currentCardIndex = { cat, idx, text, displayIdx };
                 document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
                 playSound('pop'); isAnimating = false;
             }, 350);
@@ -373,7 +413,7 @@
             const info = currentCardIndex;
             const timestamp = Date.now();
             cardMetadata[info.text] = { rating: s, category: info.cat, timestamp: timestamp, flipTimestamp: (cardMetadata[info.text]?.flipTimestamp || timestamp) };
-            saveLocalMetadata(); updateStarUI(s); showToast(`評分成功 ${s}★`);
+            saveLocalMetadata(); updateStarUI(s); showToast(`評價已儲存 ${s}★`);
         };
 
         window.updateRatingFromFav = (text, cat, s) => {
@@ -389,9 +429,10 @@
             if (overlay.classList.contains('hidden')) return;
             overlay.classList.replace('flex', 'hidden');
             const info = currentCardIndex;
-            const el = document.getElementById(`card-${info.cat}-${info.idx}`);
+            const el = document.getElementById(`card-${info.cat}-${info.idx}-${info.displayIdx}`);
             if (el) el.classList.remove('is-flipped');
-            if (!categoryProgress[info.cat]?.has(info.idx)) {
+            
+            if (info.idx !== -1 && !categoryProgress[info.cat]?.has(info.idx)) {
                 categoryProgress[info.cat].add(info.idx);
                 if (!cardMetadata[info.text]) cardMetadata[info.text] = { category: info.cat, flipTimestamp: Date.now(), rating: 0 };
                 saveLocalProgress(); saveLocalMetadata(); renderCards(); updateStats();
@@ -404,15 +445,16 @@
             currentThemeId = newTheme.id; document.body.className = `theme-${currentThemeId}`;
         };
 
-        window.shuffleGame = () => { Object.keys(gameData).forEach(cat => { gameData[cat].sort(() => Math.random() - 0.5); }); renderCards(); updateStats(); showToast("洗牌完成"); };
+        window.shuffleGame = () => { Object.keys(gameData).forEach(cat => { gameData[cat].sort(() => Math.random() - 0.5); }); renderCards(); updateStats(); showToast("洗牌成功"); };
+        
         function updateStats() {
             let total = 0, done = 0;
             Object.keys(gameData).forEach(cat => {
                 total += gameData[cat].filter(t => t !== MANDATORY_CARD).length;
                 gameData[cat].forEach((t, i) => { if (t !== MANDATORY_CARD && categoryProgress[cat].has(i)) done++; });
             });
-            const statCompleted = document.getElementById('statCompleted');
-            if (statCompleted) statCompleted.textContent = done;
+            document.getElementById('statCompleted').textContent = done;
+            document.getElementById('statRemaining').textContent = total - done;
         }
 
         window.openRecordModal = () => {
@@ -432,7 +474,7 @@
             else if (currentTab === 'unrated') { items = items.filter(i => (i.rating || 0) === 0); items.sort((a, b) => (b.flipTimestamp || 0) - (a.flipTimestamp || 0)); }
             else if (currentTab.startsWith('star')) { const s = parseInt(currentTab.replace('star', '')); items = items.filter(i => i.rating === s); items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); }
 
-            if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">無紀錄</p>'; return; }
+            if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">尚無相關紀錄</p>'; return; }
             items.forEach(item => {
                 const div = document.createElement('div'); div.className = "bg-gray-50 border-4 border-black p-4 shadow-[4px_4px_0px_#000]";
                 let stars = ''; for (let i = 1; i <= 5; i++) stars += `<span class="list-star ${i <= item.rating ? 'active' : ''}" onclick="window.updateRatingFromFav('${item.text.replace(/'/g, "\\'")}', '${item.category}', ${i})">★</span>`;
@@ -455,17 +497,17 @@
         window.shareSingleCard = async () => {
             const info = currentCardIndex;
             if (!info) return;
-            showToast("正在產生卡片...");
+            showToast("生成中...");
             const name = localStorage.getItem(STORAGE_KEYS.USERNAME) || "匿名者";
             
             document.getElementById('exportSenderInfo').textContent = `寄送人：${name} | ${getFormattedTime()}`;
             const list = document.getElementById('exportCardsList');
             list.innerHTML = `
                 <div style="display:flex; align-items:flex-start;">
-                    <div style="width: 15px; height: 180px; background: black; margin-right: 40px; margin-top: 15px;"></div>
+                    <div style="width: 20px; height: 180px; background: black; margin-right: 40px; margin-top: 15px;"></div>
                     <div style="padding-top:10px;">
                         <div style="font-size: 32px; color: #666; font-weight: bold; margin-bottom: 25px;">[ ${info.cat} ]</div>
-                        <div style="font-size: 56px; font-weight: 900; line-height: 1.4; color:black;">${info.text}</div>
+                        <div style="font-size: 58px; font-weight: 900; line-height: 1.4; color:black;">${info.text}</div>
                     </div>
                 </div>
             `;
@@ -474,7 +516,7 @@
         };
 
         window.shareRecordAsImage = async () => {
-            showToast("正在產生清單...");
+            showToast("清單生成中...");
             const name = localStorage.getItem(STORAGE_KEYS.USERNAME) || "匿名者";
             document.getElementById('exportSenderInfo').textContent = `寄送人：${name} | ${getFormattedTime()}`;
             
@@ -487,15 +529,15 @@
             else if (currentTab === 'unrated') { items = items.filter(i => (i.rating || 0) === 0); items.sort((a, b) => (b.flipTimestamp || 0) - (a.flipTimestamp || 0)); }
             else if (currentTab.startsWith('star')) { const s = parseInt(currentTab.replace('star', '')); items = items.filter(i => i.rating === s); items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); }
 
-            if (items.length === 0) { showToast("無內容匯出"); return; }
+            if (items.length === 0) { showToast("無內容可匯出"); return; }
             
             items.forEach(i => {
                 list.innerHTML += `
-                    <div style="display:flex; align-items:flex-start; margin-bottom: 80px;">
-                        <div style="width: 12px; height: 140px; background: black; margin-right: 35px; margin-top: 10px;"></div>
+                    <div style="display:flex; align-items:flex-start; margin-bottom: 90px;">
+                        <div style="width: 15px; height: 150px; background: black; margin-right: 40px; margin-top: 10px;"></div>
                         <div>
-                            <div style="font-size: 24px; color: #666; font-weight: bold; margin-bottom: 15px;">[ ${i.category} ]</div>
-                            <div style="font-size: 42px; font-weight: 900; line-height: 1.4;">${i.text}</div>
+                            <div style="font-size: 26px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${i.category} ]</div>
+                            <div style="font-size: 46px; font-weight: 900; line-height: 1.4;">${i.text}</div>
                         </div>
                     </div>
                 `;
@@ -508,20 +550,28 @@
             const template = document.getElementById('exportTemplate');
             try {
                 const canvas = await html2canvas(template, { scale: 2, backgroundColor: 'white' });
-                canvas.toBlob(async (blob) => {
-                    const file = new File([blob], `BeABetterYou.png`, { type: 'image/png' });
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        await navigator.share({ files: [file], title: '改變生命未來式' });
-                    } else {
-                        const link = document.createElement('a'); link.download = 'BeABetterYou.png'; link.href = canvas.toDataURL(); link.click(); showToast("已下載圖片");
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                const file = new File([blob], `BetterYou_Record.png`, { type: 'image/png' });
+
+                // 在電腦版或不支援分享的環境中，直接下載
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                
+                if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({ files: [file], title: '改變生命未來式紀錄' });
+                    } catch (e) {
+                        downloadImage(canvas);
                     }
-                });
-            } catch (e) { showToast("產生失敗"); }
+                } else {
+                    downloadImage(canvas);
+                }
+            } catch (e) { showToast("匯出失敗"); }
         }
 
-        window.shareApp = async () => { const d = { title: '改變生命未來式', text: '這是一個解答之書！', url: window.location.href }; if (navigator.share) await navigator.share(d); else { const i = document.createElement('input'); i.value = window.location.href; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); showToast("網址已複製"); } };
+        window.shareApp = async () => { const d = { title: '改變生命未來式', text: '這是一本引導人生的解答之書，快來試試！', url: window.location.href }; if (navigator.share) await navigator.share(d); else { const i = document.createElement('input'); i.value = window.location.href; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); showToast("連結已複製"); } };
         function parseCSV(t) { let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0; for (let l of t) { if ('"' === l) { if (s && l === p) row[i] += l; s = !s; } else if (',' === l && s) l = row[++i] = ''; else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; } else row[i] += l; p = l; } return ret; }
         function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2500); }
+        function downloadImage(canvas) { const link = document.createElement('a'); link.download = 'BeABetterYou_Record.png'; link.href = canvas.toDataURL(); link.click(); showToast("已自動儲存至本地"); }
 
         window.initApp();
     </script>
