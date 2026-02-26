@@ -20,7 +20,7 @@
             --bg-size: 20px 20px;
         }
 
-        /* 誇張可愛的 20 種風格定義 */
+        /* 20 種可愛風格 */
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
         body.theme-comic { --card-radius: 0; --card-rotate: -3deg; --card-border: 8px solid #000; --card-shadow: 15px 15px 0px #000; }
         body.theme-sticker { --card-radius: 2rem; --card-border: 10px solid #fff; --card-shadow: 0 0 0 4px #000, 8px 8px 15px rgba(0,0,0,0.2); }
@@ -42,30 +42,29 @@
         body.theme-cyber { --card-radius: 20px 0 20px 0; --card-border: 4px solid #000; --card-shadow: 5px 5px 0 #00FF00; }
         body.theme-love { --card-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; --card-border: 6px solid #FF69B4; }
 
-        @keyframes giantTextPop {
-            0% { transform: translate(-50%, -50%) scale(0.3) rotate(-15deg); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); opacity: 0; }
+        @keyframes welcomePop {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
         }
-        #giantThemeName {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 5000; font-size: 18vw; font-weight: 900; color: var(--dark);
-            text-shadow: 8px 8px 0px white, -4px -4px 0px white;
-            pointer-events: none; white-space: nowrap; display: none; font-style: italic;
+        @keyframes welcomeBounce {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-10px) rotate(2deg); }
         }
-        #giantThemeName.active { display: block; animation: giantTextPop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-welcome { animation: welcomePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .highlight-welcome { animation: welcomeBounce 0.4s ease-in-out 2; }
 
         body {
             background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
             color: var(--dark); margin: 0; padding: 0; 
-            transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-x: hidden;
         }
 
-        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.8rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
+        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.5rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
 
         #cardsGrid { 
-            display: grid; gap: 1.2rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem;
+            display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem;
             grid-auto-rows: min-content;
         }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
@@ -91,83 +90,38 @@
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
         .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 3rem; }
 
-        .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.2rem; opacity: 0.25; pointer-events: none; }
+        /* 鑽石明顯化 */
+        .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
+        
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
-        /* 自定義選單外觀 */
-        .custom-dropdown {
-            position: relative;
-            width: 130px;
-            font-weight: 900;
-            z-index: 50;
-        }
+        /* 下拉選單 */
+        .custom-dropdown { position: relative; width: 120px; font-weight: 900; z-index: 50; }
         .dropdown-trigger {
-            background: #fff;
-            border: 4px solid #000;
-            padding: 0.4rem 0.8rem;
-            border-radius: 12px;
-            box-shadow: 4px 4px 0px #000;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1.1rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            background: #fff; border: 3px solid #000; padding: 0.3rem 0.6rem; border-radius: 10px;
+            box-shadow: 3px 3px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+            font-size: 0.9rem; white-space: nowrap; overflow: hidden;
         }
         .dropdown-options {
-            position: absolute;
-            top: calc(100% + 8px);
-            right: 0;
-            width: 180px;
-            background: #fff;
-            border: 4px solid #000;
-            box-shadow: 8px 8px 0px #000;
-            border-radius: 16px;
-            max-height: 350px;
-            overflow-y: auto;
-            display: none;
-            padding: 8px 0;
+            position: absolute; top: calc(100% + 5px); right: 0; width: 160px; background: #fff;
+            border: 3px solid #000; box-shadow: 6px 6px 0px #000; border-radius: 12px;
+            max-height: 300px; overflow-y: auto; display: none; padding: 5px 0;
         }
-        .dropdown-options.active {
-            display: block;
-            animation: dropdownSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .dropdown-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 2px solid #f0f0f0;
-            font-size: 1.1rem;
-        }
-        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-options.active { display: block; }
+        .dropdown-item { padding: 10px; cursor: pointer; border-bottom: 2px solid #f0f0f0; font-size: 1rem; }
         .dropdown-item:hover { background: #000; color: #fff; }
-        .dropdown-item.selected { background: #FFD700; color: #000; }
 
-        @keyframes dropdownSlide {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        footer button { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        footer button:active { transform: scale(0.9) rotate(-5deg); }
+        .stat-box { min-width: 60px; text-align: center; }
 
         .star-rating .star { color: #ccc; cursor: pointer; font-size: 1.8rem; }
         .star-rating .star.active { color: #FFD700; }
-
-        .tab-btn {
-            padding: 0.3rem 0.75rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
-            white-space: nowrap; font-size: 0.7rem; transition: all 0.2s; background: white; color: black;
-        }
-        .tab-btn.active { background: black !important; color: white !important; }
 
         .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; align-items: center; justify-content: center; }
         .modal-close-btn {
             position: absolute; top: -15px; right: -15px; width: 36px; height: 36px;
             background: black; color: white; border: 3px solid white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: 900;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1100; cursor: pointer;
+            z-index: 1100; cursor: pointer;
         }
     </style>
 </head>
@@ -175,39 +129,37 @@
     <div id="giantThemeName">風格</div>
 
     <div id="aiLoading" class="loading-overlay">
-        <div class="animate-bounce text-6xl">🎨</div>
+        <div class="animate-bounce text-6xl">💎</div>
         <p class="font-black text-2xl mt-4">正在彩繪世界...</p>
     </div>
 
     <nav class="sticky-nav">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
+            <!-- 第一行：歡迎詞 -->
+            <div id="welcomeLine" class="text-center py-2 hidden">
+                <p id="welcomeMsg" class="text-sm md:text-base font-black italic text-black/80"></p>
+            </div>
+            <!-- 第二行：功能列 -->
+            <div class="flex items-center justify-between gap-2 py-1">
+                <div class="flex items-center gap-2">
                     <div class="stat-box">
-                        <p class="text-[8px] font-black opacity-50 mb-0.5">翻開</p>
-                        <p id="statCompleted" class="text-lg font-black">0</p>
+                        <p class="text-[8px] font-black opacity-50">翻開</p>
+                        <p id="statCompleted" class="text-base font-black">0</p>
                     </div>
                     <div class="stat-box">
-                        <p class="text-[8px] font-black opacity-50 mb-0.5">剩餘</p>
-                        <p id="statRemaining" class="text-lg font-black">0</p>
-                    </div>
-                    <div id="welcomeContainer" class="hidden flex items-center gap-2">
-                         <div id="welcomeMsg" class="text-xs font-black text-black/60 truncate max-w-[100px]"></div>
-                         <button onclick="window.editName()" class="text-black/30 hover:text-black">✎</button>
+                        <p class="text-[8px] font-black opacity-50">剩餘</p>
+                        <p id="statRemaining" class="text-base font-black">0</p>
                     </div>
                 </div>
-
-                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <button onclick="window.randomStyle()" class="nav-btn text-xs px-3 py-2 bg-yellow-400 font-black rounded-lg border-2 border-black">變身！✨</button>
-                    <!-- 自定義下拉選單 -->
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="window.randomStyle()" class="text-xs px-3 py-2 bg-yellow-400 font-black rounded-lg border-2 border-black shadow-[2px_2px_0_#000]">變身！✨</button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
-                        <div class="dropdown-trigger" id="dropdownTrigger" onclick="window.toggleDropdown()">
+                        <div class="dropdown-trigger" onclick="window.toggleDropdown()">
                             <span id="dropdownLabel">🌟 全部</span>
-                            <span class="text-xs ml-1">▼</span>
+                            <span class="text-[8px]">▼</span>
                         </div>
-                        <div class="dropdown-options no-scrollbar" id="dropdownOptions">
-                            <!-- 選項會在此自動生成 -->
-                        </div>
+                        <div class="dropdown-options no-scrollbar" id="dropdownOptions"></div>
                     </div>
                 </div>
             </div>
@@ -217,30 +169,34 @@
     <div class="max-w-6xl mx-auto px-4 py-6">
         <main id="cardsGrid"></main>
         <footer class="mt-8 mb-20 flex flex-row flex-nowrap justify-center gap-3 px-2">
-            <button onclick="window.openRecordModal()" class="flex-1 bg-pink-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl">紀錄</button>
-            <button onclick="window.shareApp()" class="flex-1 bg-cyan-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl">分享</button>
-            <button onclick="window.resetAllGame()" class="flex-1 bg-red-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl">重置</button>
+            <button onclick="window.openRecordModal()" class="flex-1 bg-pink-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">紀錄</button>
+            <button onclick="window.shareApp()" class="flex-1 bg-cyan-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">分享</button>
+            <button onclick="window.resetAllGame()" class="flex-1 bg-red-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">重置</button>
         </footer>
     </div>
 
-    <!-- 彈窗組 -->
+    <!-- 姓名輸入 -->
     <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden items-center justify-center p-6 backdrop-blur-xl">
         <div class="bg-white border-8 border-black p-8 w-full max-w-sm rounded-[40px] shadow-[15px_15px_0px_#FFD700]">
             <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
-            <input type="text" id="userNameInput" placeholder="輸入大名..." class="w-full border-4 border-black p-4 text-xl font-black rounded-2xl mb-6 outline-none">
+            <p class="text-sm font-bold mb-4">輸入名字開始探索旅程</p>
+            <input type="text" id="userNameInput" placeholder="輸入名字..." class="w-full border-4 border-black p-4 text-xl font-black rounded-2xl mb-6 outline-none">
             <button onclick="window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl rounded-2xl shadow-[5px_5px_0px_#888]">出發！</button>
         </div>
     </div>
 
+    <!-- 答案彈窗 -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-md">
-        <div id="answerContent" class="bg-white w-full max-w-sm min-h-[40vh] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
+        <div id="answerContent" class="bg-white w-full max-w-sm min-h-[45vh] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
             <div class="relative z-20 flex flex-col items-center w-full text-center flex-grow justify-center">
                 <div id="answerCategoryTag" class="text-xs font-black uppercase mb-4 bg-black text-white px-3 py-1 rounded-full">分類</div>
                 <div id="textFitContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden py-4">
-                    <div id="overlayText" class="font-black leading-tight text-black w-full" style="font-size: 32px;"></div>
+                    <!-- 文字自動縮小容器 -->
+                    <div id="overlayText" class="font-black leading-tight text-black w-full break-words"></div>
                 </div>
-                <button onclick="window.shareSingleCard()" class="bg-black text-white px-4 py-2 font-black text-[10px] rounded-xl mt-4">分享此卡 📸</button>
+                <!-- 分享按鈕放大 1.5 倍 -->
+                <button onclick="window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">分享此卡 📸</button>
             </div>
             <div id="ratingSection" class="w-full flex flex-col items-center gap-2 mt-6">
                 <div class="star-rating flex gap-1" id="starRatingContainer">
@@ -254,6 +210,7 @@
         </div>
     </div>
 
+    <!-- 紀錄 -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/70 z-[1000] hidden items-center justify-center p-6">
         <div class="bg-white border-8 border-black w-full max-w-md max-h-[80vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden" onclick="event.stopPropagation()">
             <div class="p-6 bg-pink-300 border-b-4 border-black flex justify-between items-center">
@@ -264,7 +221,6 @@
                 <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button>
                 <button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未評</button>
                 <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5★</button>
-                <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4★</button>
             </div>
             <div id="favoriteList" class="p-4 overflow-y-auto space-y-3 flex-grow bg-white"></div>
         </div>
@@ -272,7 +228,6 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <!-- 匯出模板 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background:white; font-family:'PingFang TC', sans-serif; color:black; z-index: -1;">
         <div id="exportInner" style="padding: 60px;">
             <div style="text-align:center;">
@@ -289,16 +244,6 @@
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        const THEMES = [
-            { id: "jelly", name: "Q彈果凍" }, { id: "comic", name: "熱血漫畫" }, { id: "sticker", name: "可愛貼紙" },
-            { id: "cloud", name: "鬆軟雲朵" }, { id: "star", name: "閃亮星星" }, { id: "retro", name: "復古方塊" },
-            { id: "blob", name: "變形蟲" }, { id: "pill", name: "治癒藥丸" }, { id: "leaf", name: "森林呼吸" },
-            { id: "bone", name: "頑皮骨頭" }, { id: "egg", name: "完美蛋形" }, { id: "diamond", name: "閃耀鑽石" },
-            { id: "marshmallow", name: "棉花糖" }, { id: "jagged", name: "動感鋸齒" }, { id: "fluid", name: "液態藝術" },
-            { id: "notebook", name: "手繪筆記" }, { id: "stamp", name: "冒險郵票" }, { id: "bubble", name: "夢幻泡泡" },
-            { id: "cyber", name: "未來科技" }, { id: "love", name: "粉紅愛心" }
-        ];
-
         let gameData = {}, categoryProgress = {}, cardMetadata = {}, allCategoryItems = [];
         let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all';
 
@@ -307,22 +252,9 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
         };
 
-        // 自定義下拉選單邏輯
-        window.toggleDropdown = (e) => {
-            if (e) e.stopPropagation();
-            document.getElementById('dropdownOptions').classList.toggle('active');
-        };
-
-        window.closeDropdown = () => {
-            document.getElementById('dropdownOptions').classList.remove('active');
-        };
-
-        // 監聽外部點擊以關閉選單
-        window.addEventListener('click', (e) => {
-            if (!document.getElementById('categoryDropdownContainer').contains(e.target)) {
-                window.closeDropdown();
-            }
-        });
+        window.toggleDropdown = (e) => { if (e) e.stopPropagation(); document.getElementById('dropdownOptions').classList.toggle('active'); };
+        window.closeDropdown = () => document.getElementById('dropdownOptions').classList.remove('active');
+        window.addEventListener('click', (e) => { if (!document.getElementById('categoryDropdownContainer').contains(e.target)) window.closeDropdown(); });
 
         function playSound(type) {
             if (!audioCtx) return;
@@ -356,8 +288,23 @@
         };
 
         function updateWelcomeUI(name) {
-            const c = document.getElementById('welcomeContainer'), m = document.getElementById('welcomeMsg');
-            if (name && c && m) { m.textContent = `嗨 ${name} !`; c.classList.remove('hidden'); }
+            const line = document.getElementById('welcomeLine'), m = document.getElementById('welcomeMsg');
+            if (name && line && m) { 
+                m.textContent = `歡迎 ${name} 一起改變生命未來式！`; 
+                line.classList.remove('hidden');
+                line.classList.add('animate-welcome');
+            }
+        }
+
+        // 切換選單頁面時觸發歡迎詞動畫與音效
+        function triggerWelcomeHighlight() {
+            const m = document.getElementById('welcomeMsg');
+            if (m && !document.getElementById('welcomeLine').classList.contains('hidden')) {
+                playSound('cute');
+                m.classList.remove('highlight-welcome');
+                void m.offsetWidth; // 強制重繪觸發動畫
+                m.classList.add('highlight-welcome');
+            }
         }
 
         window.randomStyle = (skip) => {
@@ -389,29 +336,20 @@
                     });
                     gameData = newData;
                     Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
-                    
-                    // 更新自定義下拉選單選項
                     const optionsContainer = document.getElementById('dropdownOptions');
                     optionsContainer.innerHTML = '';
-                    
                     const createItem = (val, label) => {
                         const div = document.createElement('div');
-                        div.className = `dropdown-item ${currentCategory === val ? 'selected' : ''}`;
+                        div.className = `dropdown-item ${currentCategory === val ? 'font-black bg-gray-100' : ''}`;
                         div.textContent = label;
-                        div.onclick = (e) => {
-                            e.stopPropagation();
-                            window.switchCategory(val);
-                            window.closeDropdown();
-                        };
+                        div.onclick = (e) => { e.stopPropagation(); window.switchCategory(val); window.closeDropdown(); };
                         return div;
                     };
-                    
                     optionsContainer.appendChild(createItem('all', '🌟 全部'));
                     Object.keys(gameData).forEach(cat => {
                         if (!categoryProgress[cat]) categoryProgress[cat] = new Set();
                         optionsContainer.appendChild(createItem(cat, cat));
                     });
-                    
                     allCategoryItems = [];
                     window.switchCategory('all');
                 }
@@ -421,14 +359,9 @@
         window.switchCategory = (cat) => { 
             currentCategory = cat; 
             document.getElementById('dropdownLabel').textContent = cat === 'all' ? '🌟 全部' : cat;
-            
-            // 更新選項的高亮狀態
-            document.querySelectorAll('.dropdown-item').forEach(item => {
-                item.classList.toggle('selected', item.textContent === (cat === 'all' ? '🌟 全部' : cat));
-            });
-            
             renderCards(); 
-            updateStats(); 
+            updateStats();
+            triggerWelcomeHighlight();
         };
 
         function renderCards() {
@@ -447,7 +380,6 @@
             } else {
                 gameData[currentCategory].forEach((txt, idx) => items.push({ cat: currentCategory, idx, text: txt }));
             }
-
             items.forEach((item, i) => {
                 const isD = (item.text === MANDATORY_CARD), done = categoryProgress[item.cat]?.has(item.idx);
                 const c = document.createElement('div');
@@ -456,7 +388,7 @@
                     <div class="card-inner" id="card-${item.cat}-${item.idx}-${i}">
                         <div class="card-face card-front">
                             <div class="card-emoji-bg">${isD ? '🐉' : '💎'}</div>
-                            <span class="card-number-text text-2xl font-black ${isD ? 'hidden' : ''}">${i + 1}</span>
+                            <span class="card-number-text text-xl font-black ${isD ? 'hidden' : ''}">${i + 1}</span>
                         </div>
                         <div class="card-face card-back">👑</div>
                     </div>`;
@@ -480,10 +412,17 @@
             }, 350);
         };
 
+        // 強化版：文字自動縮小演算法，確保字數多也能完整顯示
         function fitTextToContainer() {
             const t = document.getElementById('overlayText'), c = document.getElementById('textFitContainer');
-            let s = 32; t.style.fontSize = s + 'px';
-            while (t.scrollHeight > c.clientHeight && s > 14) { s -= 1; t.style.fontSize = s + 'px'; }
+            if (!t || !c) return;
+            let s = 42; // 起始大字體
+            t.style.fontSize = s + 'px';
+            const maxH = c.clientHeight;
+            while (t.scrollHeight > maxH && s > 12) { 
+                s -= 1; 
+                t.style.fontSize = s + 'px'; 
+            }
         }
 
         window.closeAnswer = () => {
@@ -492,40 +431,57 @@
             if (info.idx !== -1 && !categoryProgress[info.cat]?.has(info.idx)) {
                 categoryProgress[info.cat].add(info.idx);
                 if (!cardMetadata[info.text]) cardMetadata[info.text] = { category: info.cat, flipTimestamp: Date.now(), rating: 0 };
-                const obj = {}; Object.keys(categoryProgress).forEach(c => obj[c] = Array.from(categoryProgress[c]));
-                localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(obj));
+                localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(Object.keys(categoryProgress).reduce((acc,k)=>{acc[k]=Array.from(categoryProgress[k]);return acc;},{})));
                 localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
                 renderCards(); updateStats();
             }
             currentCardIndex = null;
         };
 
+        window.openRecordModal = () => { 
+            const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
+            if (!name) { document.getElementById('nameModal').classList.remove('hidden'); return; }
+            document.getElementById('recordModal').classList.replace('hidden', 'flex'); 
+            filterFavs('all'); 
+        };
+
+        window.saveUserName = () => { 
+            const v = document.getElementById('userNameInput').value.trim(); 
+            if (v) { 
+                localStorage.setItem(STORAGE_KEYS.USERNAME, v); 
+                updateWelcomeUI(v); 
+                document.getElementById('nameModal').classList.add('hidden'); 
+                // 若正在紀錄流程中，自動開啟紀錄
+                if (document.getElementById('recordModal').classList.contains('hidden')) {
+                    document.getElementById('recordModal').classList.replace('hidden', 'flex');
+                    filterFavs('all');
+                }
+            } 
+        };
+
         window.resetAllGame = async () => {
-            if (!confirm("要清除所有記憶，重新開始嗎？")) return;
-            localStorage.clear();
+            if (!confirm("要重置所有紀錄與評分嗎？")) return;
+            localStorage.removeItem(STORAGE_KEYS.PROGRESS);
+            localStorage.removeItem(STORAGE_KEYS.METADATA);
             categoryProgress = {}; cardMetadata = {}; allCategoryItems = [];
             await window.initApp();
-            showToast("世界已重置 🫧");
+            showToast("已重置 🫧");
         };
 
         window.updateRatingFromUI = (s) => {
             const i = currentCardIndex; cardMetadata[i.text] = { rating: s, category: i.cat, flipTimestamp: Date.now() };
             localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
-            updateStarUI(s); showToast(`${s} 星好評！`);
+            updateStarUI(s); showToast(`評分 ${s}★`);
         };
 
         window.updateRatingFromFav = (text, cat, s) => {
             cardMetadata[text] = { rating: s, category: cat, flipTimestamp: Date.now() };
             localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
             filterFavs(currentTab);
-            showToast("評分已更新");
         };
 
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
-
-        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME) || ""; document.getElementById('nameModal').classList.remove('hidden'); };
-        window.saveUserName = () => { const v = document.getElementById('userNameInput').value.trim(); if (v) { localStorage.setItem(STORAGE_KEYS.USERNAME, v); updateWelcomeUI(v); document.getElementById('nameModal').classList.add('hidden'); } };
-        window.openRecordModal = () => { document.getElementById('recordModal').classList.replace('hidden', 'flex'); filterFavs('all'); };
+        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.remove('hidden'); };
         window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
@@ -536,38 +492,30 @@
             else if (tab.startsWith('star')) items = items.filter(i => i.rating === parseInt(tab.replace('star','')));
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp);
             items.forEach(i => {
-                const d = document.createElement('div'); d.className = "bg-gray-100 p-3 rounded-2xl border-2 border-black";
-                let starsHTML = '';
-                for (let n = 1; n <= 5; n++) {
-                    const activeClass = n <= (i.rating || 0) ? 'text-yellow-500' : 'text-gray-300';
-                    starsHTML += `<span class="${activeClass} cursor-pointer" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">★</span>`;
-                }
-                d.innerHTML = `<div class="flex justify-between text-[10px] font-black mb-1"><span>${i.category}</span><div class="flex gap-0.5">${starsHTML}</div></div><p class="font-black text-sm">${i.text}</p>`;
+                const d = document.createElement('div'); d.className = "bg-gray-100 p-3 rounded-2xl border-2 border-black shadow-[3px_3px_0_#000]";
+                let stars = ''; for (let n=1; n<=5; n++) stars += `<span class="${n<=(i.rating||0)?'text-yellow-500':'text-gray-300'} cursor-pointer" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">★</span>`;
+                d.innerHTML = `<div class="flex justify-between text-[10px] font-black mb-1"><span>${i.category}</span><div class="flex gap-0.5">${stars}</div></div><p class="font-black text-sm">${i.text}</p>`;
                 list.appendChild(d);
             });
         }
 
-        const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME) || "安安";
-
         window.shareSingleCard = async () => {
-            const info = currentCardIndex; if (!info) return;
-            const time = new Date().toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\//g,'年').replace(' ','日 ');
+            const i = currentCardIndex; if (!i) return;
+            const time = new Date().toLocaleDateString('zh-TW');
             document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
-            document.getElementById('exportCardsList').innerHTML = `<div style="display:flex; align-items:flex-start;"><div style="width: 15px; height: 160px; background: black; margin-right: 30px;"></div><div><div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${info.cat} ]</div><div style="font-size: 52px; font-weight: 900; line-height: 1.3;">${info.text}</div></div></div>`;
+            document.getElementById('exportCardsList').innerHTML = `<div style="display:flex; align-items:flex-start;"><div style="width: 15px; height: 160px; background: black; margin-right: 30px;"></div><div><div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${i.cat} ]</div><div style="font-size: 52px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
             captureAndShare();
         };
 
         window.shareRecordAsImage = async () => {
-            const time = new Date().toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\//g,'年').replace(' ','日 ');
+            const time = new Date().toLocaleDateString('zh-TW');
             document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
-            const listEl = document.getElementById('exportCardsList'); listEl.innerHTML = '';
+            const list = document.getElementById('exportCardsList'); list.innerHTML = '';
             let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
             if (currentTab === 'unrated') items = items.filter(i => !i.rating);
             else if (currentTab.startsWith('star')) items = items.filter(i => i.rating === parseInt(currentTab.replace('star','')));
-            if(items.length === 0) { showToast("無內容可匯出"); return; }
-            items.sort((a,b) => b.flipTimestamp - a.flipTimestamp);
-            items.forEach(i => {
-                listEl.innerHTML += `<div style="display:flex; align-items:flex-start; margin-bottom: 60px;"><div style="width: 12px; height: 120px; background: black; margin-right: 25px;"></div><div><div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 10px;">[ ${i.category} ]</div><div style="font-size: 38px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
+            items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
+                list.innerHTML += `<div style="display:flex; align-items:flex-start; margin-bottom: 60px;"><div style="width: 12px; height: 120px; background: black; margin-right: 25px;"></div><div><div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 10px;">[ ${i.category} ]</div><div style="font-size: 38px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
             });
             captureAndShare();
         };
@@ -576,33 +524,21 @@
             showToast("生成圖片中...");
             const temp = document.getElementById('exportTemplate');
             try {
-                temp.style.left = "0";
-                temp.style.zIndex = "10000";
-                const canvas = await html2canvas(temp, { 
-                    scale: 2, 
-                    useCORS: true,
-                    backgroundColor: 'white',
-                    logging: false
-                });
-                temp.style.left = "-5000px";
-                temp.style.zIndex = "-1";
+                temp.style.left = "0"; temp.style.zIndex = "10000";
+                const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: 'white' });
+                temp.style.left = "-5000px"; temp.style.zIndex = "-1";
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
                 const file = new File([blob], 'BetterYou.png', { type: 'image/png' });
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({ files: [file], title: '改變生命未來式' });
                 } else {
-                    const l = document.createElement('a'); 
-                    l.download = 'BeABetterYou.png'; 
-                    l.href = canvas.toDataURL('image/png'); 
-                    l.click();
+                    const l = document.createElement('a'); l.download = 'BeABetterYou.png'; l.href = canvas.toDataURL('image/png'); l.click();
                     showToast("已下載 💾");
                 }
-            } catch (e) { 
-                showToast("生成失敗");
-                temp.style.left = "-5000px";
-            }
+            } catch (e) { showToast("生成失敗"); temp.style.left = "-5000px"; }
         }
 
+        const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME) || "安安";
         window.shareApp = () => { navigator.share?.({ title: '改變生命未來式', url: location.href }) || showToast("連結已複製"); };
         function parseCSV(t) { let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0; for (let l of t) { if ('"' === l) { if (s && l === p) row[i] += l; s = !s; } else if (',' === l && s) l = row[++i] = ''; else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; } else row[i] += l; p = l; } return ret; }
         function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000); }
