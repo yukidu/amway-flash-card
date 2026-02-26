@@ -42,16 +42,32 @@
         body.theme-cyber { --card-radius: 20px 0 20px 0; --card-border: 4px solid #000; --card-shadow: 5px 5px 0 #00FF00; }
         body.theme-love { --card-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; --card-border: 69px solid #FF69B4; }
 
+        /* 變換風格時的風格名稱特效 */
+        @keyframes themeLabelPop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.3) rotate(10deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); opacity: 0; }
+        }
+        #giantThemeName {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 5000; font-size: 15vw; font-weight: 900; 
+            color: #ff4757; /* 可愛明亮的紅色 */
+            /* 貼紙風格：白色厚邊 */
+            text-shadow: 8px 8px 0px #fff, -8px -8px 0px #fff, 8px -8px 0px #fff, -8px 8px 0px #fff, 12px 12px 30px rgba(0,0,0,0.2);
+            pointer-events: none; white-space: nowrap; display: none; font-style: italic;
+        }
+        #giantThemeName.active { display: block; animation: themeLabelPop 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
         @keyframes welcomePop {
             0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 1; }
             100% { transform: scale(1); opacity: 1; }
         }
         @keyframes welcomeBounce {
             0%, 100% { transform: translateY(0) rotate(0); }
-            50% { transform: translateY(-10px) rotate(2deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
         }
-        .animate-welcome { animation: welcomePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-welcome { animation: welcomePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .highlight-welcome { animation: welcomeBounce 0.4s ease-in-out 2; }
 
         body {
@@ -90,16 +106,14 @@
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
         .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 3rem; }
 
-        /* 鑽石明顯化 */
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
-        /* 下拉選單 */
         .custom-dropdown { position: relative; width: 120px; font-weight: 900; z-index: 50; }
         .dropdown-trigger {
-            background: #fff; border: 3px solid #000; padding: 0.3rem 0.6rem; border-radius: 10px;
+            background: #fff; border: 3px solid #000; padding: 0.45rem 0.6rem; border-radius: 10px;
             box-shadow: 3px 3px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-            font-size: 0.9rem; white-space: nowrap; overflow: hidden;
+            font-size: 0.95rem; white-space: nowrap; overflow: hidden; height: 42px;
         }
         .dropdown-options {
             position: absolute; top: calc(100% + 5px); right: 0; width: 160px; background: #fff;
@@ -115,20 +129,28 @@
         .star-rating .star.active { color: #FFD700; }
 
         .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* 統一的關閉按鈕樣式 */
         .modal-close-btn {
-            position: absolute; top: -15px; right: -15px; width: 36px; height: 36px;
+            position: absolute; top: -15px; right: -15px; width: 42px; height: 42px;
             background: black; color: white; border: 3px solid white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: 900;
-            z-index: 1100; cursor: pointer;
+            z-index: 1100; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
         
-        /* 歡迎詞容器：確保填滿寬度 */
-        #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #welcomeMsg { white-space: nowrap; width: 100%; text-align: center; line-height: 1.2; }
+        #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; }
+        #welcomeMsg { white-space: nowrap; font-weight: 900; display: inline-block; }
+
+        .tab-btn {
+            padding: 0.3rem 0.75rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
+            white-space: nowrap; font-size: 0.75rem; transition: all 0.2s; background: white; color: black;
+        }
+        .tab-btn.active { background: black !important; color: white !important; }
     </style>
 </head>
 <body class="theme-jelly" onclick="window.initInteraction()">
-    <div id="giantThemeName" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:5000; font-size:18vw; font-weight:900; display:none; pointer-events: none;">風格</div>
+    <!-- 風格名稱特效容器 -->
+    <div id="giantThemeName">風格名稱</div>
 
     <div id="aiLoading" class="loading-overlay">
         <div class="animate-bounce text-6xl">💎</div>
@@ -138,8 +160,10 @@
     <nav class="sticky-nav">
         <div class="max-w-6xl mx-auto px-4">
             <!-- 第一行：歡迎詞 (寬度填滿) -->
-            <div id="welcomeLine" class="py-1 hidden">
-                <p id="welcomeMsg" class="font-black italic text-black/90"></p>
+            <div id="welcomeLine" class="py-2 hidden flex items-center justify-center relative group">
+                <p id="welcomeMsg" class="italic text-black/90 cursor-pointer" onclick="window.editName()"></p>
+                <!-- 名字旁邊的編輯按鈕 -->
+                <button onclick="window.editName()" class="ml-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity absolute right-4">✎</button>
             </div>
             <!-- 第二行：功能列 -->
             <div class="flex items-center justify-between gap-2 py-1">
@@ -155,7 +179,7 @@
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <button onclick="window.randomStyle()" class="text-xs px-3 py-2 bg-yellow-400 font-black rounded-lg border-2 border-black shadow-[2px_2px_0_#000] active:translate-y-0.5">變身！✨</button>
+                    <button onclick="window.randomStyle()" class="px-4 bg-yellow-400 font-black rounded-lg border-2 border-black shadow-[2px_2px_0_#000] active:translate-y-0.5 text-sm h-[42px]">變身！✨</button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
                         <div class="dropdown-trigger" onclick="window.toggleDropdown()">
                             <span id="dropdownLabel">🌟 全部</span>
@@ -194,7 +218,7 @@
             <div class="relative z-20 flex flex-col items-center w-full text-center flex-grow justify-center">
                 <div id="answerCategoryTag" class="text-xs font-black uppercase mb-4 bg-black text-white px-3 py-1 rounded-full">分類</div>
                 <div id="textFitContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden py-4">
-                    <div id="overlayText" class="font-black leading-tight text-black w-full break-words"></div>
+                    <div id="overlayText" class="font-black leading-tight text-black w-full break-words text-center"></div>
                 </div>
                 <button onclick="window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">分享此卡 📸</button>
             </div>
@@ -212,16 +236,21 @@
 
     <!-- 紀錄頁面 -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/70 z-[1000] hidden items-center justify-center p-6">
-        <div class="bg-white border-8 border-black w-full max-w-md max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden" onclick="event.stopPropagation()">
-            <div class="p-6 bg-pink-300 border-b-4 border-black flex justify-between items-center">
-                <h2 class="text-2xl font-black italic">冒險紀錄 📜</h2>
-                <!-- 匯出圖片按鈕：文字修改且放大 2 倍 -->
-                <button onclick="window.shareRecordAsImage()" class="bg-black text-white px-6 py-3 rounded-xl font-black scale-125 transform origin-right">匯出圖片</button>
+        <div class="bg-white border-8 border-black w-full max-w-md max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden relative" onclick="event.stopPropagation()">
+            <!-- 關閉按鈕，與答案卡位置一致 -->
+            <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
+            
+            <div class="p-6 bg-pink-300 border-b-4 border-black flex flex-col items-center gap-4 mt-4">
+                <button onclick="window.shareRecordAsImage()" class="bg-black text-white px-10 py-4 rounded-xl font-black scale-110 transform shadow-[4px_4px_0_#fff] active:scale-95 transition-transform">匯出圖片</button>
             </div>
             <div class="flex gap-2 overflow-x-auto no-scrollbar p-4 bg-gray-50 border-b-4 border-black" id="recordTabs">
                 <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button>
                 <button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未評</button>
                 <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5★</button>
+                <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4★</button>
+                <button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3★</button>
+                <button onclick="window.changeRecordTab('star2')" class="tab-btn" data-tab="star2">2★</button>
+                <button onclick="window.changeRecordTab('star1')" class="tab-btn" data-tab="star1">1★</button>
             </div>
             <div id="favoriteList" class="p-4 overflow-y-auto space-y-3 flex-grow bg-white"></div>
         </div>
@@ -300,13 +329,13 @@
             finally { loading.style.display = 'none'; }
         };
 
-        // 自動縮放歡迎詞文字以填滿寬度
+        // 字體放大到符合頁面的最大寬度
         function fitWelcomeText() {
             const m = document.getElementById('welcomeMsg'), line = document.getElementById('welcomeLine');
             if (!m || line.classList.contains('hidden')) return;
-            let s = 100; // 起始大號字體
+            let s = 150; // 更大的起跳字體
             m.style.fontSize = s + 'px';
-            const targetW = line.clientWidth * 0.95; // 預留一點間距
+            const targetW = line.clientWidth * 0.98;
             while (m.offsetWidth > targetW && s > 10) {
                 s -= 1;
                 m.style.fontSize = s + 'px';
@@ -346,8 +375,9 @@
                 const g = document.getElementById('giantThemeName');
                 if (g) {
                     g.textContent = next.name; 
-                    g.style.display = 'block';
-                    setTimeout(() => g.style.display = 'none', 1200);
+                    g.classList.remove('active');
+                    void g.offsetWidth; // 強制重繪
+                    g.classList.add('active');
                 }
             }
         };
