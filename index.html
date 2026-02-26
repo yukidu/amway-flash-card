@@ -163,10 +163,11 @@
 
     <div class="max-w-6xl mx-auto px-4 py-8">
         <main id="cardsGrid"></main>
-        <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-4">
-            <button onclick="window.shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#444] text-sm hover:translate-y-1 hover:shadow-none transition-all">重新洗牌 🔀</button>
-            <button onclick="window.openRecordModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#000] text-sm">翻牌紀錄 📜</button>
-            <button onclick="window.shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#000] text-sm">分享網頁 🚀</button>
+        <!-- 頁尾按鈕：手機單列排列，文字濃縮 -->
+        <footer class="mt-12 mb-20 flex flex-row flex-nowrap justify-center gap-2 px-2">
+            <button onclick="window.openRecordModal()" class="flex-1 bg-pink-500 text-white py-4 font-black uppercase border-2 border-black shadow-[4px_4px_0px_#000] text-sm hover:translate-y-0.5 hover:shadow-none transition-all">紀錄</button>
+            <button onclick="window.shareApp()" class="flex-1 bg-emerald-500 text-white py-4 font-black uppercase border-2 border-black shadow-[4px_4px_0px_#000] text-sm hover:translate-y-0.5 hover:shadow-none transition-all">分享</button>
+            <button onclick="window.resetAllGame()" class="flex-1 bg-red-500 text-white py-4 font-black uppercase border-2 border-black shadow-[4px_4px_0px_#000] text-sm hover:translate-y-0.5 hover:shadow-none transition-all">重置</button>
         </footer>
     </div>
 
@@ -281,7 +282,6 @@
             window.addEventListener('devicemotion', (event) => {
                 const acc = event.accelerationIncludingGravity;
                 if (!acc) return;
-                // 設定高閾值 (需非常用力)
                 const total = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
                 if (total > 30) { 
                     const now = Date.now();
@@ -294,7 +294,7 @@
             if (currentCategory !== 'all' || document.getElementById('answerOverlay').classList.contains('flex')) return;
             const unflip = [];
             document.querySelectorAll('.card-container:not(.card-completed)').forEach(el => {
-                const idStr = el.querySelector('.card-inner').id; // card-cat-idx-displayIdx
+                const idStr = el.querySelector('.card-inner').id;
                 const parts = idStr.split('-');
                 unflip.push({ cat: parts[1], idx: parseInt(parts[2]), displayIdx: parseInt(parts[3]) });
             });
@@ -408,7 +408,8 @@
                 Object.keys(gameData).forEach(cat => {
                     gameData[cat].forEach((txt, idx) => { if (txt !== MANDATORY_CARD) items.push({ cat, idx, text: txt }); });
                 });
-                items.unshift({ cat: '宇宙指引', idx: -1, text: MANDATORY_CARD });
+                items.push({ cat: '宇宙指引', idx: -1, text: MANDATORY_CARD });
+                items.sort(() => Math.random() - 0.5);
             } else {
                 gameData[currentCategory].forEach((txt, idx) => { items.push({ cat: currentCategory, idx, text: txt }); });
             }
@@ -422,7 +423,7 @@
                     <div class="card-inner" id="card-${item.cat}-${item.idx}-${i}">
                         <div class="card-face card-front">
                             <div class="card-emoji-bg">${isDragon ? '🐲' : '💎'}</div>
-                            <span class="card-number-text text-2xl font-black">${i + 1}</span>
+                            <span class="card-number-text text-2xl font-black ${isDragon ? 'hidden' : ''}">${i + 1}</span>
                         </div>
                         <div class="card-face card-back">${done ? '👑' : '🐲'}</div>
                     </div>`;
@@ -487,6 +488,25 @@
             }, 600);
         };
 
+        window.resetAllGame = async () => {
+            const confirmReset = confirm("確定要全部重來嗎？這將清除所有已翻開的紀錄與評分。");
+            if (!confirmReset) return;
+
+            const loading = document.getElementById('aiLoading');
+            loading.style.display = 'flex';
+
+            localStorage.removeItem(STORAGE_KEYS.PROGRESS);
+            localStorage.removeItem(STORAGE_KEYS.METADATA);
+            categoryProgress = {};
+            cardMetadata = {};
+
+            await autoImport();
+            updateStats();
+            
+            loading.style.display = 'none';
+            showToast("已重置所有狀態並重新載入 🔄");
+        };
+
         window.randomStyle = (skip) => {
             const next = THEMES[Math.floor(Math.random() * THEMES.length)];
             currentThemeId = next.id;
@@ -524,6 +544,7 @@
             const el = document.getElementById(`card-${info.cat}-${info.idx}-${info.displayIdx}`);
             if (el) el.classList.remove('is-flipped');
             if (info.idx !== -1 && !categoryProgress[info.cat]?.has(info.idx)) {
+                if (!categoryProgress[info.cat]) categoryProgress[info.cat] = new Set();
                 categoryProgress[info.cat].add(info.idx);
                 if (!cardMetadata[info.text]) cardMetadata[info.text] = { category: info.cat, flipTimestamp: Date.now(), rating: 0 };
                 const obj = {}; Object.keys(categoryProgress).forEach(c => obj[c] = Array.from(categoryProgress[c]));
@@ -538,7 +559,9 @@
             let total = 0, done = 0;
             Object.keys(gameData).forEach(cat => {
                 total += gameData[cat].filter(t => t !== MANDATORY_CARD).length;
-                gameData[cat].forEach((t, i) => { if (t !== MANDATORY_CARD && categoryProgress[cat].has(i)) done++; });
+                if (categoryProgress[cat]) {
+                    gameData[cat].forEach((t, i) => { if (t !== MANDATORY_CARD && categoryProgress[cat].has(i)) done++; });
+                }
             });
             document.getElementById('statCompleted').textContent = done;
             document.getElementById('statRemaining').textContent = total - done;
@@ -586,7 +609,13 @@
             document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
             const list = document.getElementById('exportCardsList'); list.innerHTML = '';
             let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
-            if(items.length === 0) return;
+            if (currentTab === 'unrated') items = items.filter(i => (i.rating || 0) === 0);
+            else if (currentTab.startsWith('star')) {
+                const s = parseInt(currentTab.replace('star',''));
+                items = items.filter(i => i.rating === s);
+            }
+            if(items.length === 0) { showToast("目前標籤下沒有紀錄可匯出"); return; }
+            items.sort((a,b) => b.flipTimestamp - a.flipTimestamp);
             items.forEach(i => {
                 list.innerHTML += `<div style="display:flex; align-items:flex-start; margin-bottom: 60px;"><div style="width: 12px; height: 120px; background: black; margin-right: 25px;"></div><div><div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 10px;">[ ${i.category} ]</div><div style="font-size: 38px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
             });
