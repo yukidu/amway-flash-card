@@ -90,6 +90,7 @@
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
         .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 3rem; }
 
+        /* 鑽石明顯化 */
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
@@ -120,10 +121,14 @@
             display: flex; align-items: center; justify-content: center; font-weight: 900;
             z-index: 1100; cursor: pointer;
         }
+        
+        /* 歡迎詞容器：確保填滿寬度 */
+        #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        #welcomeMsg { white-space: nowrap; width: 100%; text-align: center; line-height: 1.2; }
     </style>
 </head>
 <body class="theme-jelly" onclick="window.initInteraction()">
-    <div id="giantThemeName" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:5000; font-size:18vw; font-weight:900; display:none;">風格</div>
+    <div id="giantThemeName" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:5000; font-size:18vw; font-weight:900; display:none; pointer-events: none;">風格</div>
 
     <div id="aiLoading" class="loading-overlay">
         <div class="animate-bounce text-6xl">💎</div>
@@ -132,22 +137,25 @@
 
     <nav class="sticky-nav">
         <div class="max-w-6xl mx-auto px-4">
-            <div id="welcomeLine" class="text-center py-2 hidden">
-                <p id="welcomeMsg" class="text-sm md:text-base font-black italic text-black/80"></p>
+            <!-- 第一行：歡迎詞 (寬度填滿) -->
+            <div id="welcomeLine" class="py-1 hidden">
+                <p id="welcomeMsg" class="font-black italic text-black/90"></p>
             </div>
+            <!-- 第二行：功能列 -->
             <div class="flex items-center justify-between gap-2 py-1">
                 <div class="flex items-center gap-2">
                     <div class="stat-box">
-                        <p class="text-[8px] font-black opacity-50">翻開</p>
+                        <p class="text-[8px] font-black opacity-50 uppercase">翻開</p>
                         <p id="statCompleted" class="text-base font-black">0</p>
                     </div>
                     <div class="stat-box">
-                        <p class="text-[8px] font-black opacity-50">剩餘</p>
+                        <p class="text-[8px] font-black opacity-50 uppercase">剩餘</p>
                         <p id="statRemaining" class="text-base font-black">0</p>
                     </div>
                 </div>
+                
                 <div class="flex items-center gap-2">
-                    <button onclick="window.randomStyle()" class="text-xs px-3 py-2 bg-yellow-400 font-black rounded-lg border-2 border-black shadow-[2px_2px_0_#000]">變身！✨</button>
+                    <button onclick="window.randomStyle()" class="text-xs px-3 py-2 bg-yellow-400 font-black rounded-lg border-2 border-black shadow-[2px_2px_0_#000] active:translate-y-0.5">變身！✨</button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
                         <div class="dropdown-trigger" onclick="window.toggleDropdown()">
                             <span id="dropdownLabel">🌟 全部</span>
@@ -169,6 +177,7 @@
         </footer>
     </div>
 
+    <!-- 姓名輸入視窗 -->
     <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden items-center justify-center p-6 backdrop-blur-xl">
         <div class="bg-white border-8 border-black p-8 w-full max-w-sm rounded-[40px] shadow-[15px_15px_0px_#FFD700]">
             <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
@@ -178,6 +187,7 @@
         </div>
     </div>
 
+    <!-- 答案彈窗 -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-md">
         <div id="answerContent" class="bg-white w-full max-w-sm min-h-[45vh] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
@@ -200,11 +210,13 @@
         </div>
     </div>
 
+    <!-- 紀錄頁面 -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/70 z-[1000] hidden items-center justify-center p-6">
-        <div class="bg-white border-8 border-black w-full max-w-md max-h-[80vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden" onclick="event.stopPropagation()">
+        <div class="bg-white border-8 border-black w-full max-w-md max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden" onclick="event.stopPropagation()">
             <div class="p-6 bg-pink-300 border-b-4 border-black flex justify-between items-center">
                 <h2 class="text-2xl font-black italic">冒險紀錄 📜</h2>
-                <button onclick="window.shareRecordAsImage()" class="bg-black text-white text-[10px] px-3 py-1 rounded-lg font-black">匯出</button>
+                <!-- 匯出圖片按鈕：文字修改且放大 2 倍 -->
+                <button onclick="window.shareRecordAsImage()" class="bg-black text-white px-6 py-3 rounded-xl font-black scale-125 transform origin-right">匯出圖片</button>
             </div>
             <div class="flex gap-2 overflow-x-auto no-scrollbar p-4 bg-gray-50 border-b-4 border-black" id="recordTabs">
                 <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button>
@@ -284,12 +296,22 @@
                 cardMetadata = JSON.parse(localStorage.getItem(STORAGE_KEYS.METADATA) || '{}');
                 await autoImport();
                 window.randomStyle(true);
-            } catch (err) {
-                console.error(err);
-            } finally {
-                loading.style.display = 'none';
-            }
+            } catch (err) { console.error(err); } 
+            finally { loading.style.display = 'none'; }
         };
+
+        // 自動縮放歡迎詞文字以填滿寬度
+        function fitWelcomeText() {
+            const m = document.getElementById('welcomeMsg'), line = document.getElementById('welcomeLine');
+            if (!m || line.classList.contains('hidden')) return;
+            let s = 100; // 起始大號字體
+            m.style.fontSize = s + 'px';
+            const targetW = line.clientWidth * 0.95; // 預留一點間距
+            while (m.offsetWidth > targetW && s > 10) {
+                s -= 1;
+                m.style.fontSize = s + 'px';
+            }
+        }
 
         function updateWelcomeUI(name) {
             const line = document.getElementById('welcomeLine'), m = document.getElementById('welcomeMsg');
@@ -297,6 +319,7 @@
                 m.textContent = `歡迎 ${name} 一起改變生命未來式！`; 
                 line.classList.remove('hidden');
                 line.classList.add('animate-welcome');
+                setTimeout(fitWelcomeText, 50);
             }
         }
 
@@ -309,6 +332,8 @@
                 m.classList.add('highlight-welcome');
             }
         }
+
+        window.addEventListener('resize', fitWelcomeText);
 
         window.randomStyle = (skip) => {
             const next = THEMES[Math.floor(Math.random() * THEMES.length)];
@@ -500,6 +525,50 @@
         }
 
         const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME) || "安安";
+
+        window.shareSingleCard = async () => {
+            const info = currentCardIndex; if (!info) return;
+            const time = new Date().toLocaleDateString('zh-TW');
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
+            document.getElementById('exportCardsList').innerHTML = `<div style="display:flex; align-items:flex-start;"><div style="width: 15px; height: 160px; background: black; margin-right: 30px;"></div><div><div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${info.cat} ]</div><div style="font-size: 52px; font-weight: 900; line-height: 1.3;">${info.text}</div></div></div>`;
+            captureAndShare();
+        };
+
+        window.shareRecordAsImage = async () => {
+            const time = new Date().toLocaleDateString('zh-TW');
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
+            const listEl = document.getElementById('exportCardsList'); listEl.innerHTML = '';
+            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
+            if (currentTab === 'unrated') items = items.filter(i => !i.rating);
+            else if (currentTab.startsWith('star')) items = items.filter(i => i.rating === parseInt(currentTab.replace('star','')));
+            if(items.length === 0) { showToast("無內容可匯出"); return; }
+            items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
+                listEl.innerHTML += `<div style="display:flex; align-items:flex-start; margin-bottom: 60px;"><div style="width: 12px; height: 120px; background: black; margin-right: 25px;"></div><div><div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 10px;">[ ${i.category} ]</div><div style="font-size: 38px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
+            });
+            captureAndShare();
+        };
+
+        async function captureAndShare() {
+            showToast("生成圖片中...");
+            const temp = document.getElementById('exportTemplate');
+            try {
+                temp.style.left = "0"; temp.style.zIndex = "10000";
+                const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: 'white', logging: false });
+                temp.style.left = "-5000px"; temp.style.zIndex = "-1";
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+                const file = new File([blob], 'BetterYou.png', { type: 'image/png' });
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: '改變生命未來式' });
+                } else {
+                    const l = document.createElement('a'); 
+                    l.download = 'BeABetterYou.png'; 
+                    l.href = canvas.toDataURL('image/png'); 
+                    l.click();
+                    showToast("已下載 💾");
+                }
+            } catch (e) { showToast("生成失敗"); temp.style.left = "-5000px"; }
+        }
+
         window.shareApp = () => { navigator.share?.({ title: '改變生命未來式', url: location.href }) || showToast("連結已複製"); };
         function parseCSV(t) { let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0; for (let l of t) { if ('"' === l) { if (s && l === p) row[i] += l; s = !s; } else if (',' === l && s) l = row[++i] = ''; else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; } else row[i] += l; p = l; } return ret; }
         function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000); }
