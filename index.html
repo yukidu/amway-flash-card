@@ -40,6 +40,8 @@
 
         html { overflow-y: scroll; scrollbar-gutter: stable !important; }
 
+        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 1rem 0; border-bottom: 2px solid rgba(0,0,0,0.1); }
+
         #cardsGrid { display: grid; gap: 1.5rem; width: 100%; grid-template-columns: repeat(3, 1fr); }
         @media (min-width: 640px) { #cardsGrid { grid-template-columns: repeat(4, 1fr); } }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
@@ -70,8 +72,17 @@
         
         .card-bg-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.15; padding: 15%; z-index: 5; pointer-events: none; }
 
-        .tab-btn { border: var(--card-border); box-shadow: var(--card-shadow); transition: all 0.2s; border-radius: var(--card-radius); }
-        .tab-active { filter: brightness(0.8) contrast(1.2); transform: scale(1.05); outline: 3px solid white; }
+        #categorySelect {
+            appearance: none;
+            background: #fff;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            font-weight: 900;
+            padding: 0.5rem 2.5rem 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            outline: none;
+        }
 
         @keyframes popIn { 0% { transform: scale(0.5) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
         .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
@@ -97,35 +108,48 @@
 <body class="theme-pop" onclick="handleUserInteraction()">
     <div id="aiLoading" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-8 border-black mb-4"></div>
-        <p class="text-black font-black text-2xl italic">載入中...</p>
+        <p class="text-black font-black text-2xl italic text-black">讀取靈感中...</p>
     </div>
 
-    <div class="max-w-6xl mx-auto px-4 py-8">
-        <header class="text-center mb-8">
-            <h1 class="text-5xl font-black italic mb-6 tracking-tighter uppercase">你人生的解答之書 <span id="styleName" class="text-indigo-600">普普!</span></h1>
-            <div id="categoryTabs" class="flex flex-wrap justify-center gap-4 mb-8"></div>
-            <div class="flex justify-center items-center gap-6 mb-6">
-                <div class="bg-white border-4 border-black p-4 shadow-[6px_6px_0px_#000] min-w-[120px] stat-box">
-                    <p class="text-xs font-black uppercase stat-label">已翻開</p>
-                    <p id="statCompleted" class="text-4xl font-black">0</p>
+    <!-- 永遠置頂的導航欄 -->
+    <nav class="sticky-nav">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- 全域統計數字 -->
+            <div class="flex items-center gap-4">
+                <div class="bg-white border-2 border-black p-2 shadow-[3px_3px_0px_#000] min-w-[90px] text-center stat-box">
+                    <p class="text-[10px] font-black uppercase stat-label leading-none">全體已翻</p>
+                    <p id="statCompleted" class="text-2xl font-black">0</p>
                 </div>
-                <div class="bg-white border-4 border-black p-4 shadow-[6px_6px_0px_#000] min-w-[120px] stat-box">
-                    <p class="text-xs font-black uppercase stat-label">剩餘</p>
-                    <p id="statRemaining" class="text-4xl font-black">0</p>
+                <div class="bg-white border-2 border-black p-2 shadow-[3px_3px_0px_#000] min-w-[90px] text-center stat-box">
+                    <p class="text-[10px] font-black uppercase stat-label leading-none">全體剩餘</p>
+                    <p id="statRemaining" class="text-2xl font-black">0</p>
                 </div>
             </div>
-            <p class="text-sm font-bold bg-yellow-300 inline-block px-3 py-1 border-2 border-black italic">用力「甩動」手機跨分類隨機抽牌！ 📱</p>
-        </header>
 
+            <!-- 下拉選單 -->
+            <div class="relative w-full md:w-auto">
+                <select id="categorySelect" class="w-full text-black" onchange="switchCategory(this.value)">
+                    <option disabled selected>載入中...</option>
+                </select>
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+            
+            <p class="hidden md:block text-xs font-bold bg-yellow-300 px-3 py-1 border-2 border-black italic">搖晃手機隨機抽牌！📱</p>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
         <main id="cardsGrid"></main>
 
         <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-6">
-            <button id="shuffleBtn" onclick="shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">隨機洗牌 🔀</button>
-            <button onclick="randomStyle()" class="bg-indigo-600 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">更換風格 🎨</button>
+            <button id="shuffleBtn" onclick="shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">重新洗牌 🔀</button>
+            <button onclick="randomStyle()" class="bg-indigo-600 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">切換視覺 🎨</button>
             <button onclick="openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">收藏清單 🌟</button>
             <button onclick="openEditModal()" class="bg-white text-black px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">編輯內容 ✏️</button>
             <button onclick="shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2">
-                分享遊戲
+                分享
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
                     <polyline points="16 6 12 2 8 6"></polyline>
@@ -196,50 +220,45 @@
             { id: "forest", name: "森林" }, { id: "galaxy", name: "星際" }, { id: "comic", name: "漫畫" }
         ];
 
-        // 鑽石 Icon SVG
-        const DIAMOND_SVG = `
-            <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12,2L4.5,11L12,22L19.5,11L12,2M12,4.4L17.1,10.5L12,16.6L6.9,10.5L12,4.4Z"/>
-            </svg>`;
+        const DIAMOND_SVG = `<svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,2L4.5,11L12,22L19.5,11L12,2M12,4.4L17.1,10.5L12,16.6L6.9,10.5L12,4.4Z"/></svg>`;
+        const DRAGON_SVG = `<svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12,2C10.89,2 10,2.89 10,4C10,4.55 10.22,5.05 10.59,5.41L8.41,7.59C8.05,7.22 7.55,7 7,7C5.89,7 5,7.89 5,9C5,9.55 5.22,10.05 5.59,10.41L3.41,12.59C3.05,12.22 2.55,12 2,12C0.89,12 0,12.89 0,14C0,15.11 0.89,16 2,16C2.55,16 3.05,15.78 3.41,15.41L5.59,17.59C5.22,17.95 5,18.45 5,19C5,20.11 5.89,21 7,21C7.55,21 8.05,20.78 8.41,20.41L10.59,22.59C10.95,22.95 11.45,23.17 12,23.17C12.55,23.17 13.05,22.95 13.41,22.59L15.59,20.41C15.95,20.78 16.45,21 17,21C18.11,21 19,20.11 19,19C19,18.45 18.78,17.95 18.41,17.59L20.59,15.41C20.95,15.78 21.45,16 22,16C23.11,16 24,15.11 24,14C24,12.89 23.11,12 22,12C21.45,12 20.95,12.22 20.59,12.59L18.41,10.41C18.78,10.05 19,9.55 19,9C19,7.89 18.11,7 17,7C16.45,7 15.95,7.22 15.59,7.59L13.41,5.41C13.78,5.05 14,4.55 14,4C14,2.89 13.11,2 12,2M12,4L13.5,6L12,7.5L10.5,6L12,4M7,9L8.5,10.5L7,12L5.5,10.5L7,9M17,9L18.5,10.5L17,12L15.5,10.5L17,9M2,14L3.5,15.5L2,17L0.5,15.5L2,14M22,14L23.5,15.5L22,17L20.5,15.5L22,14M7,19L8.5,20.5L7,22L5.5,20.5L7,19M17,19L18.5,20.5L17,22L15.5,20.5L17,19M12,11A3,3 0 0,1 15,14A3,3 0 0,1 12,17A3,3 0 0,1 9,14A3,3 0 0,1 12,11Z"/></svg>`;
 
-        // 龍 Icon SVG
-        const DRAGON_SVG = `
-            <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12,2C10.89,2 10,2.89 10,4C10,4.55 10.22,5.05 10.59,5.41L8.41,7.59C8.05,7.22 7.55,7 7,7C5.89,7 5,7.89 5,9C5,9.55 5.22,10.05 5.59,10.41L3.41,12.59C3.05,12.22 2.55,12 2,12C0.89,12 0,12.89 0,14C0,15.11 0.89,16 2,16C2.55,16 3.05,15.78 3.41,15.41L5.59,17.59C5.22,17.95 5,18.45 5,19C5,20.11 5.89,21 7,21C7.55,21 8.05,20.78 8.41,20.41L10.59,22.59C10.95,22.95 11.45,23.17 12,23.17C12.55,23.17 13.05,22.95 13.41,22.59L15.59,20.41C15.95,20.78 16.45,21 17,21C18.11,21 19,20.11 19,19C19,18.45 18.78,17.95 18.41,17.59L20.59,15.41C20.95,15.78 21.45,16 22,16C23.11,16 24,15.11 24,14C24,12.89 23.11,12 22,12C21.45,12 20.95,12.22 20.59,12.59L18.41,10.41C18.78,10.05 19,9.55 19,9C19,7.89 18.11,7 17,7C16.45,7 15.95,7.22 15.59,7.59L13.41,5.41C13.78,5.05 14,4.55 14,4C14,2.89 13.11,2 12,2M12,4L13.5,6L12,7.5L10.5,6L12,4M7,9L8.5,10.5L7,12L5.5,10.5L7,9M17,9L18.5,10.5L17,12L15.5,10.5L17,9M2,14L3.5,15.5L2,17L0.5,15.5L2,14M22,14L23.5,15.5L22,17L20.5,15.5L22,14M7,19L8.5,20.5L7,22L5.5,20.5L7,19M17,19L18.5,20.5L17,22L15.5,20.5L17,19M12,11A3,3 0 0,1 15,14A3,3 0 0,1 12,17A3,3 0 0,1 9,14A3,3 0 0,1 12,11Z"/>
-            </svg>`;
-        
         let gameData = {}, categoryProgress = {}, categoryColors = {}, cardMetadata = {}, flipHistory = [];
         let currentCategory = '', currentCardIndex = null, currentFavFilter = 'all', isShuffling = false, isAnimating = false;
         let audioCtx = null;
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        
         function playSound(type) {
             if (!audioCtx) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), now = audioCtx.currentTime;
             osc.connect(gain); gain.connect(audioCtx.destination);
             if (type === 'pop') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                osc.type = 'square'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
                 gain.gain.setValueAtTime(0.03, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now); osc.stop(now + 0.4);
             } else if (type === 'victory') {
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.setValueAtTime(783.99, now + 0.2);
                 gain.gain.setValueAtTime(0.08, now); gain.gain.linearRampToValueAtTime(0, now + 0.8);
                 osc.start(now); osc.stop(now + 0.8);
             }
         }
 
-        function randomStyle() {
-            const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
-            document.body.className = `theme-${theme.id}`;
-            document.getElementById('styleName').textContent = theme.name + '!';
-            if (currentCategory) switchCategory(currentCategory);
+        function handleUserInteraction() {
+            initAudio();
+            // iOS 搖一搖授權處理
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('devicemotion', handleMotion);
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                window.addEventListener('devicemotion', handleMotion);
+            }
         }
-
-        function handleUserInteraction() { initAudio(); enableShake(); }
 
         let lastShakeUpdate = 0;
         function handleMotion(event) {
@@ -248,18 +267,13 @@
                 let acc = event.acceleration || event.accelerationIncludingGravity;
                 if (!acc || acc.x === null) return;
                 let strength = Math.max(Math.abs(acc.x), Math.abs(acc.y), Math.abs(acc.z));
-                if (strength > 50) {
+                if (strength > 45) { // 稍微降低閾值增加敏感度
                     if (document.getElementById('answerOverlay').classList.contains('hidden') && !isAnimating) {
-                        flipRandomCard(); lastShakeUpdate = curTime + 1500;
+                        flipRandomCard();
+                        lastShakeUpdate = curTime + 1500;
                     }
                 }
             }
-        }
-
-        function enableShake() {
-            if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission().then(s => { if(s==='granted') window.addEventListener('devicemotion', handleMotion); });
-            } else window.addEventListener('devicemotion', handleMotion);
         }
 
         window.onload = async () => { randomStyle(); await autoImportFromGoogleSheets(); };
@@ -273,45 +287,44 @@
                 if (rows.length > 0) {
                     const headers = rows[0].map(h => h ? h.trim() : "");
                     headers.forEach((h, col) => {
-                        if (h) {
+                        // 連結的 google 試算表，標題是「未分類」的固定隱藏不要顯示
+                        if (h && h !== '未分類') {
                             newData[h] = [];
                             for (let r=1; r<rows.length; r++) if(rows[r][col]) newData[h].push(rows[r][col].trim());
                         }
                     });
                     applyNewGameData(newData);
                 }
-            } catch (err) { showToast("同步失敗"); } finally { loading.style.display = 'none'; initKeyboardSupport(); }
+            } catch (err) { showToast("連線異常"); } finally { loading.style.display = 'none'; initKeyboardSupport(); }
         }
 
         function applyNewGameData(newData) {
             gameData = newData; checkMandatory(); categoryProgress = {}; categoryColors = {};
             const palette = ["#FF0000", "#0000FF", "#FF00FF", "#00FFFF", "#32CD32", "#FF4500", "#FFD700", "#7FFF00", "#FF1493", "#00FA9A"];
+            const select = document.getElementById('categorySelect');
+            select.innerHTML = '';
+
             Object.keys(gameData).forEach((cat, idx) => {
                 categoryColors[cat] = palette[idx % palette.length];
                 categoryProgress[cat] = new Set();
                 gameData[cat].sort(() => Math.random() - 0.5);
+                
+                // 填充下拉選單
+                const opt = document.createElement('option');
+                opt.value = cat; opt.textContent = cat;
+                select.appendChild(opt);
             });
-            renderTabs(); const first = Object.keys(gameData)[0]; if(first) switchCategory(first);
-        }
-
-        function renderTabs() {
-            const container = document.getElementById('categoryTabs'); container.innerHTML = '';
-            Object.keys(gameData).forEach(cat => {
-                const btn = document.createElement('button');
-                btn.id = `tab-${cat}`; btn.textContent = cat;
-                btn.className = "tab-btn px-6 py-2 font-black uppercase text-sm transition-all";
-                btn.style.backgroundColor = categoryColors[cat];
-                btn.onclick = () => switchCategory(cat);
-                container.appendChild(btn);
-            });
+            
+            const first = Object.keys(gameData)[0];
+            if(first) switchCategory(first);
         }
 
         function switchCategory(cat) {
-            currentCategory = cat; document.documentElement.style.setProperty('--primary', categoryColors[cat]);
-            document.querySelectorAll('#categoryTabs button').forEach(b => b.classList.remove('tab-active'));
-            const tab = document.getElementById(`tab-${cat}`);
-            if (tab) tab.classList.add('tab-active');
-            renderCards(false); updateStats();
+            currentCategory = cat;
+            document.getElementById('categorySelect').value = cat;
+            document.documentElement.style.setProperty('--primary', categoryColors[cat]);
+            renderCards(false);
+            updateStats();
         }
 
         function renderCards(skip = true) {
@@ -319,16 +332,13 @@
             grid.innerHTML = '';
             items.forEach((text, i) => {
                 const done = prog.has(i), mandatory = (text === MANDATORY_CARD);
-                // 決定使用的 Icon
                 const mainIcon = mandatory ? DRAGON_SVG : DIAMOND_SVG;
-                
                 const container = document.createElement('div');
                 container.className = `card-container ${done ? 'card-completed' : ''}`;
                 container.innerHTML = `
                     <div class="card-inner" id="card-${i}" onclick="handleCardClick(${i})">
                         <div class="card-face card-front">
                             <span class="card-number-text">${i+1}</span>
-                            <!-- 一般卡顯示鑽石 bg，杜杜龍顯示龍 bg -->
                             <div class="card-bg-icon">${mainIcon}</div>
                             ${done ? `<div class="card-icon-overlay">${mainIcon}</div>` : ''}
                         </div>
@@ -364,14 +374,10 @@
             cardMetadata[text].rating = stars;
             if (!document.getElementById('answerOverlay').classList.contains('hidden')) updateStarUI(stars);
             if (!document.getElementById('favoriteModal').classList.contains('hidden')) filterFavs(currentFavFilter);
-            showToast(`已評價 ${stars} 顆星！`);
+            showToast(`已評價 ${stars} 星`);
         }
 
-        function updateRatingFromUI(s) {
-            const text = gameData[currentCategory][currentCardIndex];
-            updateRating(text, currentCategory, s);
-        }
-
+        function updateRatingFromUI(s) { updateRating(gameData[currentCategory][currentCardIndex], currentCategory, s); }
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
 
         function closeAnswer() {
@@ -385,6 +391,17 @@
                 if (!categoryProgress[currentCategory].has(idx)) { categoryProgress[currentCategory].add(idx); renderCards(true); updateStats(); }
                 currentCardIndex = null; isAnimating = false;
             }, 350);
+        }
+
+        function updateStats() {
+            // 已翻開和剩餘數字，改成統計所有分類的總合
+            let totalCards = 0, totalDone = 0;
+            Object.keys(gameData).forEach(cat => {
+                totalCards += gameData[cat].length;
+                totalDone += (categoryProgress[cat] || new Set()).size;
+            });
+            document.getElementById('statCompleted').textContent = totalDone;
+            document.getElementById('statRemaining').textContent = totalCards - totalDone;
         }
 
         function openFavoriteModal() { document.getElementById('favoriteModal').classList.replace('hidden', 'flex'); updateFavFilters(); filterFavs('all'); }
@@ -451,7 +468,7 @@
                         try { await navigator.share({ files: [file], title: titleText, text: '分享我的評分收藏清單！' }); } catch (err) {}
                     } else {
                         const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = fileName; link.click();
-                        showToast("瀏覽器不支持直接分享，已為您下載圖片！");
+                        showToast("已為您下載圖片");
                     }
                 }, 'image/jpeg', 0.9);
             } catch (e) { showToast("產生圖片失敗"); } finally { document.body.removeChild(tempDiv); }
@@ -459,13 +476,13 @@
 
         async function shareApp() {
             if (navigator.share) {
-                try { await navigator.share({ title: '你人生的解答之書', text: '這是一本能指引你人生方向的解答之書，快來試試看！', url: window.location.href }); } catch (err) {}
+                try { await navigator.share({ title: '你人生的解答之書', text: '指引你方向的解答之書，快來試試！', url: window.location.href }); } catch (err) {}
             } else {
                 try {
                     const tempInput = document.createElement('input'); document.body.appendChild(tempInput);
                     tempInput.value = window.location.href; tempInput.select();
                     document.execCommand('copy'); document.body.removeChild(tempInput);
-                    showToast("已為您複製遊戲連結！");
+                    showToast("已複製連結");
                 } catch (e) { showToast("複製連結失敗"); }
             }
         }
@@ -483,9 +500,10 @@
         }
 
         function checkMandatory() { Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); }); }
-        function updateStats() {
-            const d = gameData[currentCategory] || [], done = (categoryProgress[currentCategory] || new Set()).size;
-            document.getElementById('statCompleted').textContent = done; document.getElementById('statRemaining').textContent = d.length - done;
+        function randomStyle() {
+            const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+            document.body.className = `theme-${theme.id}`;
+            if (currentCategory) switchCategory(currentCategory);
         }
 
         function shuffleGame() {
