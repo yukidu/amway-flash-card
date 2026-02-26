@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動翻牌遊戲 - 圖片系統分享版</title>
+    <title>互動翻牌遊戲 - 收藏匯出優化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -25,7 +25,7 @@
         body.theme-retro { --bg: #f4ecd8; --dark: #5d4037; --card-border: 2px dashed #5d4037; --card-shadow: 4px 4px 0px #d7ccc8; --card-radius: 0; --bg-pattern: repeating-linear-gradient(45deg, #efebe9, #efebe9 10px, #f4ecd8 10px, #f4ecd8 20px); }
         body.theme-chalk { --bg: #1a3a3a; --dark: #fff; --card-border: 3px solid #fff; --card-shadow: 4px 4px 0px rgba(255,255,255,0.2); --card-radius: 0.5rem; --bg-pattern: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); --bg-size: 30px 30px; }
         body.theme-candy { --bg: #fff5f8; --dark: #ff6baf; --card-border: 4px solid #ff6baf; --card-shadow: 6px 6px 0px #ffd1e3; --card-radius: 2rem; --bg-pattern: radial-gradient(#ffd1e3 2px, transparent 2px); --bg-size: 25px 25px; }
-        body.theme-luxury { --bg: #1a1a1a; --dark: #d4af37; --card-border: 2px solid #d4af37; --card-shadow: 0 0 20px rgba(212,175,55,0.3); --card-radius: 0; --bg-pattern: linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222), linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222); --bg-size: 60px 60px; }
+        body.theme-luxury { --bg: #1a1a1a; --dark: #d4af37; --card-border: 2px solid #d4af37; --card-shadow: 0 0 20px rgba(212,175,55,0.3); --card-radius: 0; --bg-pattern: linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222); --bg-size: 60px 60px; }
         body.theme-blueprint { --bg: #0047ab; --dark: #fff; --card-border: 1px solid rgba(255,255,255,0.5); --card-shadow: 0 0 0 4px #0047ab, 0 0 0 5px white; --card-radius: 0; --bg-pattern: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); --bg-size: 20px 20px; }
         body.theme-pixel { --bg: #6185f2; --dark: #fff; --card-border: 6px double #fff; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --bg-pattern: none; image-rendering: pixelated; }
         body.theme-forest { --bg: #e8f5e9; --dark: #2e7d32; --card-border: 4px solid #2e7d32; --card-shadow: 6px 6px 0px #a5d6a7; --card-radius: 1rem; --bg-pattern: radial-gradient(#c8e6c9 2px, transparent 2px); --bg-size: 40px 40px; }
@@ -133,12 +133,12 @@
 
     <!-- 答案彈窗 -->
     <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-sm cursor-pointer">
-        <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative overflow-hidden cursor-default" onclick="event.stopPropagation()">
-            <div class="relative z-20 flex flex-col items-center w-full text-center mt-4">
+        <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative overflow-hidden cursor-default">
+            <div class="relative z-20 flex flex-col items-center w-full text-center mt-4 pointer-events-none">
                 <div id="answerCategoryTag" class="text-2xl font-black uppercase mb-6 bg-black text-white px-6 py-2 skew-x-[-12deg]">分類</div>
                 <div id="overlayText" class="text-4xl md:text-6xl font-black leading-tight break-words w-full text-black mb-8"></div>
             </div>
-            <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
+            <div id="ratingSection" onclick="event.stopPropagation()" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
                 <p class="font-black text-black italic uppercase">給予星級評分 (自動收藏)</p>
                 <div class="star-rating" id="starRatingContainer">
                     <span class="star" onclick="updateRatingFromUI(1)">★</span>
@@ -153,28 +153,27 @@
 
     <!-- 收藏清單視窗 -->
     <div id="favoriteModal" onclick="closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
-        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
-            <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
+        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default">
+            <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400" onclick="event.stopPropagation()">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-black uppercase italic">評分收藏 🌟</h2>
-                    <!-- 只在星級分頁顯示分享按鈕 -->
-                    <button id="exportJpegBtn" onclick="shareListAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white hover:bg-white hover:text-black transition-colors uppercase hidden flex items-center gap-1">分享圖片 📸</button>
+                    <h2 class="text-2xl font-black uppercase italic text-black">評分收藏 🌟</h2>
+                    <button id="exportJpegBtn" onclick="shareListAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white hover:bg-white hover:text-black transition-colors uppercase flex items-center gap-1">分享圖片 📸</button>
                 </div>
                 <div id="favFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
             </div>
             <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
-            <div class="p-4 border-t-8 border-black bg-gray-100 text-center text-xs font-black opacity-40 uppercase italic">點擊背景任一處關閉</div>
+            <div class="p-4 border-t-8 border-black bg-gray-100 text-center text-xs font-black opacity-40 uppercase italic">點擊背景或視窗任一處關閉</div>
         </div>
     </div>
 
     <!-- 編輯視窗 -->
     <div id="editModal" onclick="closeEditModal()" class="fixed inset-0 bg-black/60 z-40 hidden items-center justify-center p-4 cursor-pointer">
-        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
-            <div class="p-4 border-b-8 border-black bg-yellow-400">
+        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default">
+            <div class="p-4 border-b-8 border-black bg-yellow-400" onclick="event.stopPropagation()">
                 <h2 class="text-2xl font-black uppercase italic">編輯內容 ✏️</h2>
             </div>
             <div id="editList" class="p-6 overflow-y-auto space-y-3 flex-grow bg-white"></div>
-            <div class="p-6 border-t-8 border-black bg-gray-100 flex gap-4">
+            <div class="p-6 border-t-8 border-black bg-gray-100 flex gap-4" onclick="event.stopPropagation()">
                 <button onclick="saveAnswers()" class="flex-1 bg-green-500 text-white py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000]">儲存內容</button>
             </div>
         </div>
@@ -372,7 +371,8 @@
 
         function createFilterBtn(t, v) {
             const btn = document.createElement('button'); btn.textContent = t;
-            btn.className = `bg-white px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm hover:bg-black hover:text-white transition-colors ${currentFavFilter === v ? 'bg-black text-white' : ''}`;
+            // 明確指定 text-black 以防在粉色背景下看不見
+            btn.className = `bg-white px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm text-black hover:bg-black hover:text-white transition-colors ${currentFavFilter === v ? 'bg-black text-white' : ''}`;
             btn.onclick = () => filterFavs(v);
             return btn;
         }
@@ -381,87 +381,78 @@
             currentFavFilter = filter; updateFavFilters();
             const list = document.getElementById('favoriteList'), exportBtn = document.getElementById('exportJpegBtn');
             list.innerHTML = '';
-            exportBtn.classList.toggle('hidden', filter === 'all');
+            
+            // 現在不論是否為 all 都要顯示匯出按鈕，除非完全沒數據
             let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] }));
             if (filter.startsWith('star-')) items = items.filter(i => i.rating === parseInt(filter.split('-')[1]));
+            
+            exportBtn.classList.toggle('hidden', items.length === 0);
+            
             items.sort((a, b) => b.rating - a.rating || a.text.localeCompare(b.text));
-            if (items.length === 0) { list.innerHTML = '<div class="text-black font-black text-center p-10 opacity-30 italic">尚無評分紀錄</div>'; return; }
+            if (items.length === 0) { list.innerHTML = '<div class="text-black font-black text-center p-10 opacity-30 italic text-black">尚無評分紀錄</div>'; return; }
             items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = "bg-gray-50 border-4 border-black p-4 flex flex-col items-center sm:items-start gap-2 shadow-[4px_4px_0px_#000]";
+                div.onclick = (e) => e.stopPropagation();
                 let starsHTML = '';
                 for(let i=1; i<=5; i++) {
                     const activeClass = i <= item.rating ? 'star-filled' : 'star-empty';
                     starsHTML += `<span class="${activeClass} cursor-pointer hover:scale-125 transition-transform" onclick="event.stopPropagation(); updateRating('${item.text.replace(/'/g, "\\'")}', '${item.category}', ${i})">⭐</span>`;
                 }
-                div.innerHTML = `<div class="w-full text-black text-center sm:text-left"><span class="text-xs font-black bg-black text-white px-2 py-0.5 mb-1 inline-block uppercase italic">${item.category}</span><p class="font-black text-lg mb-1">${item.text}</p><div class="flex justify-center sm:justify-start gap-1 text-xl">${starsHTML}</div></div>`;
+                div.innerHTML = `<div class="w-full text-black text-center sm:text-left text-black"><span class="text-xs font-black bg-black text-white px-2 py-0.5 mb-1 inline-block uppercase italic">${item.category}</span><p class="font-black text-lg mb-1">${item.text}</p><div class="flex justify-center sm:justify-start gap-1 text-xl">${starsHTML}</div></div>`;
                 list.appendChild(div);
             });
         }
 
-        // 修改後的分享圖片功能：串接系統分享 API
         async function shareListAsImage() {
-            if (currentFavFilter === 'all') return;
             showToast("正在產生圖片...");
             
-            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.rating === parseInt(currentFavFilter.split('-')[1]));
+            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] }));
+            let titleText = "評分收藏清單";
+            if (currentFavFilter.startsWith('star-')) {
+                const starCount = currentFavFilter.split('-')[1];
+                items = items.filter(i => i.rating === parseInt(starCount));
+                titleText = `評分收藏清單 (${starCount}顆星)`;
+            }
+
             const tempDiv = document.createElement('div');
             Object.assign(tempDiv.style, { position: 'fixed', top: '0', left: '-5000px', width: '500px', background: 'white', color: 'black', padding: '40px', fontFamily: 'sans-serif' });
-            const starCount = currentFavFilter.split('-')[1];
-            tempDiv.innerHTML = `<h1 style="font-size:24px; font-weight:900; border-bottom:4px solid black; margin-bottom:20px; padding-bottom:10px;">評分收藏清單 (${starCount}顆星)</h1>`;
-            items.forEach(item => { tempDiv.innerHTML += `<div style="margin-bottom:15px; border-left:8px solid black; padding-left:12px;"><div style="font-size:12px; font-weight:900; opacity:0.6;">[ ${item.category} ]</div><div style="font-size:18px; font-weight:800; line-height:1.4;">${item.text}</div></div>`; });
-            document.body.appendChild(tempDiv);
+            
+            tempDiv.innerHTML = `
+                <h1 style="font-size:24px; font-weight:900; border-bottom:4px solid black; margin-bottom:20px; padding-bottom:10px;">${titleText}</h1>
+                <div id="tempItemsContainer"></div>
+                <div style="margin-top:30px; text-align:right; font-size:12px; color:#cccccc; font-weight:bold; letter-spacing:1px;">杜杜龍牌卡</div>
+            `;
+            
+            const container = tempDiv.querySelector('#tempItemsContainer');
+            items.sort((a,b) => b.rating - a.rating).forEach(item => {
+                container.innerHTML += `<div style="margin-bottom:15px; border-left:8px solid black; padding-left:12px;"><div style="font-size:12px; font-weight:900; opacity:0.6;">[ ${item.category} ]</div><div style="font-size:18px; font-weight:800; line-height:1.4;">${item.text}</div></div>`;
+            });
 
+            document.body.appendChild(tempDiv);
             try {
                 const canvas = await html2canvas(tempDiv, { scale: 2 });
                 canvas.toBlob(async (blob) => {
-                    const fileName = `收藏_${starCount}星_${new Date().getTime()}.jpg`;
+                    const fileName = `收藏清單_${new Date().getTime()}.jpg`;
                     const file = new File([blob], fileName, { type: "image/jpeg" });
-
-                    // 檢查是否支援系統分享文件
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: `我的收藏清單 (${starCount}顆星)`,
-                                text: '分享我的評分收藏清單！'
-                            });
-                        } catch (err) {
-                            // 使用者取消分享不報錯
-                        }
+                        try { await navigator.share({ files: [file], title: titleText, text: '分享我的評分收藏清單！' }); } catch (err) {}
                     } else {
-                        // 備案：直接下載
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = fileName;
-                        link.click();
-                        showToast("瀏覽器不支持直接分享文件，已為您下載圖片！");
+                        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = fileName; link.click();
+                        showToast("瀏覽器不支持直接分享，已為您下載圖片！");
                     }
                 }, 'image/jpeg', 0.9);
-            } catch (e) {
-                showToast("產生圖片失敗");
-            } finally {
-                document.body.removeChild(tempDiv);
-            }
+            } catch (e) { showToast("產生圖片失敗"); } finally { document.body.removeChild(tempDiv); }
         }
 
         async function shareApp() {
             if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: '互動翻牌遊戲',
-                        text: '這是一個超好玩的互動翻牌遊戲，快來試試看！',
-                        url: window.location.href
-                    });
-                } catch (err) {}
+                try { await navigator.share({ title: '互動翻牌遊戲', text: '這是一個超好玩的互動翻牌遊戲，快來試試看！', url: window.location.href }); } catch (err) {}
             } else {
                 try {
-                    const tempInput = document.createElement('input');
-                    document.body.appendChild(tempInput);
-                    tempInput.value = window.location.href;
-                    tempInput.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tempInput);
+                    const tempInput = document.createElement('input'); document.body.appendChild(tempInput);
+                    tempInput.value = window.location.href; tempInput.select();
+                    document.execCommand('copy'); document.body.removeChild(tempInput);
                     showToast("已為您複製遊戲連結！");
                 } catch (e) { showToast("複製連結失敗"); }
             }
@@ -500,6 +491,7 @@
 
         function addAnswerRow(t = '') {
             const div = document.createElement('div'); div.className = 'flex gap-2 items-center bg-gray-50 p-4 border-4 border-black';
+            div.onclick = (e) => e.stopPropagation();
             div.innerHTML = `<input type="text" value="${t}" class="item-text flex-grow font-black p-1 outline-none text-black"><button onclick="this.parentElement.remove()" class="text-2xl font-black text-black">🗑️</button>`;
             document.getElementById('editList').appendChild(div);
         }
