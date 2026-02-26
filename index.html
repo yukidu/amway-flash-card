@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動翻牌遊戲 - 統一視覺版</title>
+    <title>互動翻牌遊戲 - 評分視覺強化版</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary: #FFD700;
@@ -17,14 +18,14 @@
             --bg-size: 20px 20px;
         }
 
-        /* --- 12 種視覺風格定義 --- */
+        /* --- 12 種風格 --- */
         body.theme-pop { --bg: #F0F0F0; --dark: #000; --card-border: 4px solid #000; --card-shadow: 6px 6px 0px #000; --card-radius: 0.25rem; --bg-pattern: radial-gradient(#ccc 1.5px, transparent 1.5px); --bg-size: 15px 15px; }
         body.theme-neon { --bg: #0a0a0c; --dark: #fff; --card-border: 2px solid var(--primary); --card-shadow: 0 0 15px var(--primary); --card-radius: 1rem; --bg-pattern: linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px); --bg-size: 40px 40px; }
         body.theme-minimal { --bg: #ffffff; --dark: #333; --card-border: 1px solid #e2e8f0; --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); --card-radius: 1.5rem; --bg-pattern: none; }
         body.theme-retro { --bg: #f4ecd8; --dark: #5d4037; --card-border: 2px dashed #5d4037; --card-shadow: 4px 4px 0px #d7ccc8; --card-radius: 0; --bg-pattern: repeating-linear-gradient(45deg, #efebe9, #efebe9 10px, #f4ecd8 10px, #f4ecd8 20px); }
         body.theme-chalk { --bg: #1a3a3a; --dark: #fff; --card-border: 3px solid #fff; --card-shadow: 4px 4px 0px rgba(255,255,255,0.2); --card-radius: 0.5rem; --bg-pattern: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); --bg-size: 30px 30px; }
         body.theme-candy { --bg: #fff5f8; --dark: #ff6baf; --card-border: 4px solid #ff6baf; --card-shadow: 6px 6px 0px #ffd1e3; --card-radius: 2rem; --bg-pattern: radial-gradient(#ffd1e3 2px, transparent 2px); --bg-size: 25px 25px; }
-        body.theme-luxury { --bg: #1a1a1a; --dark: #d4af37; --card-border: 2px solid #d4af37; --card-shadow: 0 0 20px rgba(212,175,55,0.3); --card-radius: 0; --bg-pattern: linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222), linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222); --bg-size: 60px 60px; }
+        body.theme-luxury { --bg: #1a1a1a; --dark: #d4af37; --card-border: 2px solid #d4af37; --card-shadow: 0 0 20px rgba(212,175,55,0.3); --card-radius: 0; --bg-pattern: linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222); --bg-size: 60px 60px; }
         body.theme-blueprint { --bg: #0047ab; --dark: #fff; --card-border: 1px solid rgba(255,255,255,0.5); --card-shadow: 0 0 0 4px #0047ab, 0 0 0 5px white; --card-radius: 0; --bg-pattern: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); --bg-size: 20px 20px; }
         body.theme-pixel { --bg: #6185f2; --dark: #fff; --card-border: 6px double #fff; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --bg-pattern: none; image-rendering: pixelated; }
         body.theme-forest { --bg: #e8f5e9; --dark: #2e7d32; --card-border: 4px solid #2e7d32; --card-shadow: 6px 6px 0px #a5d6a7; --card-radius: 1rem; --bg-pattern: radial-gradient(#c8e6c9 2px, transparent 2px); --bg-size: 40px 40px; }
@@ -68,29 +69,17 @@
             padding: 8px; font-size: 3rem; display: flex; align-items: center; justify-content: center;
         }
 
-        /* 翻開後的狀態：數字維持在正中央 */
         .card-completed .card-front {
             background-color: #eee !important; color: #666 !important;
             border-color: #bbb; box-shadow: none; opacity: 1; 
         }
 
-        /* 超大半透明圖標層：鑽石與皇冠大小一致並留白 */
         .card-icon-overlay {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem; /* 稍微縮小以保持四邊留白 */
-            opacity: 0.15;
-            pointer-events: none;
-            z-index: 10;
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; opacity: 0.2; pointer-events: none; z-index: 10;
         }
         
-        .card-number-text {
-            position: relative;
-            z-index: 20;
-        }
+        .card-number-text { position: relative; z-index: 20; }
 
         .tab-btn { border: var(--card-border); box-shadow: var(--card-shadow); transition: all 0.2s; border-radius: var(--card-radius); }
         .tab-active { filter: brightness(0.8) contrast(1.2); transform: scale(1.05); outline: 3px solid white; }
@@ -103,25 +92,25 @@
             z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* 視窗統一樣式 */
         .modal-content { transition: all 0.5s ease; border: var(--card-border); box-shadow: var(--card-shadow); border-width: 10px; }
-        
         .stat-box { color: #000 !important; }
         .stat-label { color: rgba(0,0,0,0.6) !important; }
 
-        /* 星星評分樣式 */
-        .star-rating {
-            display: flex; gap: 0.5rem; font-size: 2rem; cursor: pointer;
-        }
+        /* 星級樣式 */
+        .star-rating { display: flex; gap: 0.5rem; font-size: 2rem; cursor: pointer; }
         .star { color: #ccc; transition: transform 0.2s; }
         .star.active { color: #FFD700; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
         .star:hover { transform: scale(1.2); }
+
+        /* 清單內淡化星級 */
+        .star-empty { color: #e2e8f0; opacity: 0.3; }
+        .star-filled { color: #fbbf24; }
     </style>
 </head>
 <body class="theme-pop" onclick="handleUserInteraction()">
     <div id="aiLoading" class="loading-overlay">
         <div class="animate-spin rounded-full h-16 w-16 border-t-8 border-black mb-4"></div>
-        <p class="text-black font-black text-2xl italic">正在載入...</p>
+        <p class="text-black font-black text-2xl italic">載入中...</p>
     </div>
 
     <div class="max-w-6xl mx-auto px-4 py-8">
@@ -146,18 +135,10 @@
         <main id="cardsGrid"></main>
 
         <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-6">
-            <button id="shuffleBtn" onclick="shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
-                隨機洗牌 🔀
-            </button>
-            <button onclick="randomStyle()" class="bg-indigo-600 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
-                更換風格 🎨
-            </button>
-            <button onclick="openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
-                收藏清單 🌟
-            </button>
-            <button onclick="openEditModal()" class="bg-white text-black px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
-                編輯內容 ✏️
-            </button>
+            <button id="shuffleBtn" onclick="shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">隨機洗牌 🔀</button>
+            <button onclick="randomStyle()" class="bg-indigo-600 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">更換風格 🎨</button>
+            <button onclick="openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">收藏清單 🌟</button>
+            <button onclick="openEditModal()" class="bg-white text-black px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">編輯內容 ✏️</button>
         </footer>
     </div>
 
@@ -168,8 +149,6 @@
                 <div id="answerCategoryTag" class="text-2xl font-black uppercase mb-6 bg-black text-white px-6 py-2 skew-x-[-12deg]">分類</div>
                 <div id="overlayText" class="text-4xl md:text-6xl font-black leading-tight break-words w-full text-black mb-8"></div>
             </div>
-
-            <!-- 評分區塊 -->
             <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
                 <p class="font-black text-black italic uppercase">給予星級評分 (自動收藏)</p>
                 <div class="star-rating" id="starRatingContainer">
@@ -183,22 +162,19 @@
         </div>
     </div>
 
-    <!-- 收藏與紀錄清單視窗 -->
+    <!-- 收藏視窗 -->
     <div id="favoriteModal" onclick="closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
         <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
             <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
-                <h2 class="text-2xl font-black uppercase mb-4 italic">評分收藏 🌟</h2>
-                <!-- 篩選器 -->
-                <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-                    <button onclick="filterFavs('all')" class="bg-white px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">全部紀錄</button>
-                    <button onclick="filterFavs('star-5')" class="bg-yellow-400 px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">⭐⭐⭐⭐⭐</button>
-                    <button onclick="filterFavs('star-4')" class="bg-yellow-300 px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">⭐⭐⭐⭐</button>
-                    <button onclick="filterFavs('star-3')" class="bg-yellow-200 px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">⭐⭐⭐</button>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-black uppercase italic">評分收藏 🌟</h2>
+                    <button id="exportJpegBtn" onclick="exportToJpeg()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white hover:bg-white hover:text-black transition-colors uppercase">匯出圖片 📸</button>
                 </div>
+                <div id="favFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
             </div>
             <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
             <div class="p-4 border-t-8 border-black bg-gray-100 text-center">
-                <p class="text-xs font-black opacity-50 italic uppercase">點擊背景關閉視窗</p>
+                <p class="text-xs font-black opacity-40 italic uppercase">點擊背景任一處關閉</p>
             </div>
         </div>
     </div>
@@ -236,6 +212,7 @@
         let cardMetadata = {}; 
         let currentCategory = '';
         let currentCardIndex = null;
+        let currentFavFilter = 'all';
         let isShuffling = false;
         let isAnimating = false;
 
@@ -275,6 +252,8 @@
             if (currentCategory) switchCategory(currentCategory);
         }
 
+        function handleUserInteraction() { initAudio(); enableShake(); }
+
         let lastShakeUpdate = 0;
         const SHAKE_THRESHOLD = 50; 
         const SHAKE_COOLDOWN = 1500; 
@@ -295,8 +274,6 @@
                 }
             }
         }
-
-        function handleUserInteraction() { initAudio(); enableShake(); }
 
         function enableShake() {
             if (isShakeInitialized) return;
@@ -334,7 +311,7 @@
                     });
                     if (Object.keys(newData).length > 0) applyNewGameData(newData);
                 }
-            } catch (err) { showToast("同步錯誤"); } finally {
+            } catch (err) { showToast("同步失敗"); } finally {
                 loadingOverlay.style.display = 'none';
                 initKeyboardSupport();
             }
@@ -386,22 +363,15 @@
             items.forEach((text, i) => {
                 const isDone = completed.has(i);
                 const isMandatory = (text === MANDATORY_CARD);
-                
-                // 翻開後：數字永遠置中。背景疊加半透明大圖標
                 const icon = isMandatory ? '👑' : '💎';
-                const frontContent = `
-                    <span class="card-number-text">${i + 1}</span>
-                    ${isDone ? `<div class="card-icon-overlay">${icon}</div>` : ''}
-                `;
+                const frontContent = `<span class="card-number-text">${i + 1}</span>${isDone ? `<div class="card-icon-overlay">${icon}</div>` : ''}`;
                 
                 const container = document.createElement('div');
                 container.className = `card-container ${isDone ? 'card-completed' : ''}`;
                 container.innerHTML = `
                     <div class="card-inner" id="card-${i}" onclick="handleCardClick(${i})">
                         <div class="card-face card-front">${frontContent}</div>
-                        <div class="card-face card-back" style="border-color: ${categoryColors[currentCategory]}">
-                            <span>${icon}</span>
-                        </div>
+                        <div class="card-face card-back" style="border-color: ${categoryColors[currentCategory]}"><span>${icon}</span></div>
                     </div>`;
                 grid.appendChild(container);
                 if (!skipAnimation) {
@@ -412,7 +382,7 @@
         }
 
         function handleCardClick(index) {
-            if (isShuffling || isAnimating) return; // 不再阻擋 completed.has(index)，允許重複翻開
+            if (isShuffling || isAnimating) return;
             isAnimating = true; currentCardIndex = index;
             const el = document.getElementById(`card-${index}`);
             if (el) el.classList.add('is-flipped');
@@ -425,11 +395,8 @@
                 const overlay = document.getElementById('answerOverlay');
                 document.getElementById('overlayText').textContent = text;
                 document.getElementById('answerCategoryTag').textContent = currentCategory;
-                
-                // 杜杜龍牌隱藏評價
                 const ratingSection = document.getElementById('ratingSection');
                 ratingSection.style.display = isMandatory ? 'none' : 'flex';
-                
                 updateStarUI(cardMetadata[text].rating);
                 overlay.classList.replace('hidden', 'flex');
                 if (isMandatory) playSound('victory'); else playSound('pop');
@@ -467,51 +434,91 @@
             }, 350);
         }
 
-        // --- 收藏清單 ---
         function openFavoriteModal() {
             document.getElementById('favoriteModal').classList.replace('hidden', 'flex');
+            updateFavFilters();
             filterFavs('all');
         }
 
-        function closeFavoriteModal() {
-            document.getElementById('favoriteModal').classList.replace('flex', 'hidden');
+        function closeFavoriteModal() { document.getElementById('favoriteModal').classList.replace('flex', 'hidden'); }
+
+        function updateFavFilters() {
+            const container = document.getElementById('favFilterContainer');
+            container.innerHTML = '';
+            const existingRatings = new Set();
+            Object.values(cardMetadata).forEach(m => { if(m.rating > 0) existingRatings.add(m.rating); });
+            const allBtn = createFilterBtn('全部紀錄', 'all');
+            container.appendChild(allBtn);
+            [5,4,3,2,1].forEach(r => {
+                if (existingRatings.has(r)) {
+                    const btn = createFilterBtn('⭐'.repeat(r), `star-${r}`);
+                    container.appendChild(btn);
+                }
+            });
+        }
+
+        function createFilterBtn(text, val) {
+            const btn = document.createElement('button');
+            btn.textContent = text;
+            btn.className = `bg-white px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm hover:bg-black hover:text-white transition-colors ${currentFavFilter === val ? 'bg-black text-white' : ''}`;
+            btn.onclick = () => filterFavs(val);
+            return btn;
         }
 
         function filterFavs(filter) {
+            currentFavFilter = filter;
+            updateFavFilters();
             const list = document.getElementById('favoriteList');
             list.innerHTML = '';
             let items = Object.keys(cardMetadata).map(text => ({ text, ...cardMetadata[text] }));
-            
-            // 收藏清單邏輯：顯示有評分的
-            if (filter === 'fav') items = items.filter(i => i.rating > 0);
-            else if (filter.startsWith('star-')) {
+            if (filter.startsWith('star-')) {
                 const val = parseInt(filter.split('-')[1]);
                 items = items.filter(i => i.rating === val);
             }
-
             items.sort((a, b) => b.rating - a.rating || a.text.localeCompare(b.text));
             if (items.length === 0) {
-                list.innerHTML = '<div class="text-black font-black text-center p-10 opacity-30 uppercase italic">無數據</div>';
+                list.innerHTML = '<div class="text-black font-black text-center p-10 opacity-30 uppercase italic">尚無數據</div>';
                 return;
             }
             items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = "bg-gray-50 border-4 border-black p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-[4px_4px_0px_#000]";
-                const stars = "⭐".repeat(item.rating) + "☆".repeat(5 - item.rating);
+                
+                // 產生更明顯淡化的星級 HTML
+                let starsHTML = '';
+                for(let i=1; i<=5; i++) {
+                    if(i <= item.rating) starsHTML += '<span class="star-filled">⭐</span>';
+                    else starsHTML += '<span class="star-empty">☆</span>';
+                }
+
                 div.innerHTML = `
                     <div class="flex-grow text-black text-center sm:text-left">
                         <span class="text-xs font-black bg-black text-white px-2 py-0.5 mb-1 inline-block uppercase italic">${item.category}</span>
                         <p class="font-black text-lg">${item.text}</p>
-                        <p class="text-yellow-600 font-bold">${stars}</p>
+                        <div class="stars-display flex justify-center sm:justify-start gap-0.5 text-xl">${starsHTML}</div>
                     </div>
                     <button onclick="jumpToCard('${item.category}', '${item.text}')" class="bg-indigo-500 text-white px-4 py-2 border-2 border-black font-black text-sm uppercase">查看</button>`;
                 list.appendChild(div);
             });
         }
 
+        async function exportToJpeg() {
+            const list = document.getElementById('favoriteList');
+            if (!list.hasChildNodes() || list.innerText.includes("尚無數據")) return;
+            showToast("正在產生圖片...");
+            try {
+                const canvas = await html2canvas(list, { backgroundColor: "#FFFFFF", scale: 2, logging: false, useCORS: true });
+                const link = document.createElement('a');
+                link.download = `收藏清單_${currentFavFilter}_${new Date().getTime()}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                showToast("匯出成功！");
+            } catch (e) { showToast("匯出失敗"); }
+        }
+
         function jumpToCard(cat, text) {
             closeFavoriteModal(); switchCategory(cat);
-            showToast(`已切換至 ${cat}`);
+            showToast(`已定位至 ${cat}`);
         }
 
         function parseCSV(text) {
@@ -581,15 +588,7 @@
 
         function initKeyboardSupport() {
             window.addEventListener('keydown', (e) => {
-                const answerOverlay = document.getElementById('answerOverlay');
-                const favModal = document.getElementById('favoriteModal');
-                const editModal = document.getElementById('editModal');
-                
-                if (e.key === 'Escape') {
-                    if (!answerOverlay.classList.contains('hidden')) closeAnswer();
-                    if (!favModal.classList.contains('hidden')) closeFavoriteModal();
-                    if (!editModal.classList.contains('hidden')) closeEditModal();
-                }
+                if (e.key === 'Escape') { closeAnswer(); closeFavoriteModal(); closeEditModal(); }
             });
         }
 
