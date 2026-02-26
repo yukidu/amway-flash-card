@@ -11,71 +11,74 @@
         :root {
             --primary: #FFD700;
             --dark: #000000;
-            --bg: #F0F0F0;
+            --bg: #F9FAFB;
             --card-border: 4px solid #000;
             --card-shadow: 6px 6px 0px #000;
             --card-radius: 0.5rem;
             --card-rotate: 0deg;
-            --bg-pattern: radial-gradient(#d1d1d1 1.5px, transparent 1.5px);
+            --bg-pattern: radial-gradient(rgba(0,0,0,0.1) 1.5px, transparent 1.5px);
             --bg-size: 20px 20px;
         }
 
-        /* 誇張的歡迎動畫 */
-        @keyframes welcomePop {
-            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
-            50% { transform: scale(1.5) rotate(10deg); }
-            70% { transform: scale(0.9) rotate(-5deg); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        .animate-welcome { animation: welcomePop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-
-        /* 洗牌動畫 */
-        @keyframes shuffleShake {
-            0% { transform: translate(0,0) rotate(0); }
-            25% { transform: translate(5px, 5px) rotate(5deg); }
-            50% { transform: translate(-5px, -5px) rotate(-5deg); }
-            75% { transform: translate(5px, -5px) rotate(5deg); }
-            100% { transform: translate(0,0) rotate(0); }
-        }
-        .shuffle-active { animation: shuffleShake 0.4s ease-in-out infinite; }
-
-        /* 超巨大風格名稱動畫 */
+        /* 風格名稱動畫：縮小尺寸並優化位置 */
         @keyframes giantTextPop {
-            0% { transform: translate(-50%, -50%) scale(0) rotate(-30deg); opacity: 0; }
-            40% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); opacity: 1; }
-            80% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+            0% { transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); opacity: 0; }
+            30% { transform: translate(-50%, -50%) scale(1.1) rotate(2deg); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
         }
         #giantThemeName {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 5000; font-size: 15vw; font-weight: 900; color: black;
-            text-shadow: 10px 10px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white, 2px 2px 0px white, 0px 15px 30px rgba(0,0,0,0.5);
+            z-index: 5000; font-size: 15vw; font-weight: 900; color: var(--dark);
+            text-shadow: 4px 4px 0px white, -2px -2px 0px white;
             pointer-events: none; white-space: nowrap; display: none;
-            font-style: italic;
+            font-style: italic; letter-spacing: -0.02em; line-height: 1;
         }
-        #giantThemeName.active { display: block; animation: giantTextPop 1.5s ease-out forwards; }
+        #giantThemeName.active { display: block; animation: giantTextPop 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
-        /* --- 風格設定 --- */
-        body.theme-pop { --bg: #f3f4f6; --dark: #000; --card-border: 4px solid #000; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --card-rotate: -2deg; }
-        body.theme-blueprint { --bg: #0047ab; --dark: #fff; --card-border: 1px solid rgba(255,255,255,0.5); --card-radius: 0; }
-        /* 其他風格繼承之前定義... */
+        /* 風格樣式定義 */
+        body.theme-pop { --card-border: 4px solid #000; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --card-rotate: -2deg; }
+        body.theme-cloud { --card-border: 6px solid #fff; --card-shadow: 0 15px 30px rgba(0,0,0,0.1); --card-radius: 50%; }
+        body.theme-leaf { --card-border: 3px solid #000; --card-shadow: 4px 4px 0px rgba(0,0,0,0.1); --card-radius: 0 2rem 0 2rem; }
+        body.theme-gem { --card-border: 2px solid #000; --card-shadow: 0 0 20px rgba(0,0,0,0.1); --card-radius: 0; }
+        body.theme-stamp { --card-border: 5px dotted #000; --card-shadow: 0 0 0 8px #fff; --card-radius: 0.25rem; }
+        body.theme-bold { --card-border: 12px solid #000; --card-shadow: 15px 15px 0px rgba(0,0,0,0.2); --card-radius: 0; }
+        body.theme-pill { --card-border: 4px solid #000; --card-shadow: 0 10px 0px rgba(0,0,0,0.1); --card-radius: 999px; }
+        body.theme-slanted { --card-border: 3px solid #000; --card-shadow: 10px 10px 0px rgba(0,0,0,0.1); --card-radius: 0; --card-rotate: 5deg; }
+        body.theme-double { --card-border: 8px double #000; --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); --card-radius: 1.5rem; }
+        body.theme-organic { --card-border: 3px solid #000; --card-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        body.theme-ticket { --card-border: 2px dashed #000; --card-shadow: 5px 5px 0px rgba(0,0,0,0.1); --card-radius: 0.5rem; }
+        body.theme-shadow { --card-border: 1px solid #000; --card-shadow: 20px 20px 60px rgba(0,0,0,0.1); --card-radius: 2rem; }
+        body.theme-retro-lcd { --card-border: 10px ridge #888; --card-radius: 0; }
+        body.theme-frame { --card-border: 2px solid #000; --card-shadow: 0 0 0 10px #fff; --card-radius: 0; }
+        body.theme-bubble { --card-border: 4px solid #000; --card-radius: 40% 60% 70% 30%; }
+        body.theme-blueprint { --card-border: 1px solid rgba(0,0,0,0.3); --card-radius: 0; }
+        body.theme-origami { --card-border: 1px solid #000; --card-shadow: 5px 5px 15px rgba(0,0,0,0.05); --card-radius: 0; }
+        body.theme-candy-cane { --card-border: 6px double #000; --card-radius: 2.5rem; }
+        body.theme-tech-light { --card-border: 2px solid #000; --card-radius: 0; }
+        body.theme-notebook { --card-border: 2px solid #000; --card-shadow: 4px 4px 0px rgba(0,0,0,0.1); --card-radius: 0; --bg-pattern: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px); --bg-size: 100% 20px; }
 
         body {
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
             background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
-            color: var(--dark); margin: 0; padding: 0; transition: all 0.5s ease;
+            color: var(--dark); margin: 0; padding: 0; 
+            /* 讓變換更絲滑 */
+            transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1), color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 1rem 0; border-bottom: 2px solid rgba(0,0,0,0.1); transition: background 0.5s ease; }
+        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 1rem 0; border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 1.2s ease; }
 
         #cardsGrid { display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem; }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
         @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
 
-        .card-container { perspective: 1000px; position: relative; width: 100%; aspect-ratio: 1; transition: transform 0.5s ease; }
+        .card-container { 
+            perspective: 1000px; position: relative; width: 100%; aspect-ratio: 1; 
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
         .card-inner {
             position: absolute; width: 100%; height: 100%;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
             transform-style: preserve-3d; cursor: pointer;
         }
         .card-inner.is-flipped { transform: rotateY(180deg); }
@@ -85,51 +88,72 @@
             backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
             border-radius: var(--card-radius); border: var(--card-border);
             box-shadow: var(--card-shadow); overflow: hidden;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
-        .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 2.5rem; }
+        .card-front { background-color: var(--primary); color: #000; font-weight: 900; position: relative; }
+        .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 3rem; }
+
+        /* Emoji 縮小並調整顏色明顯度 */
+        .card-emoji-bg {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; opacity: 0.35; z-index: 1; pointer-events: none;
+        }
+        .card-number-text { position: relative; z-index: 10; pointer-events: none; }
 
         .card-completed .card-front { 
-            background-color: #e5e7eb !important; color: #6b7280 !important; border-color: #d1d5db !important; opacity: 0.85; filter: grayscale(0.2); 
+            background-color: #f3f4f6 !important; color: #9ca3af !important; border-color: #d1d5db !important; opacity: 0.8; 
         }
 
-        #categorySelect, .nav-btn {
-            appearance: none; background: #fff; border: 4px solid #000; box-shadow: 4px 4px 0px #000;
-            font-weight: 900; padding: 0.5rem 1rem; border-radius: 0.5rem; color: #000 !important;
+        /* 導覽元件樣式 */
+        #categorySelect, .nav-btn, .stat-box {
+            background: #fff !important; border: 2px solid #000 !important; box-shadow: 2px 2px 0px #000 !important;
+            font-weight: 900; color: #000 !important;
+        }
+        .stat-box { min-width: 90px; text-align: center; padding: 0.4rem 0.8rem; }
+
+        .modal-close-btn {
+            position: absolute; top: -15px; right: -15px; width: 40px; height: 40px;
+            background: black; color: white; border: 4px solid white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: 900;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1100; cursor: pointer;
         }
 
-        .stat-box {
-            background: #fff; border: 4px solid #000; padding: 0.75rem 1.25rem; box-shadow: 4px 4px 0px #000;
-            min-width: 110px; text-align: center; color: #000 !important;
-        }
-
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255, 255, 255, 0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .star-rating .star { color: #ccc; cursor: pointer; font-size: 2rem; }
+        .star-rating .star.active { color: #FFD700; }
     </style>
 </head>
 <body class="theme-pop" onclick="window.initAudio()">
     <div id="giantThemeName">風格名稱</div>
+
+    <div id="aiLoading" class="loading-overlay">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-8 border-black mb-4"></div>
+        <p class="text-black font-black text-2xl italic">數據載入中...</p>
+    </div>
 
     <nav class="sticky-nav">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
                     <div class="stat-box">
-                        <p class="text-[10px] font-black uppercase opacity-60 leading-none mb-1">已翻開</p>
-                        <p id="statCompleted" class="text-3xl font-black">0</p>
+                        <p class="text-[9px] font-black uppercase opacity-60 leading-none mb-1">已翻開</p>
+                        <p id="statCompleted" class="text-xl font-black">0</p>
                     </div>
                     <div class="stat-box">
-                        <p class="text-[10px] font-black uppercase opacity-60 leading-none mb-1">剩餘牌卡</p>
-                        <p id="statRemaining" class="text-3xl font-black">0</p>
+                        <p class="text-[9px] font-black uppercase opacity-60 leading-none mb-1">剩餘牌卡</p>
+                        <p id="statRemaining" class="text-xl font-black">0</p>
                     </div>
-                    <div id="welcomeContainer" class="hidden flex items-center gap-2">
-                         <div id="welcomeMsg" class="text-lg font-black bg-white px-4 py-2 border-2 border-black shadow-[2px_2px_0px_black] text-black"></div>
-                         <button onclick="window.editName()" class="bg-white border-2 border-black p-2 hover:bg-gray-100 shadow-[2px_2px_0px_black] text-sm">✏️</button>
+                    <!-- 清爽設計：移除框線與陰影 -->
+                    <div id="welcomeContainer" class="hidden flex items-center gap-3">
+                         <div id="welcomeMsg" class="text-sm font-black text-black/80 tracking-wide"></div>
+                         <button onclick="window.editName()" class="text-black/40 hover:text-black transition-colors text-lg" title="修改名字">✏️</button>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-3 w-full md:w-auto">
-                    <button onclick="window.randomStyle()" class="nav-btn bg-indigo-100 whitespace-nowrap text-sm">切換視覺 🎨</button>
+                    <button onclick="window.randomStyle()" class="nav-btn whitespace-nowrap text-sm px-4">切換視覺 🎨</button>
                     <div class="relative flex-grow md:flex-grow-0">
                         <select id="categorySelect" class="w-full text-sm" onchange="window.switchCategory(this.value)">
                             <option disabled selected>載入中...</option>
@@ -142,62 +166,58 @@
 
     <div class="max-w-6xl mx-auto px-4 py-8">
         <main id="cardsGrid"></main>
-
         <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-4">
-            <button onclick="window.shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] text-sm hover:translate-y-1 hover:shadow-none transition-all">重新洗牌 🔀</button>
-            <button onclick="window.openRecordModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] text-sm">翻牌紀錄 📜</button>
-            <button onclick="window.shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] text-sm">分享網頁 🚀</button>
+            <button onclick="window.shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#444] text-sm hover:translate-y-1 hover:shadow-none transition-all">重新洗牌 🔀</button>
+            <button onclick="window.openRecordModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#000] text-sm">翻牌紀錄 📜</button>
+            <button onclick="window.shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[4px_4px_0px_#000] text-sm">分享網頁 🚀</button>
         </footer>
     </div>
 
     <!-- 姓名輸入視窗 -->
     <div id="nameModal" class="fixed inset-0 bg-black/95 z-[2000] hidden items-center justify-center p-6 backdrop-blur-md">
-        <div class="bg-white border-8 border-black p-10 w-full max-w-md shadow-[12px_12px_0px_#FFD700]">
-            <h2 class="text-4xl font-black italic mb-6 uppercase text-black">你是誰？</h2>
-            <p class="font-bold mb-6 text-lg text-black">輸入您的名字，開啟改變之旅：</p>
-            <input type="text" id="userNameInput" placeholder="在此輸入大名..." class="w-full border-4 border-black p-4 text-2xl font-black outline-none mb-8 bg-gray-50 text-black">
-            <button onclick="window.saveUserName()" class="w-full bg-black text-white p-5 font-black text-2xl uppercase">確認變更 🎯</button>
+        <div class="bg-white border-8 border-black p-10 w-full max-w-md shadow-[12px_12px_0px_#FFD700] relative">
+            <h2 class="text-3xl font-black italic mb-6 uppercase text-black">改變生命未來式</h2>
+            <p class="font-bold mb-6 text-black">輸入名字開始旅程：</p>
+            <input type="text" id="userNameInput" placeholder="在此輸入..." class="w-full border-4 border-black p-4 text-2xl font-black outline-none mb-8 bg-gray-50 text-black">
+            <button onclick="window.saveUserName()" class="w-full bg-black text-white p-5 font-black text-2xl uppercase shadow-[6px_6px_0px_#888] active:translate-y-1 active:shadow-none transition-all">確認 🎯</button>
         </div>
     </div>
 
     <!-- 答案彈窗 -->
-    <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-sm cursor-pointer">
-        <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative cursor-default" onclick="event.stopPropagation()">
+    <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-12 md:p-24 backdrop-blur-sm cursor-pointer">
+        <div id="answerContent" class="bg-white w-full max-w-lg min-h-[40vh] border-8 border-black flex flex-col items-center justify-between p-8 relative cursor-default shadow-[15px_15px_0px_white] rounded-2xl" onclick="event.stopPropagation()">
+            <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
             <div class="relative z-20 flex flex-col items-center w-full text-center mt-4">
-                <div id="answerCategoryTag" class="text-2xl font-black uppercase mb-4 bg-black text-white px-6 py-1 skew-x-[-12deg]">分類</div>
-                <div id="overlayText" class="text-3xl md:text-5xl font-black leading-tight text-black mb-10"></div>
-                <button onclick="window.shareSingleCard()" class="bg-black text-white px-6 py-2 font-black text-xs border-2 border-white mb-6 uppercase tracking-widest hover:bg-gray-800">分享此卡 📸</button>
+                <div id="answerCategoryTag" class="text-xl font-black uppercase mb-4 bg-black text-white px-4 py-1 skew-x-[-12deg]">分類</div>
+                <div id="overlayText" class="text-2xl md:text-4xl font-black leading-tight text-black mb-8 px-4"></div>
+                <div class="text-6xl mb-6">👑</div>
+                <button onclick="window.shareSingleCard()" class="bg-black text-white px-6 py-2 font-black text-xs border-2 border-white mb-4 uppercase tracking-widest hover:bg-gray-800">分享此卡 📸</button>
             </div>
-            <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
-                <p class="font-black text-black italic text-xs uppercase">給予星級評分 (記錄本次解答)</p>
+            <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black rounded-b-xl">
+                <p class="font-black text-black italic text-[10px] uppercase">評分本次解答</p>
                 <div class="star-rating" id="starRatingContainer">
-                    <span class="star" data-s="1" onclick="window.updateRatingFromUI(1)">★</span>
-                    <span class="star" data-s="2" onclick="window.updateRatingFromUI(2)">★</span>
-                    <span class="star" data-s="3" onclick="window.updateRatingFromUI(3)">★</span>
-                    <span class="star" data-s="4" onclick="window.updateRatingFromUI(4)">★</span>
-                    <span class="star" data-s="5" onclick="window.updateRatingFromUI(5)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(1)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(2)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(3)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(4)">★</span>
+                    <span class="star" onclick="window.updateRatingFromUI(5)">★</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 翻牌紀錄視窗 -->
-    <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
-        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
+    <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-8 cursor-pointer">
+        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[85vh] flex flex-col shadow-[15px_15px_0px_white] cursor-default relative" onclick="event.stopPropagation()">
+            <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
             <div class="p-6 border-b-8 border-black flex flex-col bg-pink-400">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-black uppercase italic text-black">翻牌紀錄 📜</h2>
-                    <button onclick="window.shareRecordAsImage()" class="bg-black text-white text-xs px-6 py-3 font-black border-2 border-white uppercase hover:bg-gray-800">匯出目前清單 📸</button>
+                <div class="flex justify-between items-center mb-6 pr-6">
+                    <h2 class="text-2xl font-black uppercase italic text-black">翻牌紀錄 📜</h2>
+                    <button onclick="window.shareRecordAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white uppercase hover:bg-gray-800">匯出 📸</button>
                 </div>
                 <div class="flex gap-2 overflow-x-auto no-scrollbar py-1" id="recordTabs">
-                    <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部紀錄</button>
-                    <button onclick="window.changeRecordTab('rated')" class="tab-btn" data-tab="rated">已評價</button>
-                    <button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未評價</button>
-                    <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5★</button>
-                    <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4★</button>
-                    <button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3★</button>
-                    <button onclick="window.changeRecordTab('star2')" class="tab-btn" data-tab="star2">2★</button>
-                    <button onclick="window.changeRecordTab('star1')" class="tab-btn" data-tab="star1">1★</button>
+                    <button onclick="window.changeRecordTab('all')" class="tab-btn active bg-black text-white px-3 py-1 rounded-full text-xs font-black" data-tab="all">全部</button>
+                    <button onclick="window.changeRecordTab('rated')" class="tab-btn border-2 border-black px-3 py-1 rounded-full text-xs font-black" data-tab="rated">已評價</button>
                 </div>
             </div>
             <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
@@ -233,18 +253,16 @@
             { id: "tech-light", name: "科技風" }, { id: "notebook", name: "筆記風" }
         ];
 
-        let gameData = {}, categoryProgress = {}, categoryColors = {}, cardMetadata = {};
+        let gameData = {}, categoryProgress = {}, cardMetadata = {};
         let currentCategory = '', currentCardIndex = null, isAnimating = false, currentThemeId = 'pop';
         let audioCtx = null, currentTab = 'all';
 
-        // --- 核心初始化 ---
         window.initAudio = () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); };
         
         function playSound(type) { 
             if (!audioCtx) return; 
             const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), now = audioCtx.currentTime;
             osc.connect(gain); gain.connect(audioCtx.destination);
-            
             if (type === 'pop') {
                 osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
                 gain.gain.setValueAtTime(0.02, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
@@ -263,11 +281,9 @@
 
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
-            loading.style.display = 'flex';
-            
+            if (loading) loading.style.display = 'flex';
             const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
             if (name) updateWelcomeUI(name);
-            
             const prog = localStorage.getItem(STORAGE_KEYS.PROGRESS);
             if (prog) { 
                 const data = JSON.parse(prog); 
@@ -275,35 +291,32 @@
             }
             const meta = localStorage.getItem(STORAGE_KEYS.METADATA);
             if (meta) { cardMetadata = JSON.parse(meta); }
-
             await autoImport();
             window.randomStyle(true);
-            loading.style.display = 'none';
+            if (loading) loading.style.display = 'none';
         };
 
         function updateWelcomeUI(name) {
-            const welcomeContainer = document.getElementById('welcomeContainer');
-            const welcomeMsg = document.getElementById('welcomeMsg');
-            if (name && welcomeContainer && welcomeMsg) {
-                welcomeMsg.textContent = `歡迎 ${name} 一起改變生命未來式`;
-                welcomeContainer.classList.remove('hidden');
-                welcomeMsg.classList.add('animate-welcome');
+            const container = document.getElementById('welcomeContainer');
+            const msg = document.getElementById('welcomeMsg');
+            if (name && container && msg) {
+                msg.textContent = `歡迎 ${name} 一起改變生命未來式`;
+                container.classList.remove('hidden');
             }
         }
 
         window.editName = () => {
-            const currentName = localStorage.getItem(STORAGE_KEYS.USERNAME);
-            document.getElementById('userNameInput').value = currentName || "";
+            document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME) || "";
             document.getElementById('nameModal').classList.remove('hidden');
         };
 
         window.saveUserName = () => {
             const val = document.getElementById('userNameInput').value.trim();
-            if (!val) { showToast("名字不能為空"); return; }
+            if (!val) { showToast("請輸入名字"); return; }
             localStorage.setItem(STORAGE_KEYS.USERNAME, val);
             updateWelcomeUI(val);
             document.getElementById('nameModal').classList.add('hidden');
-            showToast("名字更新成功！");
+            showToast("名字已更新！");
         };
 
         async function autoImport() {
@@ -321,20 +334,21 @@
                     });
                     applyNewGameData(newData);
                 }
-            } catch (err) { showToast("載入失敗"); }
+            } catch (err) { showToast("連線異常"); }
         }
 
         function applyNewGameData(newData) {
             gameData = newData; 
             Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
-            
             const select = document.getElementById('categorySelect');
-            select.innerHTML = '<option value="all">✨ 全部解答之書 ✨</option>';
-            Object.keys(gameData).forEach((cat) => {
-                if (!categoryProgress[cat]) categoryProgress[cat] = new Set();
-                gameData[cat].sort(() => Math.random() - 0.5);
-                const opt = document.createElement('option'); opt.value = cat; opt.textContent = cat; select.appendChild(opt);
-            });
+            if (select) {
+                select.innerHTML = '<option value="all">✨ 全部解答 ✨</option>';
+                Object.keys(gameData).forEach((cat) => {
+                    if (!categoryProgress[cat]) categoryProgress[cat] = new Set();
+                    gameData[cat].sort(() => Math.random() - 0.5);
+                    const opt = document.createElement('option'); opt.value = cat; opt.textContent = cat; select.appendChild(opt);
+                });
+            }
             window.switchCategory('all');
         }
 
@@ -344,35 +358,26 @@
 
         function renderCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = '';
-            if (Object.keys(gameData).length === 0) return;
-            
-            let itemsToRender = [];
+            let items = [];
             if (currentCategory === 'all') {
                 Object.keys(gameData).forEach(cat => {
-                    gameData[cat].forEach((txt, idx) => {
-                        if (txt === MANDATORY_CARD) return;
-                        itemsToRender.push({ cat, idx, text: txt });
-                    });
+                    gameData[cat].forEach((txt, idx) => { if (txt !== MANDATORY_CARD) items.push({ cat, idx, text: txt }); });
                 });
-                itemsToRender.unshift({ cat: '宇宙指引', idx: -1, text: MANDATORY_CARD });
+                items.unshift({ cat: '宇宙指引', idx: -1, text: MANDATORY_CARD });
             } else {
-                gameData[currentCategory].forEach((txt, idx) => {
-                    itemsToRender.push({ cat: currentCategory, idx, text: txt });
-                });
+                gameData[currentCategory].forEach((txt, idx) => { items.push({ cat: currentCategory, idx, text: txt }); });
             }
 
-            itemsToRender.forEach((item, i) => {
+            items.forEach((item, i) => {
                 const isDragon = (item.text === MANDATORY_CARD);
                 const done = (categoryProgress[item.cat]?.has(item.idx) || false);
-                const numStr = (i + 1).toString();
-                
                 const container = document.createElement('div');
                 container.className = `card-container ${done ? 'card-completed' : ''}`;
                 container.innerHTML = `
                     <div class="card-inner" id="card-${item.cat}-${item.idx}-${i}">
                         <div class="card-face card-front">
-                            <span class="card-number-text text-2xl">${numStr}</span>
-                            <div class="card-bg-icon">${isDragon ? '🐲' : '💎'}</div>
+                            <div class="card-emoji-bg">${isDragon ? '🐲' : '💎'}</div>
+                            <span class="card-number-text text-2xl font-black">${i + 1}</span>
                         </div>
                         <div class="card-face card-back">🐲</div>
                     </div>`;
@@ -385,7 +390,13 @@
             if (isAnimating) return;
             const text = (idx === -1) ? MANDATORY_CARD : gameData[cat][idx];
             const el = document.getElementById(`card-${cat}-${idx}-${displayIdx}`);
-            if(el) el.classList.add('is-flipped');
+            if(el) {
+                el.classList.add('is-flipped');
+                setTimeout(() => {
+                    const back = el.querySelector('.card-back');
+                    if(back) back.textContent = '👑';
+                }, 150);
+            }
             
             setTimeout(() => {
                 document.getElementById('overlayText').textContent = text;
@@ -400,52 +411,44 @@
 
         window.shuffleGame = () => {
             playSound('shuffle');
-            // 動畫：讓未翻開的牌卡晃動
             document.querySelectorAll('.card-container:not(.card-completed)').forEach(el => {
-                el.classList.add('shuffle-active');
-                setTimeout(() => el.classList.remove('shuffle-active'), 500);
+                el.style.animation = 'shuffleShake 0.4s ease-in-out';
+                setTimeout(() => el.style.animation = '', 400);
             });
-
-            // 邏輯：保留已翻開的索引文字，只打亂未翻開的部分
             Object.keys(gameData).forEach(cat => {
                 const prog = categoryProgress[cat];
-                const unFlippedIndices = [];
-                const unFlippedTexts = [];
-                
-                gameData[cat].forEach((txt, idx) => {
-                    if (!prog.has(idx)) {
-                        unFlippedIndices.push(idx);
-                        unFlippedTexts.push(txt);
-                    }
-                });
-                
-                // 打亂未翻開的文字
-                unFlippedTexts.sort(() => Math.random() - 0.5);
-                
-                // 放回原位
-                unFlippedIndices.forEach((origIdx, i) => {
-                    gameData[cat][origIdx] = unFlippedTexts[i];
-                });
+                const unIdx = [], unTxt = [];
+                gameData[cat].forEach((t, i) => { if (!prog.has(i)) { unIdx.push(i); unTxt.push(t); } });
+                unTxt.sort(() => Math.random() - 0.5);
+                unIdx.forEach((orig, i) => { gameData[cat][orig] = unTxt[i]; });
             });
-            
-            setTimeout(() => {
-                renderCards();
-                showToast("未探索牌卡已重新洗牌 🌀");
-            }, 500);
+            setTimeout(() => { renderCards(); showToast("神秘牌卡已重新洗牌 🌀"); }, 400);
+        };
+
+        window.randomStyle = (skip) => {
+            const next = THEMES[Math.floor(Math.random() * THEMES.length)];
+            currentThemeId = next.id;
+            document.body.className = `theme-${next.id}`;
+            const h = Math.floor(Math.random() * 360);
+            const primary = `hsl(${h}, 90%, 75%)`;
+            const bg = `hsl(${h}, 40%, 97%)`;
+            document.documentElement.style.setProperty('--primary', primary);
+            document.documentElement.style.setProperty('--bg', bg);
+            if (!skip) {
+                const g = document.getElementById('giantThemeName'); g.textContent = next.name; g.classList.remove('active');
+                void g.offsetWidth; g.classList.add('active');
+            }
         };
 
         window.updateRatingFromUI = (s) => {
             const info = currentCardIndex;
-            const timestamp = Date.now();
-            cardMetadata[info.text] = { rating: s, category: info.cat, timestamp: timestamp, flipTimestamp: (cardMetadata[info.text]?.flipTimestamp || timestamp) };
+            cardMetadata[info.text] = { rating: s, category: info.cat, flipTimestamp: Date.now() };
             localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
-            updateStarUI(s);
-            showToast(`評分已記錄 ${s}★`);
+            updateStarUI(s); showToast(`評分成功 ${s}★`);
         };
 
         window.updateRatingFromFav = (text, cat, s) => {
-            const timestamp = Date.now();
-            cardMetadata[text] = { rating: s, category: cat, timestamp: timestamp, flipTimestamp: (cardMetadata[text]?.flipTimestamp || timestamp) };
+            cardMetadata[text] = { rating: s, category: cat, flipTimestamp: Date.now() };
             localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
             filterFavs();
         };
@@ -458,26 +461,15 @@
             document.getElementById('answerOverlay').classList.replace('flex', 'hidden');
             const el = document.getElementById(`card-${info.cat}-${info.idx}-${info.displayIdx}`);
             if (el) el.classList.remove('is-flipped');
-            
             if (info.idx !== -1 && !categoryProgress[info.cat]?.has(info.idx)) {
                 categoryProgress[info.cat].add(info.idx);
                 if (!cardMetadata[info.text]) cardMetadata[info.text] = { category: info.cat, flipTimestamp: Date.now(), rating: 0 };
-                const saveObj = {};
-                Object.keys(categoryProgress).forEach(c => saveObj[c] = Array.from(categoryProgress[c]));
-                localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(saveObj));
+                const obj = {}; Object.keys(categoryProgress).forEach(c => obj[c] = Array.from(categoryProgress[c]));
+                localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(obj));
                 localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
                 renderCards(); updateStats();
             }
             currentCardIndex = null;
-        };
-
-        window.randomStyle = (skip) => {
-            let next; do { next = THEMES[Math.floor(Math.random() * THEMES.length)]; } while (next.id === currentThemeId);
-            currentThemeId = next.id; document.body.className = `theme-${next.id}`;
-            if (!skip) {
-                const g = document.getElementById('giantThemeName'); g.textContent = next.name; g.classList.remove('active');
-                void g.offsetWidth; g.classList.add('active');
-            }
         };
 
         function updateStats() {
@@ -500,43 +492,31 @@
         function filterFavs() {
             const list = document.getElementById('favoriteList'); list.innerHTML = '';
             let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
-            if (currentTab === 'all') items.sort((a,b) => b.flipTimestamp - a.flipTimestamp);
-            else if (currentTab === 'rated') { items = items.filter(i => i.rating > 0); items.sort((a,b) => b.rating - a.rating); }
-            else if (currentTab === 'unrated') items = items.filter(i => (i.rating||0) === 0);
-            else { const s = parseInt(currentTab.replace('star','')); items = items.filter(i => i.rating === s); }
-
+            if (currentTab === 'rated') items = items.filter(i => (i.rating||0) > 0);
             if (items.length === 0) { list.innerHTML = '<p class="text-center opacity-30 italic p-10">尚無內容</p>'; return; }
             items.forEach(i => {
-                const d = document.createElement('div'); d.className = "bg-white border-4 border-black p-4 shadow-[4px_4px_0px_#000]";
-                let ss = ''; for(let n=1; n<=5; n++) ss += `<span class="list-star ${n<=i.rating?'active':''}" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">★</span>`;
-                d.innerHTML = `<div class="flex justify-between items-start mb-2"><span class="bg-black text-white text-[10px] px-2 py-1 italic">${i.category}</span><div class="flex gap-1">${ss}</div></div><p class="font-black text-lg text-black">${i.text}</p>`;
+                const d = document.createElement('div'); d.className = "bg-gray-50 border-4 border-black p-4 shadow-[4px_4px_0px_black]";
+                let ss = ''; for(let n=1; n<=5; n++) ss += `<span class="list-star ${n<=i.rating?'active text-yellow-500':'text-gray-300'}" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">★</span>`;
+                d.innerHTML = `<div class="flex justify-between items-start mb-2"><span class="bg-black text-white text-[10px] px-2 py-1 italic uppercase">${i.category}</span><div class="flex gap-1">${ss}</div></div><p class="font-black text-lg text-black leading-snug">${i.text}</p>`;
                 list.appendChild(d);
             });
         }
 
-        // --- 匯出系統 ---
         const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME) || (Math.random() > 0.5 ? "安安" : "麗麗");
 
         window.shareSingleCard = async () => {
             const info = currentCardIndex; if (!info) return;
-            const name = getSenderName();
             const time = new Date().toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\//g,'年').replace(' ','日 ');
-            document.getElementById('exportSenderInfo').textContent = `寄送人：${name} | ${time}`;
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
             document.getElementById('exportCardsList').innerHTML = `<div style="display:flex; align-items:flex-start;"><div style="width: 15px; height: 160px; background: black; margin-right: 30px;"></div><div><div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${info.cat} ]</div><div style="font-size: 52px; font-weight: 900; line-height: 1.3;">${info.text}</div></div></div>`;
             captureAndShare();
         };
 
         window.shareRecordAsImage = async () => {
-            const name = getSenderName();
             const time = new Date().toLocaleString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\//g,'年').replace(' ','日 ');
-            document.getElementById('exportSenderInfo').textContent = `寄送人：${name} | ${time}`;
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
             const list = document.getElementById('exportCardsList'); list.innerHTML = '';
             let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
-            if (currentTab === 'all') items.sort((a,b) => b.flipTimestamp - a.flipTimestamp);
-            else if (currentTab === 'rated') items = items.filter(i => i.rating > 0).sort((a,b) => b.rating - a.rating);
-            else if (currentTab === 'unrated') items = items.filter(i => (i.rating||0) === 0);
-            else items = items.filter(i => i.rating === parseInt(currentTab.replace('star','')));
-
             if(items.length === 0) return;
             items.forEach(i => {
                 list.innerHTML += `<div style="display:flex; align-items:flex-start; margin-bottom: 60px;"><div style="width: 12px; height: 120px; background: black; margin-right: 25px;"></div><div><div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 10px;">[ ${i.category} ]</div><div style="font-size: 38px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
@@ -545,7 +525,7 @@
         };
 
         async function captureAndShare() {
-            showToast("圖片生成中...");
+            showToast("生成圖片中...");
             const temp = document.getElementById('exportTemplate');
             try {
                 const canvas = await html2canvas(temp, { scale: 2, backgroundColor: 'white' });
@@ -555,12 +535,12 @@
                     await navigator.share({ files: [file], title: '改變生命未來式' });
                 } else {
                     const l = document.createElement('a'); l.download = 'BeABetterYou.png'; l.href = canvas.toDataURL(); l.click();
-                    showToast("已自動下載圖片 💾");
+                    showToast("已下載 💾");
                 }
-            } catch (e) { showToast("生成失敗"); }
+            } catch (e) { showToast("失敗"); }
         }
 
-        window.shareApp = async () => { const d = { title: '改變生命未來式', url: window.location.href }; if (navigator.share) await navigator.share(d); else { const i = document.createElement('input'); i.value = window.location.href; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); showToast("網址已複製"); } };
+        window.shareApp = async () => { const d = { title: '改變生命未來式', url: window.location.href }; if (navigator.share) await navigator.share(d); else { const i = document.createElement('input'); i.value = window.location.href; document.body.appendChild(i); i.select(); document.execCommand('copy'); document.body.removeChild(i); showToast("連結已複製"); } };
         function parseCSV(t) { let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0; for (let l of t) { if ('"' === l) { if (s && l === p) row[i] += l; s = !s; } else if (',' === l && s) l = row[++i] = ''; else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; } else row[i] += l; p = l; } return ret; }
         function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 2500); }
 
