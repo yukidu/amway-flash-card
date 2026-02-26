@@ -3,232 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動翻牌遊戲 - 搖一搖優化版</title>
+    <title>互動翻牌遊戲 - 統一視覺版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --primary: #4F46E5;
-            --dark: #1E293B;
-            --bg: #F8FAFC;
+            --primary: #FFD700;
+            --dark: #000000;
+            --bg: #F0F0F0;
+            --card-border: 4px solid #000;
+            --card-shadow: 6px 6px 0px #000;
+            --card-radius: 0.5rem;
+            --bg-pattern: radial-gradient(#d1d1d1 1.5px, transparent 1.5px);
+            --bg-size: 20px 20px;
         }
 
-        html {
-            overflow-y: scroll;
-            scrollbar-gutter: stable !important;
-        }
+        /* --- 12 種視覺風格定義 --- */
+        body.theme-pop { --bg: #F0F0F0; --dark: #000; --card-border: 4px solid #000; --card-shadow: 6px 6px 0px #000; --card-radius: 0.25rem; --bg-pattern: radial-gradient(#ccc 1.5px, transparent 1.5px); --bg-size: 15px 15px; }
+        body.theme-neon { --bg: #0a0a0c; --dark: #fff; --card-border: 2px solid var(--primary); --card-shadow: 0 0 15px var(--primary); --card-radius: 1rem; --bg-pattern: linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px); --bg-size: 40px 40px; }
+        body.theme-minimal { --bg: #ffffff; --dark: #333; --card-border: 1px solid #e2e8f0; --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); --card-radius: 1.5rem; --bg-pattern: none; }
+        body.theme-retro { --bg: #f4ecd8; --dark: #5d4037; --card-border: 2px dashed #5d4037; --card-shadow: 4px 4px 0px #d7ccc8; --card-radius: 0; --bg-pattern: repeating-linear-gradient(45deg, #efebe9, #efebe9 10px, #f4ecd8 10px, #f4ecd8 20px); }
+        body.theme-chalk { --bg: #1a3a3a; --dark: #fff; --card-border: 3px solid #fff; --card-shadow: 4px 4px 0px rgba(255,255,255,0.2); --card-radius: 0.5rem; --bg-pattern: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); --bg-size: 30px 30px; }
+        body.theme-candy { --bg: #fff5f8; --dark: #ff6baf; --card-border: 4px solid #ff6baf; --card-shadow: 6px 6px 0px #ffd1e3; --card-radius: 2rem; --bg-pattern: radial-gradient(#ffd1e3 2px, transparent 2px); --bg-size: 25px 25px; }
+        body.theme-luxury { --bg: #1a1a1a; --dark: #d4af37; --card-border: 2px solid #d4af37; --card-shadow: 0 0 20px rgba(212,175,55,0.3); --card-radius: 0; --bg-pattern: linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222), linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222); --bg-size: 60px 60px; }
+        body.theme-blueprint { --bg: #0047ab; --dark: #fff; --card-border: 1px solid rgba(255,255,255,0.5); --card-shadow: 0 0 0 4px #0047ab, 0 0 0 5px white; --card-radius: 0; --bg-pattern: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); --bg-size: 20px 20px; }
+        body.theme-pixel { --bg: #6185f2; --dark: #fff; --card-border: 6px double #fff; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --bg-pattern: none; image-rendering: pixelated; }
+        body.theme-forest { --bg: #e8f5e9; --dark: #2e7d32; --card-border: 4px solid #2e7d32; --card-shadow: 6px 6px 0px #a5d6a7; --card-radius: 1rem; --bg-pattern: radial-gradient(#c8e6c9 2px, transparent 2px); --bg-size: 40px 40px; }
+        body.theme-galaxy { --bg: #020617; --dark: #94a3b8; --card-border: 2px solid #38bdf8; --card-shadow: 0 0 15px rgba(56,189,248,0.5); --card-radius: 2rem; --bg-pattern: radial-gradient(white 1px, transparent 1px); --bg-size: 50px 50px; }
+        body.theme-comic { --bg: #ffffff; --dark: #000; --card-border: 5px solid #000; --card-shadow: 10px 10px 0px #fde047; --card-radius: 0; --bg-pattern: radial-gradient(#eee 3px, transparent 3px); --bg-size: 12px 12px; }
 
         body {
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            background-color: var(--bg);
-            color: var(--dark);
-            margin: 0;
-            padding: 0;
-            width: 100%;
+            background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
+            color: var(--dark); margin: 0; padding: 0; transition: all 0.5s ease;
         }
 
+        html { overflow-y: scroll; scrollbar-gutter: stable !important; }
+
         #cardsGrid {
-            display: grid;
-            gap: 0.75rem;
-            width: 100%;
+            display: grid; gap: 1.5rem; width: 100%;
             grid-template-columns: repeat(3, 1fr);
         }
         @media (min-width: 640px) { #cardsGrid { grid-template-columns: repeat(4, 1fr); } }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
         @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
 
-        .card-container {
-            perspective: 1000px;
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 0.75rem;
-        }
-
+        .card-container { perspective: 1000px; position: relative; width: 100%; aspect-ratio: 1; }
         .card-inner {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-style: preserve-3d;
-            cursor: pointer;
+            position: absolute; width: 100%; height: 100%;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d; cursor: pointer;
         }
-
-        .card-inner.is-flipped {
-            transform: rotateY(180deg);
-        }
+        .card-inner.is-flipped { transform: rotateY(180deg); }
 
         .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
+            border-radius: var(--card-radius); border: var(--card-border);
+            box-shadow: var(--card-shadow); overflow: hidden; transition: all 0.4s ease;
+        }
+
+        .card-front { background-color: var(--primary); color: #000; font-size: 2.5rem; font-weight: 900; position: relative; }
+        .card-back {
+            background-color: white !important; transform: rotateY(180deg);
+            padding: 8px; font-size: 3rem; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 翻開後的狀態：數字維持在正中央 */
+        .card-completed .card-front {
+            background-color: #eee !important; color: #666 !important;
+            border-color: #bbb; box-shadow: none; opacity: 1; 
+        }
+
+        /* 超大半透明圖標層：鑽石與皇冠大小一致並留白 */
+        .card-icon-overlay {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            overflow: hidden;
-        }
-
-        .card-front {
-            background-color: var(--primary); 
-            color: white;
-            font-size: 2.5rem;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        .card-back {
-            background-color: white !important;
-            transform: rotateY(180deg);
-            border: 3px solid #e2e8f0;
-            padding: 4px 2px;
-            font-size: 1.6rem;
-            font-weight: 800;
-            text-align: center;
-        }
-
-        .card-completed .card-front {
-            background-color: #cbd5e1 !important;
-            color: #64748b !important;
-            box-shadow: none;
-            cursor: default;
-        }
-
-        .is-shuffling-active {
-            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
-            z-index: 50;
+            font-size: 5rem; /* 稍微縮小以保持四邊留白 */
+            opacity: 0.15;
             pointer-events: none;
+            z-index: 10;
+        }
+        
+        .card-number-text {
+            position: relative;
+            z-index: 20;
         }
 
-        @keyframes coolPop {
-            0% { transform: scale(0.3) rotate(-15deg); opacity: 0; filter: blur(20px); }
-            50% { transform: scale(1.08) rotate(5deg); opacity: 1; filter: blur(0px); }
-            75% { transform: scale(0.96) rotate(-2deg); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        .animate-answer-pop {
-            animation: coolPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
+        .tab-btn { border: var(--card-border); box-shadow: var(--card-shadow); transition: all 0.2s; border-radius: var(--card-radius); }
+        .tab-active { filter: brightness(0.8) contrast(1.2); transform: scale(1.05); outline: 3px solid white; }
 
-        @keyframes dealCard {
-            from { transform: scale(0) translateY(20px) rotate(10deg); opacity: 0; }
-            to { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
-        }
-        .animate-deal {
-            animation: dealCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        .tab-active {
-            background-color: var(--primary) !important;
-            color: white !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
+        @keyframes popIn { 0% { transform: scale(0.5) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
         .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            position: fixed; inset: 0; background: rgba(255, 255, 255, 0.95);
+            z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center;
         }
+
+        /* 視窗統一樣式 */
+        .modal-content { transition: all 0.5s ease; border: var(--card-border); box-shadow: var(--card-shadow); border-width: 10px; }
+        
+        .stat-box { color: #000 !important; }
+        .stat-label { color: rgba(0,0,0,0.6) !important; }
+
+        /* 星星評分樣式 */
+        .star-rating {
+            display: flex; gap: 0.5rem; font-size: 2rem; cursor: pointer;
+        }
+        .star { color: #ccc; transition: transform 0.2s; }
+        .star.active { color: #FFD700; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
+        .star:hover { transform: scale(1.2); }
     </style>
 </head>
-<body onclick="handleUserInteraction()">
+<body class="theme-pop" onclick="handleUserInteraction()">
     <div id="aiLoading" class="loading-overlay">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600 mb-4"></div>
-        <p id="loadingMsg" class="text-indigo-900 font-bold text-lg">正在處理數據...</p>
+        <div class="animate-spin rounded-full h-16 w-16 border-t-8 border-black mb-4"></div>
+        <p class="text-black font-black text-2xl italic">正在載入...</p>
     </div>
 
-    <div class="max-w-5xl mx-auto px-4 py-8">
-        <header class="text-center mb-6">
-            <div id="categoryTabs" class="flex flex-wrap justify-center gap-2 mb-6 bg-white p-2 rounded-2xl shadow-sm border inline-flex mx-auto"></div>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-black italic mb-6 tracking-tighter uppercase">翻牌大師 <span id="styleName" class="text-indigo-600">普普!</span></h1>
+            
+            <div id="categoryTabs" class="flex flex-wrap justify-center gap-4 mb-8"></div>
 
-            <div class="flex justify-center items-center gap-8 bg-white/50 backdrop-blur-sm border border-slate-200 rounded-2xl py-3 px-6 max-w-md mx-auto mb-6 shadow-sm">
-                <div class="text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">已翻開</p>
-                    <p id="statCompleted" class="text-2xl font-black transition-colors duration-300">0</p>
+            <div class="flex justify-center items-center gap-6 mb-6">
+                <div class="bg-white border-4 border-black p-4 shadow-[6px_6px_0px_#000] min-w-[120px] stat-box">
+                    <p class="text-xs font-black uppercase stat-label">已翻開</p>
+                    <p id="statCompleted" class="text-4xl font-black">0</p>
                 </div>
-                <div class="h-8 w-px bg-slate-200"></div>
-                <div class="text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">剩餘</p>
-                    <p id="statRemaining" class="text-2xl font-black text-slate-700">0</p>
-                </div>
-                <div class="h-8 w-px bg-slate-200"></div>
-                <div class="text-center">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">進度</p>
-                    <p id="statPercent" class="text-2xl font-black text-slate-700">0%</p>
+                <div class="bg-white border-4 border-black p-4 shadow-[6px_6px_0px_#000] min-w-[120px] stat-box">
+                    <p class="text-xs font-black uppercase stat-label">剩餘</p>
+                    <p id="statRemaining" class="text-4xl font-black">0</p>
                 </div>
             </div>
-            <p class="text-xs text-slate-400 mt-2 sm:hidden">📱 需用力「甩動」手機可隨機翻牌</p>
+            <p class="text-sm font-bold bg-yellow-300 inline-block px-3 py-1 border-2 border-black italic">用力「甩動」手機隨機翻牌！ 📱</p>
         </header>
 
         <main id="cardsGrid"></main>
 
-        <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-4">
-            <button id="shuffleBtn" onclick="shuffleGame()" class="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform active:scale-95">
-                🔀 隨機洗牌
+        <footer class="mt-12 mb-20 flex flex-wrap justify-center gap-6">
+            <button id="shuffleBtn" onclick="shuffleGame()" class="bg-black text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#444] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
+                隨機洗牌 🔀
             </button>
-            <button onclick="openEditModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 rounded-full font-bold shadow-lg transition-transform active:scale-95">
-                ✏️ 編輯題目
+            <button onclick="randomStyle()" class="bg-indigo-600 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
+                更換風格 🎨
+            </button>
+            <button onclick="openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
+                收藏清單 🌟
+            </button>
+            <button onclick="openEditModal()" class="bg-white text-black px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">
+                編輯內容 ✏️
             </button>
         </footer>
     </div>
 
-    <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/70 z-[999] hidden items-center justify-center p-10 md:p-20 cursor-pointer backdrop-blur-sm">
-        <div id="answerContent" class="bg-white w-full max-w-2xl h-auto min-h-[40vh] rounded-[2.5rem] shadow-[0_0_50px_rgba(79,70,229,0.4)] flex flex-col items-center justify-center p-8 md:p-12 border-[10px] border-indigo-500 relative">
-            <div class="relative z-20 flex flex-col items-center w-full text-center">
-                <div id="answerCategoryTag" class="text-xl font-bold tracking-widest uppercase mb-6 opacity-60">ANSWER</div>
-                <div id="overlayText" class="text-4xl md:text-6xl font-black text-center leading-tight transition-colors duration-300 break-words w-full px-[2px]"></div>
+    <!-- 答案彈窗 -->
+    <div id="answerOverlay" onclick="closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-sm cursor-pointer">
+        <div id="answerContent" class="bg-white w-full max-w-2xl min-h-[45vh] modal-content flex flex-col items-center justify-between p-8 relative overflow-hidden cursor-default" onclick="event.stopPropagation()">
+            <div class="relative z-20 flex flex-col items-center w-full text-center mt-4">
+                <div id="answerCategoryTag" class="text-2xl font-black uppercase mb-6 bg-black text-white px-6 py-2 skew-x-[-12deg]">分類</div>
+                <div id="overlayText" class="text-4xl md:text-6xl font-black leading-tight break-words w-full text-black mb-8"></div>
             </div>
-        </div>
-    </div>
 
-    <div id="editModal" class="fixed inset-0 bg-black/60 z-40 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-4 border-b flex justify-between items-center bg-slate-50">
-                <h2 class="text-lg font-bold text-slate-800">編輯內容與匯入</h2>
-                <button onclick="closeEditModal()" class="text-slate-400 text-2xl">✕</button>
-            </div>
-            
-            <div id="editList" class="p-4 overflow-y-auto space-y-3 flex-grow bg-white no-scrollbar"></div>
-
-            <div class="p-4 border-t bg-slate-50 space-y-4">
-                <div class="flex gap-3">
-                    <button onclick="addAnswerRow()" class="flex-[2] bg-white border-2 border-dashed border-slate-300 py-2 rounded-xl text-slate-500 font-bold hover:bg-slate-100">+ 新增答案</button>
-                    <button onclick="clearAllEditAnswers()" class="flex-1 bg-red-50 border-2 border-dashed border-red-200 py-2 rounded-xl text-red-500 font-bold hover:bg-red-100">🗑️ 清空</button>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="saveAnswers()" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 shadow-lg transition-transform active:scale-95 text-center">儲存當前分類</button>
-                    <button onclick="closeEditModal()" class="px-8 bg-slate-200 text-slate-600 rounded-xl font-bold">取消</button>
+            <!-- 評分區塊 -->
+            <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
+                <p class="font-black text-black italic uppercase">給予星級評分 (自動收藏)</p>
+                <div class="star-rating" id="starRatingContainer">
+                    <span class="star" onclick="rateCard(1)">★</span>
+                    <span class="star" onclick="rateCard(2)">★</span>
+                    <span class="star" onclick="rateCard(3)">★</span>
+                    <span class="star" onclick="rateCard(4)">★</span>
+                    <span class="star" onclick="rateCard(5)">★</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full text-sm shadow-2xl z-[1000] transition-all opacity-0 pointer-events-none font-bold"></div>
+    <!-- 收藏與紀錄清單視窗 -->
+    <div id="favoriteModal" onclick="closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
+        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
+            <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
+                <h2 class="text-2xl font-black uppercase mb-4 italic">評分收藏 🌟</h2>
+                <!-- 篩選器 -->
+                <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                    <button onclick="filterFavs('all')" class="bg-white px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">全部紀錄</button>
+                    <button onclick="filterFavs('star-5')" class="bg-yellow-400 px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">⭐⭐⭐⭐⭐</button>
+                    <button onclick="filterFavs('star-4')" class="bg-yellow-300 px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">⭐⭐⭐⭐</button>
+                    <button onclick="filterFavs('star-3')" class="bg-yellow-200 px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm">⭐⭐⭐</button>
+                </div>
+            </div>
+            <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
+            <div class="p-4 border-t-8 border-black bg-gray-100 text-center">
+                <p class="text-xs font-black opacity-50 italic uppercase">點擊背景關閉視窗</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯視窗 -->
+    <div id="editModal" onclick="closeEditModal()" class="fixed inset-0 bg-black/60 z-40 hidden items-center justify-center p-4 cursor-pointer">
+        <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
+            <div class="p-4 border-b-8 border-black bg-yellow-400">
+                <h2 class="text-2xl font-black uppercase italic">編輯內容 ✏️</h2>
+            </div>
+            <div id="editList" class="p-6 overflow-y-auto space-y-3 flex-grow bg-white"></div>
+            <div class="p-6 border-t-8 border-black bg-gray-100 flex gap-4">
+                <button onclick="saveAnswers()" class="flex-1 bg-green-500 text-white py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000]">儲存內容</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black text-white px-8 py-4 font-black text-lg border-4 border-white shadow-2xl z-[1000] transition-all opacity-0 pointer-events-none uppercase"></div>
 
     <script>
-        const apiKey = ""; 
         const MANDATORY_CARD = "程式與視覺設計 杜杜龍創辦人白金 2026.2";
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        let categoryColors = {
-            '永續農耕': '#10B981', '日用品': '#3B82F6', '創業思維': '#6366F1', '回答異議': '#F59E0B', '美麗': '#EC4899'
-        };
-
-        let gameData = {
-            '永續農耕': ['瓢蟲','蚯蚓','老鷹','貓頭鷹','蝙蝠','螳螂','綿羊','植物指紋','針葉櫻桃','七座活火山','害蟲','土壤堆肥','大蒜','深海魚油','紫錐花','海藻鈣','螺旋藻','靈芝胞子粉','益生菌','黃豆','小麥','豌豆','番茄','洋蔥','橄欖油'],
-            '日用品': ['咖啡','堅果','淨水器','空氣清淨機','PM2.5','牙膏','牙刷','牙線棒','肥皂','護手霜','染髮劑','能量飲'],
-            '創業思維': ['自由','家庭','希望','獎勵','環保愛地球','全球第一','助人','海外旅遊','郵輪'],
-            '回答異議': ['飽和了','我朋友都沒做起來','利用朋友賺錢','我沒口才','太貴了','公司太老了','美國產品不適合台灣','我要回去問家人','我很忙沒時間','產品太多','不可能純天然','安麗老闆死掉了','直銷要做就要做頭'],
-            '美麗': ['口紅','純素認證','滑石粉','全球前五大','幹細胞']
-        };
-
+        const POP_PALETTE = ["#FF0000", "#0000FF", "#FF00FF", "#00FFFF", "#32CD32", "#FF4500", "#FFD700", "#7FFF00", "#FF1493", "#00FA9A"];
+        const THEMES = [
+            { id: "pop", name: "普普" }, { id: "neon", name: "霓虹" }, { id: "minimal", name: "極簡" },
+            { id: "retro", name: "復古" }, { id: "chalk", name: "黑板" }, { id: "candy", name: "糖果" },
+            { id: "luxury", name: "奢華" }, { id: "blueprint", name: "藍圖" }, { id: "pixel", name: "像素" },
+            { id: "forest", name: "森林" }, { id: "galaxy", name: "星際" }, { id: "comic", name: "漫畫" }
+        ];
+        
+        let gameData = {};
         let categoryProgress = {};
-        let currentCategory = '永續農耕';
+        let categoryColors = {};
+        let cardMetadata = {}; 
+        let currentCategory = '';
         let currentCardIndex = null;
         let isShuffling = false;
         let isAnimating = false;
@@ -242,63 +248,53 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             const now = audioCtx.currentTime;
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            // 音量再次降低 50%
+            osc.connect(gain); gain.connect(audioCtx.destination);
             const volumeBase = 0.035; 
 
             if (type === 'pop') {
-                switch (currentCategory) {
-                    case '永續農耕': osc.type = 'triangle'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(80, now + 0.1); gain.gain.setValueAtTime(volumeBase, now); gain.gain.linearRampToValueAtTime(0, now + 0.2); break;
-                    case '日用品': osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.05); gain.gain.setValueAtTime(volumeBase * 0.8, now); gain.gain.linearRampToValueAtTime(0, now + 0.1); break;
-                    case '創業思維': osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.2); gain.gain.setValueAtTime(volumeBase * 0.5, now); gain.gain.linearRampToValueAtTime(0, now + 0.3); break;
-                    case '回答異議': osc.type = 'square'; osc.frequency.setValueAtTime(220, now); osc.frequency.setValueAtTime(180, now + 0.1); gain.gain.setValueAtTime(volumeBase * 0.4, now); gain.gain.linearRampToValueAtTime(0, now + 0.2); break;
-                    case '美麗': osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now); osc.frequency.exponentialRampToValueAtTime(1800, now + 0.05); osc.frequency.exponentialRampToValueAtTime(1500, now + 0.15); gain.gain.setValueAtTime(volumeBase * 0.6, now); gain.gain.linearRampToValueAtTime(0, now + 0.4); break;
-                    default: osc.type = 'sine'; osc.frequency.setValueAtTime(440, now); osc.frequency.exponentialRampToValueAtTime(880, now + 0.1); gain.gain.setValueAtTime(volumeBase, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                }
-                osc.start(now); osc.stop(now + 0.5);
+                osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gain.gain.setValueAtTime(volumeBase, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.4);
             } else if (type === 'victory') {
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now); osc.frequency.setValueAtTime(659.25, now + 0.1); osc.frequency.setValueAtTime(783.99, now + 0.2); osc.frequency.setValueAtTime(1046.50, now + 0.3); gain.gain.setValueAtTime(volumeBase * 2, now); gain.gain.linearRampToValueAtTime(0, now + 0.8); osc.start(now); osc.stop(now + 0.8);
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                osc.frequency.setValueAtTime(1046.50, now + 0.3);
+                gain.gain.setValueAtTime(volumeBase * 2.5, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.8);
+                osc.start(now); osc.stop(now + 0.8);
             }
         }
 
-        // 核心修正：線性加速度偵測，忽略重力傾斜
+        function randomStyle() {
+            const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+            document.body.className = `theme-${theme.id}`;
+            document.getElementById('styleName').textContent = theme.name + '!';
+            if (currentCategory) switchCategory(currentCategory);
+        }
+
         let lastShakeUpdate = 0;
-        const SHAKE_THRESHOLD = 25; // 線性加速度的門檻，25 m/s² 已是非常大力的甩動
-        const SHAKE_COOLDOWN = 1200; 
+        const SHAKE_THRESHOLD = 50; 
+        const SHAKE_COOLDOWN = 1500; 
         let isShakeInitialized = false;
 
         function handleMotion(event) {
             let curTime = Date.now();
             if ((curTime - lastShakeUpdate) > 100) {
-                // 優先使用 acceleration (排除重力影響的純加速度)
                 let acc = event.acceleration || event.accelerationIncludingGravity;
                 if (!acc || acc.x === null) return;
-
-                // 如果只有帶重力的數據，則計算變動差值；如果有純加速度數據則直接判斷強度
-                let strength = 0;
-                if (event.acceleration && event.acceleration.x !== null) {
-                    strength = Math.max(Math.abs(acc.x), Math.abs(acc.y), Math.abs(acc.z));
-                } else {
-                    // 退而求其次的差值計算法 (較不穩定，但部分舊手機僅支援此)
-                    let deltaX = Math.abs(acc.x - lastX);
-                    let deltaY = Math.abs(acc.y - lastY);
-                    let deltaZ = Math.abs(acc.z - lastZ);
-                    strength = Math.max(deltaX, deltaY, deltaZ) * 2; 
-                    lastX = acc.x; lastY = acc.y; lastZ = acc.z;
-                }
-
+                let strength = Math.max(Math.abs(acc.x), Math.abs(acc.y), Math.abs(acc.z));
                 if (strength > SHAKE_THRESHOLD) {
                     const overlay = document.getElementById('answerOverlay');
-                    if (overlay.classList.contains('hidden') && !isShuffling && !isAnimating) {
+                    if (overlay && overlay.classList.contains('hidden') && !isShuffling && !isAnimating) {
                         flipRandomCard();
                         lastShakeUpdate = curTime + SHAKE_COOLDOWN;
                     }
                 }
             }
         }
-        let lastX = 0, lastY = 0, lastZ = 0;
 
         function handleUserInteraction() { initAudio(); enableShake(); }
 
@@ -306,34 +302,58 @@
             if (isShakeInitialized) return;
             if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
                 DeviceMotionEvent.requestPermission().then(state => {
-                    if (state === 'granted') {
-                        window.addEventListener('devicemotion', handleMotion, false);
-                        isShakeInitialized = true;
-                    }
+                    if (state === 'granted') { window.addEventListener('devicemotion', handleMotion, false); isShakeInitialized = true; }
                 });
-            } else {
-                window.addEventListener('devicemotion', handleMotion, false);
-                isShakeInitialized = true;
+            } else { window.addEventListener('devicemotion', handleMotion, false); isShakeInitialized = true; }
+        }
+
+        window.onload = async () => {
+            randomStyle(); 
+            await autoImportFromGoogleSheets();
+        };
+
+        async function autoImportFromGoogleSheets() {
+            const loadingOverlay = document.getElementById('aiLoading');
+            loadingOverlay.style.display = 'flex';
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+                const newData = {};
+                if (rows.length > 0) {
+                    const headers = rows[0].map(h => h ? h.trim() : "");
+                    headers.forEach((catName, colIndex) => {
+                        if (catName) {
+                            newData[catName] = [];
+                            for (let r = 1; r < rows.length; r++) { 
+                                if (rows[r] && rows[r][colIndex] && rows[r][colIndex].trim() !== "") {
+                                    newData[catName].push(rows[r][colIndex].trim());
+                                }
+                            }
+                        }
+                    });
+                    if (Object.keys(newData).length > 0) applyNewGameData(newData);
+                }
+            } catch (err) { showToast("同步錯誤"); } finally {
+                loadingOverlay.style.display = 'none';
+                initKeyboardSupport();
             }
         }
 
-        window.onload = () => {
-            checkMandatoryCards();
-            initProgress();
-            renderTabs();
+        function applyNewGameData(newData) {
+            gameData = newData; 
+            checkMandatoryCards(); 
+            categoryProgress = {};
+            categoryColors = {}; 
+            const shuffledPalette = [...POP_PALETTE].sort(() => Math.random() - 0.5);
+            Object.keys(gameData).forEach((cat, idx) => {
+                categoryColors[cat] = shuffledPalette[idx % shuffledPalette.length];
+                categoryProgress[cat] = new Set();
+                gameData[cat].sort(() => Math.random() - 0.5);
+            });
+            renderTabs(); 
             const firstCat = Object.keys(gameData)[0];
             if (firstCat) switchCategory(firstCat);
-            initKeyboardSupport();
-        };
-
-        function checkMandatoryCards() {
-            Object.keys(gameData).forEach(cat => {
-                if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD);
-            });
-        }
-
-        function initProgress() {
-            Object.keys(gameData).forEach(cat => { if (!categoryProgress[cat]) categoryProgress[cat] = new Set(); });
         }
 
         function renderTabs() {
@@ -342,40 +362,20 @@
             Object.keys(gameData).forEach(cat => {
                 const btn = document.createElement('button');
                 btn.id = `tab-${cat}`; btn.textContent = cat;
-                btn.className = "px-4 py-2 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all text-sm sm:text-base";
+                btn.className = "tab-btn px-6 py-2 font-black uppercase text-sm transition-all";
+                btn.style.backgroundColor = categoryColors[cat];
                 btn.onclick = () => switchCategory(cat);
                 tabsContainer.appendChild(btn);
             });
         }
 
-        function updateStats() {
-            const data = gameData[currentCategory] || [];
-            const done = (categoryProgress[currentCategory] || new Set()).size;
-            const remaining = data.length - done;
-            const percent = data.length > 0 ? Math.round((done / data.length) * 100) : 0;
-            const color = categoryColors[currentCategory] || '#4F46E5';
-            const statComp = document.getElementById('statCompleted');
-            if (statComp) { statComp.textContent = done; statComp.style.color = color; }
-            document.getElementById('statRemaining').textContent = remaining;
-            document.getElementById('statPercent').textContent = `${percent}%`;
-        }
-
         function switchCategory(cat) {
             if (isShuffling || isAnimating) return;
-            document.getElementById('answerOverlay').classList.add('hidden');
             currentCategory = cat;
             if (!categoryProgress[currentCategory]) categoryProgress[currentCategory] = new Set();
-            const color = categoryColors[cat] || '#4F46E5';
+            const color = categoryColors[cat] || '#FFD700';
             document.documentElement.style.setProperty('--primary', color);
-            document.getElementById('answerContent').style.borderColor = color;
-            document.getElementById('answerCategoryTag').style.color = color;
-            document.getElementById('answerCategoryTag').textContent = cat;
-            document.getElementById('overlayText').style.color = color;
-            document.querySelectorAll('#categoryTabs button').forEach(btn => btn.classList.remove('tab-active'));
-            const activeBtn = document.getElementById(`tab-${cat}`);
-            if (activeBtn) activeBtn.classList.add('tab-active');
-            renderCards(false);
-            updateStats();
+            renderCards(false); updateStats();
         }
 
         function renderCards(skipAnimation = true) {
@@ -385,41 +385,71 @@
             grid.innerHTML = '';
             items.forEach((text, i) => {
                 const isDone = completed.has(i);
+                const isMandatory = (text === MANDATORY_CARD);
+                
+                // 翻開後：數字永遠置中。背景疊加半透明大圖標
+                const icon = isMandatory ? '👑' : '💎';
+                const frontContent = `
+                    <span class="card-number-text">${i + 1}</span>
+                    ${isDone ? `<div class="card-icon-overlay">${icon}</div>` : ''}
+                `;
+                
                 const container = document.createElement('div');
                 container.className = `card-container ${isDone ? 'card-completed' : ''}`;
                 container.innerHTML = `
                     <div class="card-inner" id="card-${i}" onclick="handleCardClick(${i})">
-                        <div class="card-face card-front relative">
-                            ${i + 1}
-                            ${isDone ? '<div class="absolute inset-0 flex items-center justify-center text-red-600 text-5xl font-black opacity-90">✕</div>' : ''}
-                        </div>
-                        <div class="card-face card-back overflow-hidden">
-                            <span class="card-back-text" style="color: ${categoryColors[currentCategory] || '#4F46E5'}">${text}</span>
+                        <div class="card-face card-front">${frontContent}</div>
+                        <div class="card-face card-back" style="border-color: ${categoryColors[currentCategory]}">
+                            <span>${icon}</span>
                         </div>
                     </div>`;
                 grid.appendChild(container);
                 if (!skipAnimation) {
                     container.style.opacity = '0';
-                    setTimeout(() => { container.style.opacity = '1'; container.classList.add('animate-deal'); }, i * 15);
+                    setTimeout(() => { container.style.opacity = '1'; container.classList.add('animate-pop'); }, i * 15);
                 }
             });
         }
 
         function handleCardClick(index) {
-            const completed = categoryProgress[currentCategory];
-            if (completed.has(index) || isShuffling || isAnimating) return;
+            if (isShuffling || isAnimating) return; // 不再阻擋 completed.has(index)，允許重複翻開
             isAnimating = true; currentCardIndex = index;
             const el = document.getElementById(`card-${index}`);
             if (el) el.classList.add('is-flipped');
             const text = gameData[currentCategory][index];
+            const isMandatory = (text === MANDATORY_CARD);
+            
+            if (!cardMetadata[text]) cardMetadata[text] = { rating: 0, category: currentCategory };
+
             setTimeout(() => {
                 const overlay = document.getElementById('answerOverlay');
                 document.getElementById('overlayText').textContent = text;
+                document.getElementById('answerCategoryTag').textContent = currentCategory;
+                
+                // 杜杜龍牌隱藏評價
+                const ratingSection = document.getElementById('ratingSection');
+                ratingSection.style.display = isMandatory ? 'none' : 'flex';
+                
+                updateStarUI(cardMetadata[text].rating);
                 overlay.classList.replace('hidden', 'flex');
-                document.getElementById('answerContent').classList.add('animate-answer-pop');
-                if (text === MANDATORY_CARD) playSound('victory'); else playSound('pop');
+                if (isMandatory) playSound('victory'); else playSound('pop');
                 isAnimating = false;
             }, 350);
+        }
+
+        function rateCard(stars) {
+            const text = gameData[currentCategory][currentCardIndex];
+            cardMetadata[text].rating = stars;
+            updateStarUI(stars);
+            showToast(`已評價 ${stars} 顆星！`);
+        }
+
+        function updateStarUI(stars) {
+            const starEls = document.querySelectorAll('.star');
+            starEls.forEach((s, i) => {
+                if (i < stars) s.classList.add('active');
+                else s.classList.remove('active');
+            });
         }
 
         function closeAnswer() {
@@ -437,47 +467,112 @@
             }, 350);
         }
 
+        // --- 收藏清單 ---
+        function openFavoriteModal() {
+            document.getElementById('favoriteModal').classList.replace('hidden', 'flex');
+            filterFavs('all');
+        }
+
+        function closeFavoriteModal() {
+            document.getElementById('favoriteModal').classList.replace('flex', 'hidden');
+        }
+
+        function filterFavs(filter) {
+            const list = document.getElementById('favoriteList');
+            list.innerHTML = '';
+            let items = Object.keys(cardMetadata).map(text => ({ text, ...cardMetadata[text] }));
+            
+            // 收藏清單邏輯：顯示有評分的
+            if (filter === 'fav') items = items.filter(i => i.rating > 0);
+            else if (filter.startsWith('star-')) {
+                const val = parseInt(filter.split('-')[1]);
+                items = items.filter(i => i.rating === val);
+            }
+
+            items.sort((a, b) => b.rating - a.rating || a.text.localeCompare(b.text));
+            if (items.length === 0) {
+                list.innerHTML = '<div class="text-black font-black text-center p-10 opacity-30 uppercase italic">無數據</div>';
+                return;
+            }
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-gray-50 border-4 border-black p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-[4px_4px_0px_#000]";
+                const stars = "⭐".repeat(item.rating) + "☆".repeat(5 - item.rating);
+                div.innerHTML = `
+                    <div class="flex-grow text-black text-center sm:text-left">
+                        <span class="text-xs font-black bg-black text-white px-2 py-0.5 mb-1 inline-block uppercase italic">${item.category}</span>
+                        <p class="font-black text-lg">${item.text}</p>
+                        <p class="text-yellow-600 font-bold">${stars}</p>
+                    </div>
+                    <button onclick="jumpToCard('${item.category}', '${item.text}')" class="bg-indigo-500 text-white px-4 py-2 border-2 border-black font-black text-sm uppercase">查看</button>`;
+                list.appendChild(div);
+            });
+        }
+
+        function jumpToCard(cat, text) {
+            closeFavoriteModal(); switchCategory(cat);
+            showToast(`已切換至 ${cat}`);
+        }
+
+        function parseCSV(text) {
+            let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
+            for (l of text) {
+                if ('"' === l) { if (s && l === p) row[i] += l; s = !s; }
+                else if (',' === l && s) l = row[++i] = '';
+                else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; }
+                else row[i] += l;
+                p = l;
+            }
+            return ret;
+        }
+
+        function checkMandatoryCards() {
+            Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
+        }
+
+        function updateStats() {
+            const data = gameData[currentCategory] || [];
+            const done = (categoryProgress[currentCategory] || new Set()).size;
+            document.getElementById('statCompleted').textContent = done;
+            document.getElementById('statRemaining').textContent = data.length - done;
+        }
+
         function shuffleGame() {
             if (isShuffling || isAnimating) return;
             isShuffling = true;
-            const grid = document.getElementById('cardsGrid');
             const cards = document.querySelectorAll('.card-container');
-            const btn = document.getElementById('shuffleBtn');
-            btn.disabled = true;
             cards.forEach((card, i) => {
-                card.classList.add('is-shuffling-active');
-                card.style.transform = `scale(0) rotate(${1080 + i * 10}deg)`;
+                card.style.transition = "all 0.4s ease";
+                card.style.transform = `scale(0) rotate(${360 + i * 5}deg)`;
                 card.style.opacity = '0';
             });
             setTimeout(() => {
                 gameData[currentCategory].sort(() => Math.random() - 0.5);
                 categoryProgress[currentCategory] = new Set();
                 renderCards(false); updateStats();
-                setTimeout(() => { isShuffling = false; btn.disabled = false; }, 500);
-            }, 850);
+                setTimeout(() => { isShuffling = false; }, 500);
+            }, 500);
         }
 
         function openEditModal() {
+            document.getElementById('editModal').classList.replace('hidden', 'flex');
             const list = document.getElementById('editList'); list.innerHTML = '';
             const items = gameData[currentCategory] || [];
             items.forEach(text => { if(text !== MANDATORY_CARD) addAnswerRow(text); });
-            document.getElementById('editModal').classList.replace('hidden', 'flex');
         }
 
         function addAnswerRow(text = '') {
             const list = document.getElementById('editList');
             const div = document.createElement('div');
-            div.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded-lg border border-slate-200';
-            div.innerHTML = `<input type="text" value="${text}" class="item-text flex-grow border border-slate-200 rounded px-3 py-2 text-sm outline-none font-bold"><button onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500 p-2 text-lg">🗑️</button>`;
+            div.className = 'flex gap-2 items-center bg-gray-50 p-4 border-4 border-black';
+            div.innerHTML = `<input type="text" value="${text}" class="item-text flex-grow font-black p-1 outline-none text-black"><button onclick="this.parentElement.remove()" class="text-2xl font-black text-black">🗑️</button>`;
             list.appendChild(div);
         }
-
-        function clearAllEditAnswers() { document.getElementById('editList').innerHTML = ''; }
 
         function saveAnswers() {
             const rows = document.querySelectorAll('#editList .item-text');
             const newList = [];
-            rows.forEach(input => { const t = input.value.trim(); if (t) newList.push(t); });
+            rows.forEach(input => { if (input.value.trim()) newList.push(input.value.trim()); });
             gameData[currentCategory] = newList; checkMandatoryCards(); categoryProgress[currentCategory] = new Set();
             closeEditModal(); renderCards(false); updateStats();
         }
@@ -486,11 +581,15 @@
 
         function initKeyboardSupport() {
             window.addEventListener('keydown', (e) => {
-                if (!document.getElementById('editModal').classList.contains('hidden')) return;
-                const isOverlayOpen = !document.getElementById('answerOverlay').classList.contains('hidden');
-                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', 'PageDown', 'PageUp'].includes(e.key)) {
-                    e.preventDefault(); if (isOverlayOpen) closeAnswer(); else if (!isAnimating) flipRandomCard();
-                } else if (e.key === 'Escape' && isOverlayOpen) closeAnswer();
+                const answerOverlay = document.getElementById('answerOverlay');
+                const favModal = document.getElementById('favoriteModal');
+                const editModal = document.getElementById('editModal');
+                
+                if (e.key === 'Escape') {
+                    if (!answerOverlay.classList.contains('hidden')) closeAnswer();
+                    if (!favModal.classList.contains('hidden')) closeFavoriteModal();
+                    if (!editModal.classList.contains('hidden')) closeEditModal();
+                }
             });
         }
 
@@ -501,6 +600,13 @@
             items.forEach((_, i) => { if (!prog.has(i)) available.push(i); });
             if (available.length === 0) return;
             handleCardClick(available[Math.floor(Math.random() * available.length)]);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0'); toast.classList.add('opacity-100');
+            setTimeout(() => { toast.classList.replace('opacity-100', 'opacity-0'); }, 3000);
         }
     </script>
 </body>
