@@ -20,12 +20,12 @@
             --bg-size: 20px 20px;
         }
 
-        /* 風格名稱動畫：縮小尺寸並優化位置 */
+        /* 風格名稱動畫 */
         @keyframes giantTextPop {
-            0% { transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); opacity: 0; }
-            30% { transform: translate(-50%, -50%) scale(1.1) rotate(2deg); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(0.5) rotate(-5deg); opacity: 0; }
+            30% { transform: translate(-50%, -50%) scale(1.1) rotate(1deg); opacity: 1; }
             70% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
         }
         #giantThemeName {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -36,7 +36,18 @@
         }
         #giantThemeName.active { display: block; animation: giantTextPop 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
-        /* 風格樣式定義 */
+        /* 洗牌動畫 */
+        @keyframes shuffleShake {
+            0% { transform: translate(0, 0) rotate(0); }
+            20% { transform: translate(4px, -4px) rotate(2deg); }
+            40% { transform: translate(-4px, 4px) rotate(-2deg); }
+            60% { transform: translate(4px, 4px) rotate(2deg); }
+            80% { transform: translate(-4px, -4px) rotate(-2deg); }
+            100% { transform: translate(0, 0) rotate(0); }
+        }
+        .shuffle-active { animation: shuffleShake 0.5s ease-in-out infinite; }
+
+        /* 風格樣式預定義 */
         body.theme-pop { --card-border: 4px solid #000; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --card-rotate: -2deg; }
         body.theme-cloud { --card-border: 6px solid #fff; --card-shadow: 0 15px 30px rgba(0,0,0,0.1); --card-radius: 50%; }
         body.theme-leaf { --card-border: 3px solid #000; --card-shadow: 4px 4px 0px rgba(0,0,0,0.1); --card-radius: 0 2rem 0 2rem; }
@@ -62,13 +73,15 @@
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
             background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
             color: var(--dark); margin: 0; padding: 0; 
-            /* 讓變換更絲滑 */
             transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1), color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 1rem 0; border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 1.2s ease; }
 
-        #cardsGrid { display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem; }
+        #cardsGrid { 
+            display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem;
+            grid-auto-rows: min-content;
+        }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
         @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
 
@@ -84,20 +97,19 @@
         .card-inner.is-flipped { transform: rotateY(180deg); }
 
         .card-face {
-            position: absolute; width: 100%; height: 100%;
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
             backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
             border-radius: var(--card-radius); border: var(--card-border);
             box-shadow: var(--card-shadow); overflow: hidden;
             transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .card-front { background-color: var(--primary); color: #000; font-weight: 900; position: relative; }
+        .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
         .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 3rem; }
 
-        /* Emoji 縮小並調整顏色明顯度 */
         .card-emoji-bg {
             position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-            font-size: 4rem; opacity: 0.35; z-index: 1; pointer-events: none;
+            font-size: 3.6rem; opacity: 0.35; z-index: 1; pointer-events: none;
         }
         .card-number-text { position: relative; z-index: 10; pointer-events: none; }
 
@@ -105,7 +117,6 @@
             background-color: #f3f4f6 !important; color: #9ca3af !important; border-color: #d1d5db !important; opacity: 0.8; 
         }
 
-        /* 導覽元件樣式 */
         #categorySelect, .nav-btn, .stat-box {
             background: #fff !important; border: 2px solid #000 !important; box-shadow: 2px 2px 0px #000 !important;
             font-weight: 900; color: #000 !important;
@@ -121,7 +132,7 @@
 
         .loading-overlay { position: fixed; inset: 0; background: rgba(255, 255, 255, 0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .star-rating .star { color: #ccc; cursor: pointer; font-size: 2rem; }
+        .star-rating .star { color: #ccc; cursor: pointer; font-size: 2.2rem; }
         .star-rating .star.active { color: #FFD700; }
     </style>
 </head>
@@ -145,14 +156,15 @@
                         <p class="text-[9px] font-black uppercase opacity-60 leading-none mb-1">剩餘牌卡</p>
                         <p id="statRemaining" class="text-xl font-black">0</p>
                     </div>
-                    <!-- 清爽設計：移除框線與陰影 -->
                     <div id="welcomeContainer" class="hidden flex items-center gap-3">
-                         <div id="welcomeMsg" class="text-sm font-black text-black/80 tracking-wide"></div>
-                         <button onclick="window.editName()" class="text-black/40 hover:text-black transition-colors text-lg" title="修改名字">✏️</button>
+                         <div id="welcomeMsg" class="text-sm font-black text-black/70 tracking-tight"></div>
+                         <button onclick="window.editName()" class="text-black/30 hover:text-black transition-colors" title="修改名字">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path></svg>
+                         </button>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="flex items-center gap-3 w-full md:auto">
                     <button onclick="window.randomStyle()" class="nav-btn whitespace-nowrap text-sm px-4">切換視覺 🎨</button>
                     <div class="relative flex-grow md:flex-grow-0">
                         <select id="categorySelect" class="w-full text-sm" onchange="window.switchCategory(this.value)">
@@ -184,18 +196,25 @@
     </div>
 
     <!-- 答案彈窗 -->
-    <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-12 md:p-24 backdrop-blur-sm cursor-pointer">
-        <div id="answerContent" class="bg-white w-full max-w-lg min-h-[40vh] border-8 border-black flex flex-col items-center justify-between p-8 relative cursor-default shadow-[15px_15px_0px_white] rounded-2xl" onclick="event.stopPropagation()">
+    <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-4 md:p-12 backdrop-blur-sm cursor-pointer">
+        <div id="answerContent" class="bg-white w-full max-w-xl min-h-[50vh] max-h-[85vh] border-8 border-black flex flex-col items-center justify-between p-6 md:p-10 relative cursor-default shadow-[20px_20px_0px_white] rounded-3xl" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
-            <div class="relative z-20 flex flex-col items-center w-full text-center mt-4">
-                <div id="answerCategoryTag" class="text-xl font-black uppercase mb-4 bg-black text-white px-4 py-1 skew-x-[-12deg]">分類</div>
-                <div id="overlayText" class="text-2xl md:text-4xl font-black leading-tight text-black mb-8 px-4"></div>
-                <div class="text-6xl mb-6">👑</div>
-                <button onclick="window.shareSingleCard()" class="bg-black text-white px-6 py-2 font-black text-xs border-2 border-white mb-4 uppercase tracking-widest hover:bg-gray-800">分享此卡 📸</button>
+            
+            <div class="relative z-20 flex flex-col items-center w-full text-center flex-grow justify-center overflow-hidden">
+                <div id="answerCategoryTag" class="text-lg font-black uppercase mb-4 bg-black text-white px-5 py-1 skew-x-[-12deg] inline-block">分類</div>
+                
+                <!-- 答案容器：用於測量文字是否超出 -->
+                <div id="textFitContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden py-4">
+                    <div id="overlayText" class="font-black leading-[1.15] text-black w-full px-2" style="font-size: 60px;"></div>
+                </div>
+
+                <button onclick="window.shareSingleCard()" class="bg-black text-white px-6 py-2 font-black text-[10px] border-2 border-white uppercase tracking-widest hover:bg-gray-800 mb-2 mt-4">分享此卡 📸</button>
             </div>
-            <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black rounded-b-xl">
-                <p class="font-black text-black italic text-[10px] uppercase">評分本次解答</p>
-                <div class="star-rating" id="starRatingContainer">
+
+            <!-- 評價部分：一行顯示 -->
+            <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-3 bg-gray-50 p-4 border-t-4 border-black rounded-b-2xl shrink-0">
+                <p class="font-black text-black italic text-[10px] uppercase tracking-wider">評分本次解答</p>
+                <div class="star-rating flex flex-row flex-nowrap whitespace-nowrap gap-2 justify-center" id="starRatingContainer">
                     <span class="star" onclick="window.updateRatingFromUI(1)">★</span>
                     <span class="star" onclick="window.updateRatingFromUI(2)">★</span>
                     <span class="star" onclick="window.updateRatingFromUI(3)">★</span>
@@ -379,11 +398,34 @@
                             <div class="card-emoji-bg">${isDragon ? '🐲' : '💎'}</div>
                             <span class="card-number-text text-2xl font-black">${i + 1}</span>
                         </div>
-                        <div class="card-face card-back">🐲</div>
+                        <div class="card-face card-back">${done ? '👑' : '🐲'}</div>
                     </div>`;
                 container.onclick = () => window.handleCardClick(item.cat, item.idx, i);
                 grid.appendChild(container);
             });
+        }
+
+        /**
+         * 文字自動縮放函式
+         * 會偵測文字是否超出容器高度，並自動調降字體
+         */
+        function fitTextToContainer() {
+            const textEl = document.getElementById('overlayText');
+            const container = document.getElementById('textFitContainer');
+            if (!textEl || !container) return;
+
+            let size = 60; // 預設最大字體
+            const minSize = 16; // 最小限制
+            textEl.style.fontSize = size + 'px';
+
+            // 強制瀏覽器重繪高度
+            const maxHeight = container.clientHeight;
+            
+            // 如果捲動高度大於容器高度，就縮小字體
+            while (textEl.scrollHeight > maxHeight && size > minSize) {
+                size -= 2;
+                textEl.style.fontSize = size + 'px';
+            }
         }
 
         window.handleCardClick = (cat, idx, displayIdx) => {
@@ -395,26 +437,33 @@
                 setTimeout(() => {
                     const back = el.querySelector('.card-back');
                     if(back) back.textContent = '👑';
-                }, 150);
+                }, 200);
             }
             
             setTimeout(() => {
-                document.getElementById('overlayText').textContent = text;
+                const overlayText = document.getElementById('overlayText');
+                overlayText.textContent = text;
                 document.getElementById('answerCategoryTag').textContent = cat;
                 document.getElementById('ratingSection').style.display = (text === MANDATORY_CARD) ? 'none' : 'flex';
                 updateStarUI(cardMetadata[text]?.rating || 0);
+                
                 currentCardIndex = { cat, idx, text, displayIdx };
                 document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
+                
+                // 等待顯示後進行文字縮放計算
+                requestAnimationFrame(() => {
+                    fitTextToContainer();
+                });
+
                 playSound('pop');
             }, 350);
         };
 
         window.shuffleGame = () => {
             playSound('shuffle');
-            document.querySelectorAll('.card-container:not(.card-completed)').forEach(el => {
-                el.style.animation = 'shuffleShake 0.4s ease-in-out';
-                setTimeout(() => el.style.animation = '', 400);
-            });
+            const targets = document.querySelectorAll('.card-container:not(.card-completed)');
+            targets.forEach(el => el.classList.add('shuffle-active'));
+            
             Object.keys(gameData).forEach(cat => {
                 const prog = categoryProgress[cat];
                 const unIdx = [], unTxt = [];
@@ -422,7 +471,12 @@
                 unTxt.sort(() => Math.random() - 0.5);
                 unIdx.forEach((orig, i) => { gameData[cat][orig] = unTxt[i]; });
             });
-            setTimeout(() => { renderCards(); showToast("神秘牌卡已重新洗牌 🌀"); }, 400);
+            
+            setTimeout(() => { 
+                targets.forEach(el => el.classList.remove('shuffle-active'));
+                renderCards(); 
+                showToast("神秘牌卡已重新洗牌 🌀"); 
+            }, 600);
         };
 
         window.randomStyle = (skip) => {
