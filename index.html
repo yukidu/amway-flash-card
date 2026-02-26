@@ -65,8 +65,10 @@
 
         .card-completed .card-front { background-color: #eee !important; color: #666 !important; border-color: #bbb; box-shadow: none; opacity: 1; }
 
-        .card-icon-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.15; pointer-events: none; z-index: 10; padding: 15%; }
+        .card-icon-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.15; pointer-events: none; z-index: 10; padding: 20%; }
         .card-number-text { position: relative; z-index: 20; }
+        
+        .card-bg-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.15; padding: 15%; z-index: 5; pointer-events: none; }
 
         .tab-btn { border: var(--card-border); box-shadow: var(--card-shadow); transition: all 0.2s; border-radius: var(--card-radius); }
         .tab-active { filter: brightness(0.8) contrast(1.2); transform: scale(1.05); outline: 3px solid white; }
@@ -89,8 +91,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 龍 Icon SVG 樣式 */
-        .dragon-icon { width: 100%; height: 100%; fill: currentColor; }
+        .svg-icon { width: 100%; height: 100%; fill: currentColor; }
     </style>
 </head>
 <body class="theme-pop" onclick="handleUserInteraction()">
@@ -185,7 +186,7 @@
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black text-white px-8 py-4 font-black text-lg border-4 border-white shadow-2xl z-[1000] transition-all opacity-0 pointer-events-none uppercase"></div>
 
     <script>
-        const MANDATORY_CARD = "程式與視覺設計 杜杜龍創辦人白金 2026.2";
+        const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
         const THEMES = [
@@ -195,9 +196,15 @@
             { id: "forest", name: "森林" }, { id: "galaxy", name: "星際" }, { id: "comic", name: "漫畫" }
         ];
 
-        // 龍 Icon SVG 定義
+        // 鑽石 Icon SVG
+        const DIAMOND_SVG = `
+            <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12,2L4.5,11L12,22L19.5,11L12,2M12,4.4L17.1,10.5L12,16.6L6.9,10.5L12,4.4Z"/>
+            </svg>`;
+
+        // 龍 Icon SVG
         const DRAGON_SVG = `
-            <svg class="dragon-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg class="svg-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12,2C10.89,2 10,2.89 10,4C10,4.55 10.22,5.05 10.59,5.41L8.41,7.59C8.05,7.22 7.55,7 7,7C5.89,7 5,7.89 5,9C5,9.55 5.22,10.05 5.59,10.41L3.41,12.59C3.05,12.22 2.55,12 2,12C0.89,12 0,12.89 0,14C0,15.11 0.89,16 2,16C2.55,16 3.05,15.78 3.41,15.41L5.59,17.59C5.22,17.95 5,18.45 5,19C5,20.11 5.89,21 7,21C7.55,21 8.05,20.78 8.41,20.41L10.59,22.59C10.95,22.95 11.45,23.17 12,23.17C12.55,23.17 13.05,22.95 13.41,22.59L15.59,20.41C15.95,20.78 16.45,21 17,21C18.11,21 19,20.11 19,19C19,18.45 18.78,17.95 18.41,17.59L20.59,15.41C20.95,15.78 21.45,16 22,16C23.11,16 24,15.11 24,14C24,12.89 23.11,12 22,12C21.45,12 20.95,12.22 20.59,12.59L18.41,10.41C18.78,10.05 19,9.55 19,9C19,7.89 18.11,7 17,7C16.45,7 15.95,7.22 15.59,7.59L13.41,5.41C13.78,5.05 14,4.55 14,4C14,2.89 13.11,2 12,2M12,4L13.5,6L12,7.5L10.5,6L12,4M7,9L8.5,10.5L7,12L5.5,10.5L7,9M17,9L18.5,10.5L17,12L15.5,10.5L17,9M2,14L3.5,15.5L2,17L0.5,15.5L2,14M22,14L23.5,15.5L22,17L20.5,15.5L22,14M7,19L8.5,20.5L7,22L5.5,20.5L7,19M17,19L18.5,20.5L17,22L15.5,20.5L17,19M12,11A3,3 0 0,1 15,14A3,3 0 0,1 12,17A3,3 0 0,1 9,14A3,3 0 0,1 12,11Z"/>
             </svg>`;
         
@@ -311,17 +318,22 @@
             const grid = document.getElementById('cardsGrid'), items = gameData[currentCategory] || [], prog = categoryProgress[currentCategory] || new Set();
             grid.innerHTML = '';
             items.forEach((text, i) => {
-                const done = prog.has(i), icon = DRAGON_SVG;
+                const done = prog.has(i), mandatory = (text === MANDATORY_CARD);
+                // 決定使用的 Icon
+                const mainIcon = mandatory ? DRAGON_SVG : DIAMOND_SVG;
+                
                 const container = document.createElement('div');
                 container.className = `card-container ${done ? 'card-completed' : ''}`;
                 container.innerHTML = `
                     <div class="card-inner" id="card-${i}" onclick="handleCardClick(${i})">
                         <div class="card-face card-front">
                             <span class="card-number-text">${i+1}</span>
-                            ${done ? `<div class="card-icon-overlay">${icon}</div>` : ''}
+                            <!-- 一般卡顯示鑽石 bg，杜杜龍顯示龍 bg -->
+                            <div class="card-bg-icon">${mainIcon}</div>
+                            ${done ? `<div class="card-icon-overlay">${mainIcon}</div>` : ''}
                         </div>
                         <div class="card-face card-back" style="border-color: ${categoryColors[currentCategory]}">
-                            <div style="width:50%; height:50%;">${icon}</div>
+                            <div style="width:50%; height:50%;">${mainIcon}</div>
                         </div>
                     </div>`;
                 grid.appendChild(container);
