@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>互動翻牌遊戲 - 評分視覺強化版</title>
+    <title>互動翻牌遊戲 - 圖片系統分享版</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -25,7 +25,7 @@
         body.theme-retro { --bg: #f4ecd8; --dark: #5d4037; --card-border: 2px dashed #5d4037; --card-shadow: 4px 4px 0px #d7ccc8; --card-radius: 0; --bg-pattern: repeating-linear-gradient(45deg, #efebe9, #efebe9 10px, #f4ecd8 10px, #f4ecd8 20px); }
         body.theme-chalk { --bg: #1a3a3a; --dark: #fff; --card-border: 3px solid #fff; --card-shadow: 4px 4px 0px rgba(255,255,255,0.2); --card-radius: 0.5rem; --bg-pattern: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); --bg-size: 30px 30px; }
         body.theme-candy { --bg: #fff5f8; --dark: #ff6baf; --card-border: 4px solid #ff6baf; --card-shadow: 6px 6px 0px #ffd1e3; --card-radius: 2rem; --bg-pattern: radial-gradient(#ffd1e3 2px, transparent 2px); --bg-size: 25px 25px; }
-        body.theme-luxury { --bg: #1a1a1a; --dark: #d4af37; --card-border: 2px solid #d4af37; --card-shadow: 0 0 20px rgba(212,175,55,0.3); --card-radius: 0; --bg-pattern: linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222); --bg-size: 60px 60px; }
+        body.theme-luxury { --bg: #1a1a1a; --dark: #d4af37; --card-border: 2px solid #d4af37; --card-shadow: 0 0 20px rgba(212,175,55,0.3); --card-radius: 0; --bg-pattern: linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222), linear-gradient(45deg, #222 25%, transparent 25%, transparent 75%, #222 75%, #222); --bg-size: 60px 60px; }
         body.theme-blueprint { --bg: #0047ab; --dark: #fff; --card-border: 1px solid rgba(255,255,255,0.5); --card-shadow: 0 0 0 4px #0047ab, 0 0 0 5px white; --card-radius: 0; --bg-pattern: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); --bg-size: 20px 20px; }
         body.theme-pixel { --bg: #6185f2; --dark: #fff; --card-border: 6px double #fff; --card-shadow: 8px 8px 0px #000; --card-radius: 0; --bg-pattern: none; image-rendering: pixelated; }
         body.theme-forest { --bg: #e8f5e9; --dark: #2e7d32; --card-border: 4px solid #2e7d32; --card-shadow: 6px 6px 0px #a5d6a7; --card-radius: 1rem; --bg-pattern: radial-gradient(#c8e6c9 2px, transparent 2px); --bg-size: 40px 40px; }
@@ -40,10 +40,7 @@
 
         html { overflow-y: scroll; scrollbar-gutter: stable !important; }
 
-        #cardsGrid {
-            display: grid; gap: 1.5rem; width: 100%;
-            grid-template-columns: repeat(3, 1fr);
-        }
+        #cardsGrid { display: grid; gap: 1.5rem; width: 100%; grid-template-columns: repeat(3, 1fr); }
         @media (min-width: 640px) { #cardsGrid { grid-template-columns: repeat(4, 1fr); } }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
         @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
@@ -64,21 +61,11 @@
         }
 
         .card-front { background-color: var(--primary); color: #000; font-size: 2.5rem; font-weight: 900; position: relative; }
-        .card-back {
-            background-color: white !important; transform: rotateY(180deg);
-            padding: 8px; font-size: 3rem; display: flex; align-items: center; justify-content: center;
-        }
+        .card-back { background-color: white !important; transform: rotateY(180deg); padding: 8px; font-size: 3rem; display: flex; align-items: center; justify-content: center; }
 
-        .card-completed .card-front {
-            background-color: #eee !important; color: #666 !important;
-            border-color: #bbb; box-shadow: none; opacity: 1; 
-        }
+        .card-completed .card-front { background-color: #eee !important; color: #666 !important; border-color: #bbb; box-shadow: none; opacity: 1; }
 
-        .card-icon-overlay {
-            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-            font-size: 4rem; opacity: 0.2; pointer-events: none; z-index: 10;
-        }
-        
+        .card-icon-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 4.5rem; opacity: 0.15; pointer-events: none; z-index: 10; }
         .card-number-text { position: relative; z-index: 20; }
 
         .tab-btn { border: var(--card-border); box-shadow: var(--card-shadow); transition: all 0.2s; border-radius: var(--card-radius); }
@@ -87,24 +74,20 @@
         @keyframes popIn { 0% { transform: scale(0.5) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
         .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        .loading-overlay {
-            position: fixed; inset: 0; background: rgba(255, 255, 255, 0.95);
-            z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center;
-        }
-
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255, 255, 255, 0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .modal-content { transition: all 0.5s ease; border: var(--card-border); box-shadow: var(--card-shadow); border-width: 10px; }
         .stat-box { color: #000 !important; }
         .stat-label { color: rgba(0,0,0,0.6) !important; }
 
-        /* 星級樣式 */
         .star-rating { display: flex; gap: 0.5rem; font-size: 2rem; cursor: pointer; }
         .star { color: #ccc; transition: transform 0.2s; }
         .star.active { color: #FFD700; text-shadow: 0 0 5px rgba(255,215,0,0.5); }
-        .star:hover { transform: scale(1.2); }
-
-        /* 清單內淡化星級 */
-        .star-empty { color: #e2e8f0; opacity: 0.3; }
+        
+        .star-empty { color: #ccc; opacity: 0.1; }
         .star-filled { color: #fbbf24; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="theme-pop" onclick="handleUserInteraction()">
@@ -116,9 +99,7 @@
     <div class="max-w-6xl mx-auto px-4 py-8">
         <header class="text-center mb-8">
             <h1 class="text-5xl font-black italic mb-6 tracking-tighter uppercase">翻牌大師 <span id="styleName" class="text-indigo-600">普普!</span></h1>
-            
             <div id="categoryTabs" class="flex flex-wrap justify-center gap-4 mb-8"></div>
-
             <div class="flex justify-center items-center gap-6 mb-6">
                 <div class="bg-white border-4 border-black p-4 shadow-[6px_6px_0px_#000] min-w-[120px] stat-box">
                     <p class="text-xs font-black uppercase stat-label">已翻開</p>
@@ -129,7 +110,7 @@
                     <p id="statRemaining" class="text-4xl font-black">0</p>
                 </div>
             </div>
-            <p class="text-sm font-bold bg-yellow-300 inline-block px-3 py-1 border-2 border-black italic">用力「甩動」手機隨機翻牌！ 📱</p>
+            <p class="text-sm font-bold bg-yellow-300 inline-block px-3 py-1 border-2 border-black italic">用力「甩動」手機跨分類隨機抽牌！ 📱</p>
         </header>
 
         <main id="cardsGrid"></main>
@@ -139,6 +120,14 @@
             <button onclick="randomStyle()" class="bg-indigo-600 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">更換風格 🎨</button>
             <button onclick="openFavoriteModal()" class="bg-pink-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">收藏清單 🌟</button>
             <button onclick="openEditModal()" class="bg-white text-black px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all">編輯內容 ✏️</button>
+            <button onclick="shareApp()" class="bg-emerald-500 text-white px-8 py-4 font-black uppercase border-4 border-black shadow-[6px_6px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center gap-2">
+                分享遊戲
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+            </button>
         </footer>
     </div>
 
@@ -152,30 +141,29 @@
             <div id="ratingSection" class="z-20 w-full flex flex-col items-center gap-4 bg-gray-50 p-6 border-t-4 border-black">
                 <p class="font-black text-black italic uppercase">給予星級評分 (自動收藏)</p>
                 <div class="star-rating" id="starRatingContainer">
-                    <span class="star" onclick="rateCard(1)">★</span>
-                    <span class="star" onclick="rateCard(2)">★</span>
-                    <span class="star" onclick="rateCard(3)">★</span>
-                    <span class="star" onclick="rateCard(4)">★</span>
-                    <span class="star" onclick="rateCard(5)">★</span>
+                    <span class="star" onclick="updateRatingFromUI(1)">★</span>
+                    <span class="star" onclick="updateRatingFromUI(2)">★</span>
+                    <span class="star" onclick="updateRatingFromUI(3)">★</span>
+                    <span class="star" onclick="updateRatingFromUI(4)">★</span>
+                    <span class="star" onclick="updateRatingFromUI(5)">★</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 收藏視窗 -->
+    <!-- 收藏清單視窗 -->
     <div id="favoriteModal" onclick="closeFavoriteModal()" class="fixed inset-0 bg-black/60 z-[1000] hidden items-center justify-center p-4 cursor-pointer">
         <div class="bg-white border-8 border-black w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[15px_15px_0px_#000] cursor-default" onclick="event.stopPropagation()">
             <div class="p-4 border-b-8 border-black flex flex-col bg-pink-400">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-black uppercase italic">評分收藏 🌟</h2>
-                    <button id="exportJpegBtn" onclick="exportToJpeg()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white hover:bg-white hover:text-black transition-colors uppercase">匯出圖片 📸</button>
+                    <!-- 只在星級分頁顯示分享按鈕 -->
+                    <button id="exportJpegBtn" onclick="shareListAsImage()" class="bg-black text-white text-xs px-4 py-2 font-black border-2 border-white hover:bg-white hover:text-black transition-colors uppercase hidden flex items-center gap-1">分享圖片 📸</button>
                 </div>
                 <div id="favFilterContainer" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
             </div>
             <div id="favoriteList" class="p-6 overflow-y-auto space-y-4 flex-grow bg-white"></div>
-            <div class="p-4 border-t-8 border-black bg-gray-100 text-center">
-                <p class="text-xs font-black opacity-40 italic uppercase">點擊背景任一處關閉</p>
-            </div>
+            <div class="p-4 border-t-8 border-black bg-gray-100 text-center text-xs font-black opacity-40 uppercase italic">點擊背景任一處關閉</div>
         </div>
     </div>
 
@@ -198,7 +186,6 @@
         const MANDATORY_CARD = "程式與視覺設計 杜杜龍創辦人白金 2026.2";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        const POP_PALETTE = ["#FF0000", "#0000FF", "#FF00FF", "#00FFFF", "#32CD32", "#FF4500", "#FFD700", "#7FFF00", "#FF1493", "#00FA9A"];
         const THEMES = [
             { id: "pop", name: "普普" }, { id: "neon", name: "霓虹" }, { id: "minimal", name: "極簡" },
             { id: "retro", name: "復古" }, { id: "chalk", name: "黑板" }, { id: "candy", name: "糖果" },
@@ -206,41 +193,26 @@
             { id: "forest", name: "森林" }, { id: "galaxy", name: "星際" }, { id: "comic", name: "漫畫" }
         ];
         
-        let gameData = {};
-        let categoryProgress = {};
-        let categoryColors = {};
-        let cardMetadata = {}; 
-        let currentCategory = '';
-        let currentCardIndex = null;
-        let currentFavFilter = 'all';
-        let isShuffling = false;
-        let isAnimating = false;
-
+        let gameData = {}, categoryProgress = {}, categoryColors = {}, cardMetadata = {}, flipHistory = [];
+        let currentCategory = '', currentCardIndex = null, currentFavFilter = 'all', isShuffling = false, isAnimating = false;
         let audioCtx = null;
+
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         
         function playSound(type) {
             if (!audioCtx) return;
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator(), gain = audioCtx.createGain(), now = audioCtx.currentTime;
             osc.connect(gain); gain.connect(audioCtx.destination);
-            const volumeBase = 0.035; 
-
             if (type === 'pop') {
                 osc.type = 'square'; osc.frequency.setValueAtTime(300, now);
                 osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
-                gain.gain.setValueAtTime(volumeBase, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                gain.gain.setValueAtTime(0.03, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now); osc.stop(now + 0.4);
             } else if (type === 'victory') {
                 osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.setValueAtTime(659.25, now + 0.1);
                 osc.frequency.setValueAtTime(783.99, now + 0.2);
-                osc.frequency.setValueAtTime(1046.50, now + 0.3);
-                gain.gain.setValueAtTime(volumeBase * 2.5, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.8);
+                gain.gain.setValueAtTime(0.08, now); gain.gain.linearRampToValueAtTime(0, now + 0.8);
                 osc.start(now); osc.stop(now + 0.8);
             }
         }
@@ -255,270 +227,244 @@
         function handleUserInteraction() { initAudio(); enableShake(); }
 
         let lastShakeUpdate = 0;
-        const SHAKE_THRESHOLD = 50; 
-        const SHAKE_COOLDOWN = 1500; 
-        let isShakeInitialized = false;
-
         function handleMotion(event) {
             let curTime = Date.now();
             if ((curTime - lastShakeUpdate) > 100) {
                 let acc = event.acceleration || event.accelerationIncludingGravity;
                 if (!acc || acc.x === null) return;
                 let strength = Math.max(Math.abs(acc.x), Math.abs(acc.y), Math.abs(acc.z));
-                if (strength > SHAKE_THRESHOLD) {
-                    const overlay = document.getElementById('answerOverlay');
-                    if (overlay && overlay.classList.contains('hidden') && !isShuffling && !isAnimating) {
-                        flipRandomCard();
-                        lastShakeUpdate = curTime + SHAKE_COOLDOWN;
+                if (strength > 50) {
+                    if (document.getElementById('answerOverlay').classList.contains('hidden') && !isAnimating) {
+                        flipRandomCard(); lastShakeUpdate = curTime + 1500;
                     }
                 }
             }
         }
 
         function enableShake() {
-            if (isShakeInitialized) return;
-            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-                DeviceMotionEvent.requestPermission().then(state => {
-                    if (state === 'granted') { window.addEventListener('devicemotion', handleMotion, false); isShakeInitialized = true; }
-                });
-            } else { window.addEventListener('devicemotion', handleMotion, false); isShakeInitialized = true; }
+            if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission().then(s => { if(s==='granted') window.addEventListener('devicemotion', handleMotion); });
+            } else window.addEventListener('devicemotion', handleMotion);
         }
 
-        window.onload = async () => {
-            randomStyle(); 
-            await autoImportFromGoogleSheets();
-        };
+        window.onload = async () => { randomStyle(); await autoImportFromGoogleSheets(); };
 
         async function autoImportFromGoogleSheets() {
-            const loadingOverlay = document.getElementById('aiLoading');
-            loadingOverlay.style.display = 'flex';
+            const loading = document.getElementById('aiLoading'); loading.style.display = 'flex';
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL);
-                const csvText = await response.text();
-                const rows = parseCSV(csvText);
-                const newData = {};
+                const csv = await response.text();
+                const rows = parseCSV(csv), newData = {};
                 if (rows.length > 0) {
                     const headers = rows[0].map(h => h ? h.trim() : "");
-                    headers.forEach((catName, colIndex) => {
-                        if (catName) {
-                            newData[catName] = [];
-                            for (let r = 1; r < rows.length; r++) { 
-                                if (rows[r] && rows[r][colIndex] && rows[r][colIndex].trim() !== "") {
-                                    newData[catName].push(rows[r][colIndex].trim());
-                                }
-                            }
+                    headers.forEach((h, col) => {
+                        if (h) {
+                            newData[h] = [];
+                            for (let r=1; r<rows.length; r++) if(rows[r][col]) newData[h].push(rows[r][col].trim());
                         }
                     });
-                    if (Object.keys(newData).length > 0) applyNewGameData(newData);
+                    applyNewGameData(newData);
                 }
-            } catch (err) { showToast("同步失敗"); } finally {
-                loadingOverlay.style.display = 'none';
-                initKeyboardSupport();
-            }
+            } catch (err) { showToast("同步失敗"); } finally { loading.style.display = 'none'; initKeyboardSupport(); }
         }
 
         function applyNewGameData(newData) {
-            gameData = newData; 
-            checkMandatoryCards(); 
-            categoryProgress = {};
-            categoryColors = {}; 
-            const shuffledPalette = [...POP_PALETTE].sort(() => Math.random() - 0.5);
+            gameData = newData; checkMandatory(); categoryProgress = {}; categoryColors = {};
+            const palette = ["#FF0000", "#0000FF", "#FF00FF", "#00FFFF", "#32CD32", "#FF4500", "#FFD700", "#7FFF00", "#FF1493", "#00FA9A"];
             Object.keys(gameData).forEach((cat, idx) => {
-                categoryColors[cat] = shuffledPalette[idx % shuffledPalette.length];
+                categoryColors[cat] = palette[idx % palette.length];
                 categoryProgress[cat] = new Set();
                 gameData[cat].sort(() => Math.random() - 0.5);
             });
-            renderTabs(); 
-            const firstCat = Object.keys(gameData)[0];
-            if (firstCat) switchCategory(firstCat);
+            renderTabs(); const first = Object.keys(gameData)[0]; if(first) switchCategory(first);
         }
 
         function renderTabs() {
-            const tabsContainer = document.getElementById('categoryTabs');
-            tabsContainer.innerHTML = '';
+            const container = document.getElementById('categoryTabs'); container.innerHTML = '';
             Object.keys(gameData).forEach(cat => {
                 const btn = document.createElement('button');
                 btn.id = `tab-${cat}`; btn.textContent = cat;
                 btn.className = "tab-btn px-6 py-2 font-black uppercase text-sm transition-all";
                 btn.style.backgroundColor = categoryColors[cat];
                 btn.onclick = () => switchCategory(cat);
-                tabsContainer.appendChild(btn);
+                container.appendChild(btn);
             });
         }
 
         function switchCategory(cat) {
-            if (isShuffling || isAnimating) return;
-            currentCategory = cat;
-            if (!categoryProgress[currentCategory]) categoryProgress[currentCategory] = new Set();
-            const color = categoryColors[cat] || '#FFD700';
-            document.documentElement.style.setProperty('--primary', color);
+            currentCategory = cat; document.documentElement.style.setProperty('--primary', categoryColors[cat]);
+            document.querySelectorAll('#categoryTabs button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById(`tab-${cat}`).classList.add('tab-active');
             renderCards(false); updateStats();
         }
 
-        function renderCards(skipAnimation = true) {
-            const grid = document.getElementById('cardsGrid');
-            const items = gameData[currentCategory] || [];
-            const completed = categoryProgress[currentCategory] || new Set();
+        function renderCards(skip = true) {
+            const grid = document.getElementById('cardsGrid'), items = gameData[currentCategory] || [], prog = categoryProgress[currentCategory] || new Set();
             grid.innerHTML = '';
             items.forEach((text, i) => {
-                const isDone = completed.has(i);
-                const isMandatory = (text === MANDATORY_CARD);
-                const icon = isMandatory ? '👑' : '💎';
-                const frontContent = `<span class="card-number-text">${i + 1}</span>${isDone ? `<div class="card-icon-overlay">${icon}</div>` : ''}`;
-                
+                const done = prog.has(i), mandatory = (text === MANDATORY_CARD), icon = mandatory ? '👑' : '💎';
                 const container = document.createElement('div');
-                container.className = `card-container ${isDone ? 'card-completed' : ''}`;
+                container.className = `card-container ${done ? 'card-completed' : ''}`;
                 container.innerHTML = `
                     <div class="card-inner" id="card-${i}" onclick="handleCardClick(${i})">
-                        <div class="card-face card-front">${frontContent}</div>
+                        <div class="card-face card-front"><span class="card-number-text">${i+1}</span>${done ? `<div class="card-icon-overlay">${icon}</div>` : ''}</div>
                         <div class="card-face card-back" style="border-color: ${categoryColors[currentCategory]}"><span>${icon}</span></div>
                     </div>`;
                 grid.appendChild(container);
-                if (!skipAnimation) {
-                    container.style.opacity = '0';
-                    setTimeout(() => { container.style.opacity = '1'; container.classList.add('animate-pop'); }, i * 15);
-                }
+                if (!skip) { container.style.opacity = '0'; setTimeout(() => { container.style.opacity = '1'; container.classList.add('animate-pop'); }, i*15); }
             });
         }
 
-        function handleCardClick(index) {
+        function handleCardClick(idx) {
             if (isShuffling || isAnimating) return;
-            isAnimating = true; currentCardIndex = index;
-            const el = document.getElementById(`card-${index}`);
-            if (el) el.classList.add('is-flipped');
-            const text = gameData[currentCategory][index];
-            const isMandatory = (text === MANDATORY_CARD);
-            
+            isAnimating = true; currentCardIndex = idx;
+            if (flipHistory[flipHistory.length-1] !== idx) flipHistory.push(idx);
+            document.getElementById(`card-${idx}`).classList.add('is-flipped');
+            const text = gameData[currentCategory][idx], mandatory = (text === MANDATORY_CARD);
             if (!cardMetadata[text]) cardMetadata[text] = { rating: 0, category: currentCategory };
-
             setTimeout(() => {
-                const overlay = document.getElementById('answerOverlay');
                 document.getElementById('overlayText').textContent = text;
                 document.getElementById('answerCategoryTag').textContent = currentCategory;
-                const ratingSection = document.getElementById('ratingSection');
-                ratingSection.style.display = isMandatory ? 'none' : 'flex';
+                document.getElementById('ratingSection').style.display = mandatory ? 'none' : 'flex';
                 updateStarUI(cardMetadata[text].rating);
-                overlay.classList.replace('hidden', 'flex');
-                if (isMandatory) playSound('victory'); else playSound('pop');
+                document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
+                if (mandatory) playSound('victory'); else playSound('pop');
                 isAnimating = false;
             }, 350);
         }
 
-        function rateCard(stars) {
-            const text = gameData[currentCategory][currentCardIndex];
+        function updateRating(text, category, stars) {
+            if (!cardMetadata[text]) cardMetadata[text] = { rating: 0, category: category };
             cardMetadata[text].rating = stars;
-            updateStarUI(stars);
+            if (!document.getElementById('answerOverlay').classList.contains('hidden')) updateStarUI(stars);
+            if (!document.getElementById('favoriteModal').classList.contains('hidden')) filterFavs(currentFavFilter);
             showToast(`已評價 ${stars} 顆星！`);
         }
 
-        function updateStarUI(stars) {
-            const starEls = document.querySelectorAll('.star');
-            starEls.forEach((s, i) => {
-                if (i < stars) s.classList.add('active');
-                else s.classList.remove('active');
-            });
+        function updateRatingFromUI(s) {
+            const text = gameData[currentCategory][currentCardIndex];
+            updateRating(text, currentCategory, s);
         }
+
+        function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
 
         function closeAnswer() {
             const overlay = document.getElementById('answerOverlay');
             if (overlay.classList.contains('hidden')) return;
             isAnimating = true; overlay.classList.replace('flex', 'hidden');
             const idx = currentCardIndex;
-            const cardInner = document.getElementById(`card-${idx}`);
-            if (cardInner) cardInner.classList.remove('is-flipped');
+            document.getElementById(`card-${idx}`).classList.remove('is-flipped');
             setTimeout(() => {
-                if (idx !== null && !categoryProgress[currentCategory].has(idx)) {
-                    categoryProgress[currentCategory].add(idx); renderCards(true); updateStats();
-                }
+                if (!categoryProgress[currentCategory].has(idx)) { categoryProgress[currentCategory].add(idx); renderCards(true); updateStats(); }
                 currentCardIndex = null; isAnimating = false;
             }, 350);
         }
 
-        function openFavoriteModal() {
-            document.getElementById('favoriteModal').classList.replace('hidden', 'flex');
-            updateFavFilters();
-            filterFavs('all');
-        }
-
+        function openFavoriteModal() { document.getElementById('favoriteModal').classList.replace('hidden', 'flex'); updateFavFilters(); filterFavs('all'); }
         function closeFavoriteModal() { document.getElementById('favoriteModal').classList.replace('flex', 'hidden'); }
 
         function updateFavFilters() {
-            const container = document.getElementById('favFilterContainer');
-            container.innerHTML = '';
-            const existingRatings = new Set();
-            Object.values(cardMetadata).forEach(m => { if(m.rating > 0) existingRatings.add(m.rating); });
-            const allBtn = createFilterBtn('全部紀錄', 'all');
-            container.appendChild(allBtn);
-            [5,4,3,2,1].forEach(r => {
-                if (existingRatings.has(r)) {
-                    const btn = createFilterBtn('⭐'.repeat(r), `star-${r}`);
-                    container.appendChild(btn);
-                }
-            });
+            const container = document.getElementById('favFilterContainer'); container.innerHTML = '';
+            const existing = new Set(); Object.values(cardMetadata).forEach(m => { if(m.rating > 0) existing.add(m.rating); });
+            container.appendChild(createFilterBtn('全部翻開', 'all'));
+            [5,4,3,2,1].forEach(r => { if(existing.has(r)) container.appendChild(createFilterBtn('⭐'.repeat(r), `star-${r}`)); });
         }
 
-        function createFilterBtn(text, val) {
-            const btn = document.createElement('button');
-            btn.textContent = text;
-            btn.className = `bg-white px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm hover:bg-black hover:text-white transition-colors ${currentFavFilter === val ? 'bg-black text-white' : ''}`;
-            btn.onclick = () => filterFavs(val);
+        function createFilterBtn(t, v) {
+            const btn = document.createElement('button'); btn.textContent = t;
+            btn.className = `bg-white px-4 py-2 font-black border-2 border-black whitespace-nowrap text-sm hover:bg-black hover:text-white transition-colors ${currentFavFilter === v ? 'bg-black text-white' : ''}`;
+            btn.onclick = () => filterFavs(v);
             return btn;
         }
 
         function filterFavs(filter) {
-            currentFavFilter = filter;
-            updateFavFilters();
-            const list = document.getElementById('favoriteList');
+            currentFavFilter = filter; updateFavFilters();
+            const list = document.getElementById('favoriteList'), exportBtn = document.getElementById('exportJpegBtn');
             list.innerHTML = '';
-            let items = Object.keys(cardMetadata).map(text => ({ text, ...cardMetadata[text] }));
-            if (filter.startsWith('star-')) {
-                const val = parseInt(filter.split('-')[1]);
-                items = items.filter(i => i.rating === val);
-            }
+            exportBtn.classList.toggle('hidden', filter === 'all');
+            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] }));
+            if (filter.startsWith('star-')) items = items.filter(i => i.rating === parseInt(filter.split('-')[1]));
             items.sort((a, b) => b.rating - a.rating || a.text.localeCompare(b.text));
-            if (items.length === 0) {
-                list.innerHTML = '<div class="text-black font-black text-center p-10 opacity-30 uppercase italic">尚無數據</div>';
-                return;
-            }
+            if (items.length === 0) { list.innerHTML = '<div class="text-black font-black text-center p-10 opacity-30 italic">尚無評分紀錄</div>'; return; }
             items.forEach(item => {
                 const div = document.createElement('div');
-                div.className = "bg-gray-50 border-4 border-black p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-[4px_4px_0px_#000]";
-                
-                // 產生更明顯淡化的星級 HTML
+                div.className = "bg-gray-50 border-4 border-black p-4 flex flex-col items-center sm:items-start gap-2 shadow-[4px_4px_0px_#000]";
                 let starsHTML = '';
                 for(let i=1; i<=5; i++) {
-                    if(i <= item.rating) starsHTML += '<span class="star-filled">⭐</span>';
-                    else starsHTML += '<span class="star-empty">☆</span>';
+                    const activeClass = i <= item.rating ? 'star-filled' : 'star-empty';
+                    starsHTML += `<span class="${activeClass} cursor-pointer hover:scale-125 transition-transform" onclick="event.stopPropagation(); updateRating('${item.text.replace(/'/g, "\\'")}', '${item.category}', ${i})">⭐</span>`;
                 }
-
-                div.innerHTML = `
-                    <div class="flex-grow text-black text-center sm:text-left">
-                        <span class="text-xs font-black bg-black text-white px-2 py-0.5 mb-1 inline-block uppercase italic">${item.category}</span>
-                        <p class="font-black text-lg">${item.text}</p>
-                        <div class="stars-display flex justify-center sm:justify-start gap-0.5 text-xl">${starsHTML}</div>
-                    </div>
-                    <button onclick="jumpToCard('${item.category}', '${item.text}')" class="bg-indigo-500 text-white px-4 py-2 border-2 border-black font-black text-sm uppercase">查看</button>`;
+                div.innerHTML = `<div class="w-full text-black text-center sm:text-left"><span class="text-xs font-black bg-black text-white px-2 py-0.5 mb-1 inline-block uppercase italic">${item.category}</span><p class="font-black text-lg mb-1">${item.text}</p><div class="flex justify-center sm:justify-start gap-1 text-xl">${starsHTML}</div></div>`;
                 list.appendChild(div);
             });
         }
 
-        async function exportToJpeg() {
-            const list = document.getElementById('favoriteList');
-            if (!list.hasChildNodes() || list.innerText.includes("尚無數據")) return;
+        // 修改後的分享圖片功能：串接系統分享 API
+        async function shareListAsImage() {
+            if (currentFavFilter === 'all') return;
             showToast("正在產生圖片...");
+            
+            let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.rating === parseInt(currentFavFilter.split('-')[1]));
+            const tempDiv = document.createElement('div');
+            Object.assign(tempDiv.style, { position: 'fixed', top: '0', left: '-5000px', width: '500px', background: 'white', color: 'black', padding: '40px', fontFamily: 'sans-serif' });
+            const starCount = currentFavFilter.split('-')[1];
+            tempDiv.innerHTML = `<h1 style="font-size:24px; font-weight:900; border-bottom:4px solid black; margin-bottom:20px; padding-bottom:10px;">評分收藏清單 (${starCount}顆星)</h1>`;
+            items.forEach(item => { tempDiv.innerHTML += `<div style="margin-bottom:15px; border-left:8px solid black; padding-left:12px;"><div style="font-size:12px; font-weight:900; opacity:0.6;">[ ${item.category} ]</div><div style="font-size:18px; font-weight:800; line-height:1.4;">${item.text}</div></div>`; });
+            document.body.appendChild(tempDiv);
+
             try {
-                const canvas = await html2canvas(list, { backgroundColor: "#FFFFFF", scale: 2, logging: false, useCORS: true });
-                const link = document.createElement('a');
-                link.download = `收藏清單_${currentFavFilter}_${new Date().getTime()}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.9);
-                link.click();
-                showToast("匯出成功！");
-            } catch (e) { showToast("匯出失敗"); }
+                const canvas = await html2canvas(tempDiv, { scale: 2 });
+                canvas.toBlob(async (blob) => {
+                    const fileName = `收藏_${starCount}星_${new Date().getTime()}.jpg`;
+                    const file = new File([blob], fileName, { type: "image/jpeg" });
+
+                    // 檢查是否支援系統分享文件
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: `我的收藏清單 (${starCount}顆星)`,
+                                text: '分享我的評分收藏清單！'
+                            });
+                        } catch (err) {
+                            // 使用者取消分享不報錯
+                        }
+                    } else {
+                        // 備案：直接下載
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = fileName;
+                        link.click();
+                        showToast("瀏覽器不支持直接分享文件，已為您下載圖片！");
+                    }
+                }, 'image/jpeg', 0.9);
+            } catch (e) {
+                showToast("產生圖片失敗");
+            } finally {
+                document.body.removeChild(tempDiv);
+            }
         }
 
-        function jumpToCard(cat, text) {
-            closeFavoriteModal(); switchCategory(cat);
-            showToast(`已定位至 ${cat}`);
+        async function shareApp() {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: '互動翻牌遊戲',
+                        text: '這是一個超好玩的互動翻牌遊戲，快來試試看！',
+                        url: window.location.href
+                    });
+                } catch (err) {}
+            } else {
+                try {
+                    const tempInput = document.createElement('input');
+                    document.body.appendChild(tempInput);
+                    tempInput.value = window.location.href;
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    showToast("已為您複製遊戲連結！");
+                } catch (e) { showToast("複製連結失敗"); }
+            }
         }
 
         function parseCSV(text) {
@@ -533,54 +479,34 @@
             return ret;
         }
 
-        function checkMandatoryCards() {
-            Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
-        }
-
+        function checkMandatory() { Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); }); }
         function updateStats() {
-            const data = gameData[currentCategory] || [];
-            const done = (categoryProgress[currentCategory] || new Set()).size;
-            document.getElementById('statCompleted').textContent = done;
-            document.getElementById('statRemaining').textContent = data.length - done;
+            const d = gameData[currentCategory] || [], done = (categoryProgress[currentCategory] || new Set()).size;
+            document.getElementById('statCompleted').textContent = done; document.getElementById('statRemaining').textContent = d.length - done;
         }
 
         function shuffleGame() {
             if (isShuffling || isAnimating) return;
             isShuffling = true;
-            const cards = document.querySelectorAll('.card-container');
-            cards.forEach((card, i) => {
-                card.style.transition = "all 0.4s ease";
-                card.style.transform = `scale(0) rotate(${360 + i * 5}deg)`;
-                card.style.opacity = '0';
-            });
-            setTimeout(() => {
-                gameData[currentCategory].sort(() => Math.random() - 0.5);
-                categoryProgress[currentCategory] = new Set();
-                renderCards(false); updateStats();
-                setTimeout(() => { isShuffling = false; }, 500);
-            }, 500);
+            document.querySelectorAll('.card-container').forEach((c, i) => { c.style.transition = "all 0.4s"; c.style.transform = "scale(0) rotate(180deg)"; c.style.opacity = '0'; });
+            setTimeout(() => { gameData[currentCategory].sort(() => Math.random() - 0.5); categoryProgress[currentCategory] = new Set(); renderCards(false); updateStats(); isShuffling = false; }, 500);
         }
 
         function openEditModal() {
             document.getElementById('editModal').classList.replace('hidden', 'flex');
             const list = document.getElementById('editList'); list.innerHTML = '';
-            const items = gameData[currentCategory] || [];
-            items.forEach(text => { if(text !== MANDATORY_CARD) addAnswerRow(text); });
+            (gameData[currentCategory] || []).forEach(t => { if(t !== MANDATORY_CARD) addAnswerRow(t); });
         }
 
-        function addAnswerRow(text = '') {
-            const list = document.getElementById('editList');
-            const div = document.createElement('div');
-            div.className = 'flex gap-2 items-center bg-gray-50 p-4 border-4 border-black';
-            div.innerHTML = `<input type="text" value="${text}" class="item-text flex-grow font-black p-1 outline-none text-black"><button onclick="this.parentElement.remove()" class="text-2xl font-black text-black">🗑️</button>`;
-            list.appendChild(div);
+        function addAnswerRow(t = '') {
+            const div = document.createElement('div'); div.className = 'flex gap-2 items-center bg-gray-50 p-4 border-4 border-black';
+            div.innerHTML = `<input type="text" value="${t}" class="item-text flex-grow font-black p-1 outline-none text-black"><button onclick="this.parentElement.remove()" class="text-2xl font-black text-black">🗑️</button>`;
+            document.getElementById('editList').appendChild(div);
         }
 
         function saveAnswers() {
-            const rows = document.querySelectorAll('#editList .item-text');
-            const newList = [];
-            rows.forEach(input => { if (input.value.trim()) newList.push(input.value.trim()); });
-            gameData[currentCategory] = newList; checkMandatoryCards(); categoryProgress[currentCategory] = new Set();
+            const newList = []; document.querySelectorAll('#editList .item-text').forEach(i => { if(i.value.trim()) newList.push(i.value.trim()); });
+            gameData[currentCategory] = newList; checkMandatory(); categoryProgress[currentCategory] = new Set();
             closeEditModal(); renderCards(false); updateStats();
         }
 
@@ -588,24 +514,38 @@
 
         function initKeyboardSupport() {
             window.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') { closeAnswer(); closeFavoriteModal(); closeEditModal(); }
+                const ans = document.getElementById('answerOverlay'), fav = document.getElementById('favoriteModal'), edt = document.getElementById('editModal');
+                const open = !ans.classList.contains('hidden') || !fav.classList.contains('hidden') || !edt.classList.contains('hidden');
+                if (open) { closeAnswer(); closeFavoriteModal(); closeEditModal(); return; }
+                if (!isAnimating) {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); flipRandomCard(); }
+                    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); if(flipHistory.length) handleCardClick(flipHistory[flipHistory.length-1]); }
+                }
             });
         }
 
         function flipRandomCard() {
-            const items = gameData[currentCategory] || [];
-            const prog = categoryProgress[currentCategory] || new Set();
-            const available = [];
-            items.forEach((_, i) => { if (!prog.has(i)) available.push(i); });
-            if (available.length === 0) return;
-            handleCardClick(available[Math.floor(Math.random() * available.length)]);
+            const categories = Object.keys(gameData);
+            if (categories.length === 0) return;
+            let allAvailable = [];
+            categories.forEach(cat => {
+                const items = gameData[cat];
+                const prog = categoryProgress[cat] || new Set();
+                items.forEach((_, idx) => { if (!prog.has(idx)) allAvailable.push({ cat, idx }); });
+            });
+            let target;
+            if (allAvailable.length > 0) { target = allAvailable[Math.floor(Math.random() * allAvailable.length)]; }
+            else {
+                const randomCat = categories[Math.floor(Math.random() * categories.length)];
+                target = { cat: randomCat, idx: Math.floor(Math.random() * gameData[randomCat].length) };
+            }
+            if (currentCategory !== target.cat) switchCategory(target.cat);
+            handleCardClick(target.idx);
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.remove('opacity-0'); toast.classList.add('opacity-100');
-            setTimeout(() => { toast.classList.replace('opacity-100', 'opacity-0'); }, 3000);
+            const t = document.getElementById('toast'); t.textContent = msg;
+            t.classList.replace('opacity-0', 'opacity-100'); setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 3000);
         }
     </script>
 </body>
