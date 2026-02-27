@@ -192,11 +192,36 @@
         </footer>
     </div>
 
-    <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden items-center justify-center p-6 backdrop-blur-xl">
-        <div class="bg-white border-8 border-black p-8 w-full max-w-sm rounded-[40px] shadow-[15px_15px_0px_#FFD700]">
+    <!-- 修正：姓名視窗加入外部瀏覽器開啟教學 -->
+    <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden flex items-center justify-center p-6 backdrop-blur-xl">
+        <div class="bg-white border-8 border-black p-8 w-full max-w-md rounded-[40px] shadow-[15px_15px_0px_#FFD700] max-h-[90vh] overflow-y-auto no-scrollbar">
             <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
             <input type="text" id="userNameInput" placeholder="輸入名字..." class="w-full border-4 border-black p-4 text-xl font-black rounded-2xl mb-6 outline-none">
-            <button onclick="window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl rounded-2xl shadow-[5px_5px_0px_#888]">出發！</button>
+            <button onclick="window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl rounded-2xl shadow-[5px_5px_0px_#888] mb-8">出發！</button>
+            
+            <!-- 教學區塊 -->
+            <div class="border-t-4 border-dashed border-gray-300 pt-6">
+                <p class="text-pink-500 font-black text-lg mb-4 flex items-center">
+                    <span class="mr-2">💡</span> Line 使用者必看：
+                </p>
+                <p class="text-gray-600 font-bold text-sm mb-4 leading-relaxed">
+                    為了正常使用「照片分享金句」功能，請依照以下步驟切換至外部瀏覽器：
+                </p>
+                <div class="space-y-4">
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-black">1</div>
+                        <p class="text-gray-700 font-black text-sm pt-0.5">點擊 Line 視窗右上角的「<span class="text-lg">⋮</span>」或「<span class="text-lg">⋯</span>」選單</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-black">2</div>
+                        <p class="text-gray-700 font-black text-sm pt-0.5">選擇「<span class="text-blue-600 underline">使用預設瀏覽器開啟</span>」或「在外部瀏覽器開啟」</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-black">3</div>
+                        <p class="text-gray-700 font-black text-sm pt-0.5">即可盡情分享精美金句照片給朋友！✨</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -331,9 +356,8 @@
                 if (name) {
                     updateWelcomeUI(name);
                 } else {
-                    // 第一次進入，自動跳出詢問姓名視窗 (維持此引導功能)
                     setTimeout(() => {
-                        document.getElementById('nameModal').classList.remove('hidden');
+                        document.getElementById('nameModal').classList.replace('hidden', 'flex');
                     }, 1000);
                 }
                 const prog = localStorage.getItem(STORAGE_KEYS.PROGRESS);
@@ -502,7 +526,6 @@
             currentCardIndex = null;
         };
 
-        // 修正：進入紀錄頁面不再彈出詢問姓名
         window.openRecordModal = () => { 
             document.getElementById('recordModal').classList.replace('hidden', 'flex'); 
             filterFavs('all'); 
@@ -512,7 +535,7 @@
             const v = document.getElementById('userNameInput').value.trim(); 
             if (v) { 
                 localStorage.setItem(STORAGE_KEYS.USERNAME, v); updateWelcomeUI(v); 
-                document.getElementById('nameModal').classList.add('hidden'); 
+                document.getElementById('nameModal').classList.replace('flex', 'hidden'); 
             } 
         };
 
@@ -537,7 +560,7 @@
         };
 
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
-        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.remove('hidden'); };
+        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('hidden', 'flex'); };
         window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
@@ -563,12 +586,11 @@
             return `${dateStr} ${timeStr}`;
         }
 
-        // 智慧計算字體大小，確保控制在三行內
         function getSmartFontSize(text) {
             const len = text.length;
-            if (len <= 20) return "64px"; // 預設大一號字
-            if (len <= 45) return "52px"; // 二行~三行邊界
-            return "42px"; // 三行上限字體
+            if (len <= 20) return "64px"; 
+            if (len <= 45) return "52px"; 
+            return "42px"; 
         }
 
         window.shareSingleCard = async () => {
