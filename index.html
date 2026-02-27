@@ -25,15 +25,15 @@
             --bg-size: 20px 20px;
         }
 
-        /* 載入畫面文字風格設計：彩虹漸層 */
+        /* 彩虹漸層動畫 */
         .loading-style-rainbow { 
             background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
             animation: rainbowMove 2s infinite linear;
             background-size: 200% auto;
-            position: relative;
             z-index: 50;
+            position: relative;
         }
 
         @keyframes rainbowMove {
@@ -41,49 +41,31 @@
             100% { background-position: 200% center; }
         }
 
-        /* 巨大調色盤動畫 */
+        /* 調色盤動態 */
         @keyframes paletteFloat { 
-            0% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.2; } 
-            25% { transform: scale(1.2) rotate(3deg) translate(10px, -10px); opacity: 0.25; }
-            50% { transform: scale(1.3) rotate(-2deg) translate(-5px, 5px); opacity: 0.2; } 
-            75% { transform: scale(1.2) rotate(2deg) translate(10px, 10px); opacity: 0.25; }
-            100% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.2; } 
+            0% { transform: scale(1.1) rotate(0deg); opacity: 0.2; } 
+            50% { transform: scale(1.25) rotate(3deg); opacity: 0.3; } 
+            100% { transform: scale(1.1) rotate(0deg); opacity: 0.2; } 
         }
 
-        /* 旅行意象動畫 Keyframes */
-        @keyframes rotateEarth { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes flyPlane { 
-            0% { transform: translate(-100vw, 10vh) rotate(10deg); } 
-            100% { transform: translate(100vw, -20vh) rotate(10deg); } 
-        }
-        @keyframes sailShip { 
-            0% { transform: translateX(-120%); } 
-            100% { transform: translateX(120vw); } 
-        }
-        @keyframes driftCloud { 
-            0% { transform: translateX(-20vw); opacity: 0; } 
-            20% { opacity: 0.6; }
-            80% { opacity: 0.6; }
-            100% { transform: translateX(120vw); opacity: 0; } 
-        }
-        @keyframes jumpDolphin { 
-            0%, 100% { transform: translate(0, 0) rotate(0deg); } 
-            50% { transform: translate(50px, -100px) rotate(45deg); } 
-        }
+        /* 環遊世界意象動畫 */
+        @keyframes earthRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes planeFly { 0% { transform: translate(-150%, 50%) rotate(15deg); } 100% { transform: translate(250%, -50%) rotate(15deg); } }
+        @keyframes cloudDrift { 0% { transform: translateX(-10vw); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { transform: translateX(110vw); opacity: 0; } }
+        @keyframes shipSail { 0% { transform: translateX(-100%); } 100% { transform: translateX(110vw); } }
+        @keyframes dolphinJump { 0%, 100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(40px, -80px) rotate(45deg); } }
 
-        /* 載入畫面層級 */
         .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.2; z-index: 1; animation: paletteFloat 12s infinite ease-in-out; pointer-events: none; }
+        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.3; z-index: 1; animation: paletteFloat 15s infinite ease-in-out; }
         
-        /* 動畫元素容器 */
-        .travel-layer { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
-        .anim-earth { position: absolute; top: 35%; left: 50%; font-size: 5rem; margin-left: -2.5rem; animation: rotateEarth 10s infinite linear; }
-        .anim-plane { position: absolute; top: 40%; left: 0; font-size: 3rem; animation: flyPlane 6s infinite linear; }
-        .anim-ship { position: absolute; top: 60%; left: 0; font-size: 4rem; animation: sailShip 15s infinite linear; }
-        .anim-cloud { position: absolute; font-size: 4rem; opacity: 0.6; }
-        .anim-dolphin { position: absolute; bottom: 15%; left: 20%; font-size: 3rem; animation: jumpDolphin 4s infinite ease-in-out; }
+        .travel-box { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+        .item-earth { position: absolute; top: 30%; left: 50%; font-size: 5rem; margin-left: -2.5rem; animation: earthRotate 12s infinite linear; filter: drop-shadow(0 0 20px rgba(0,0,0,0.1)); }
+        .item-plane { position: absolute; top: 20%; left: 10%; font-size: 3rem; animation: planeFly 8s infinite linear; }
+        .item-ship { position: absolute; bottom: 30%; left: 0; font-size: 4rem; animation: shipSail 20s infinite linear; }
+        .item-dolphin { position: absolute; bottom: 20%; left: 30%; font-size: 2.5rem; animation: dolphinJump 4s infinite ease-in-out; }
+        .item-cloud { position: absolute; font-size: 4rem; animation: cloudDrift 15s infinite linear; }
 
-        /* 20 種風格樣式保持不變 */
+        /* 卡片與 UI 風格 */
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
         body.theme-comic { --card-radius: 0; --card-rotate: -3deg; --card-border: 8px solid #000; --card-shadow: 15px 15px 0px #000; }
         body.theme-sticker { --card-radius: 2rem; --card-border: 10px solid #fff; --card-shadow: 0 0 0 4px #000, 8px 8px 15px rgba(0,0,0,0.2); }
@@ -105,24 +87,110 @@
         body.theme-cyber { --card-radius: 20px 0 20px 0; --card-border: 4px solid #000; --card-shadow: 5px 5px 0 #00FF00; }
         body.theme-love { --card-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; --card-border: 69px solid #FF69B4; }
 
-        /* 教學與紀錄視窗風格 */
+        @keyframes themeLabelPop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.3) rotate(10deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); opacity: 0; }
+        }
+        #giantThemeName {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 5000; font-size: 15vw; font-weight: 900; color: #FF1493;
+            text-shadow: 8px 8px 0px #fff, -4px -4px 0px #fff, 4px -4px 0px #fff, -4px 4px 0px #fff;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+            pointer-events: none; white-space: nowrap; display: none; font-style: italic;
+        }
+        #giantThemeName.active { display: block; animation: themeLabelPop 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes welcomePop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes welcomeBounce { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(1deg); } }
+        .animate-welcome { animation: welcomePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .highlight-welcome { animation: welcomeBounce 0.4s ease-in-out 2; }
+
+        body {
+            background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
+            color: var(--dark); margin: 0; padding: 0; 
+            transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+        }
+
+        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.5rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
+
+        #cardsGrid { display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem; grid-auto-rows: min-content; }
+        @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
+        @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
+
+        .card-container { perspective: 1000px; position: relative; width: 100%; aspect-ratio: 1; }
+        .card-inner {
+            position: absolute; width: 100%; height: 100%;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d; cursor: pointer; transform: rotate(var(--card-rotate));
+        }
+        .card-inner.is-flipped { transform: rotateY(180deg) rotate(var(--card-rotate)); }
+
+        .card-face {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+            backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
+            border-radius: var(--card-radius); border: var(--card-border);
+            box-shadow: var(--card-shadow); overflow: hidden;
+            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
+        .card-back { background-color: white !important; transform: rotateY(180deg); }
+        .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
+        .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
+
+        .custom-dropdown { position: relative; width: 96px; font-weight: 900; z-index: 50; }
+        .dropdown-trigger {
+            background: #fff; border: 3px solid #000; padding: 0.45rem 0.6rem; border-radius: 10px;
+            box-shadow: 3px 3px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+            font-size: 0.95rem; white-space: nowrap; overflow: hidden; height: 42px;
+        }
+        .dropdown-options {
+            position: absolute; top: calc(100% + 5px); right: 0; width: 160px; background: #fff;
+            border: 3px solid #000; box-shadow: 6px 6px 0px #000; border-radius: 12px;
+            max-height: 300px; overflow-y: auto; display: none; padding: 5px 0;
+        }
+        .dropdown-options.active { display: block; }
+        .dropdown-item { padding: 10px; cursor: pointer; border-bottom: 2px solid #f0f0f0; font-size: 1rem; }
+        .dropdown-item:hover { background: #000; color: #fff; }
+
+        .stat-box { min-width: 60px; text-align: center; }
+        .star-rating .star { color: #ccc; cursor: pointer; font-size: 1.8rem; }
+        .star-rating .star.active { color: #FFD700; }
+
         .modal-close-btn {
             position: absolute; top: -15px; right: -15px; width: 42px; height: 42px;
             background: black; color: white; border: 3px solid white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: 900;
             z-index: 1300; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        .record-modal-container { position: relative; overflow: visible !important; }
-        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.5rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
+        
         #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; padding: 0.2rem 1rem; }
         #welcomeMsg { white-space: nowrap; font-weight: 900; display: inline-block; cursor: pointer; letter-spacing: -0.05em; }
+
+        .tab-btn {
+            padding: 0 0.6rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
+            white-space: nowrap; font-size: 0.7rem; transition: all 0.2s; background: white; color: black;
+            height: 34px; line-height: 30px; flex-shrink: 0; display: flex; align-items: center;
+        }
+        .tab-btn.active { background: black !important; color: white !important; }
+        
+        .edit-name-btn {
+            flex-shrink: 0; width: 32px; height: 32px; background: black; color: white;
+            border: 2px solid white; border-radius: 50%; font-size: 14px; display: flex;
+            align-items: center; justify-content: center; cursor: pointer; margin-left: 8px;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .record-modal-container { position: relative; overflow: visible !important; }
     </style>
 </head>
 <body class="theme-jelly" onclick="window.initInteraction()">
     <div id="giantThemeName">風格</div>
 
-    <!-- 載入畫面：環遊世界意象 -->
     <div id="aiLoading" class="loading-overlay">
+        <!-- 巨大動態調色盤 -->
         <svg class="palette-bg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path d="M90,50 C90,72.1 72.1,90 50,90 C27.9,90 10,72.1 10,50 C10,27.9 27.9,10 40,10 C45,10 48,13 52,15 C56,17 60,15 65,12 C75,7 90,27.9 90,50 Z" fill="#F3E5AB" stroke="#000" stroke-width="0.5"/>
             <circle cx="30" cy="35" r="5" fill="#FF4444"/>
@@ -133,15 +201,15 @@
             <ellipse cx="25" cy="18" rx="8" ry="4" fill="#fff" opacity="0.6"/>
         </svg>
 
-        <div class="travel-layer">
-            <div class="anim-cloud" style="top: 10%; animation: driftCloud 12s infinite linear;">☁️</div>
-            <div class="anim-cloud" style="top: 25%; animation: driftCloud 8s infinite linear 2s;">☁️</div>
-            <div class="anim-cloud" style="top: 50%; animation: driftCloud 15s infinite linear 1s;">☁️</div>
-            <div class="anim-earth">🌍</div>
-            <div class="anim-plane">✈️</div>
-            <div class="anim-ship">🚢</div>
-            <div class="anim-dolphin">🐬</div>
-            <div class="anim-dolphin" style="left: 70%; animation-delay: 1.5s;">🐬</div>
+        <!-- 環遊世界意象 -->
+        <div class="travel-box">
+            <div class="item-earth">🌍</div>
+            <div class="item-plane">✈️</div>
+            <div class="item-ship">🚢</div>
+            <div class="item-dolphin">🐬</div>
+            <div class="item-cloud" style="top:10%; animation-delay: 0s;">☁️</div>
+            <div class="item-cloud" style="top:25%; animation-delay: 4s;">☁️</div>
+            <div class="item-cloud" style="top:50%; animation-delay: 2s;">☁️</div>
         </div>
 
         <p id="loadingText" class="font-black text-3xl mt-4 px-6 text-center loading-style-rainbow">正在彩繪你的美麗人生</p>
@@ -272,6 +340,7 @@
                 <button onclick="window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">這句Line給朋友 📸</button>
             </div>
             <div id="ratingSection" class="w-full flex flex-col items-center gap-2 mt-6">
+                <p class="font-black text-gray-400 text-[10px] uppercase">標記你的喜歡程度</p>
                 <div class="star-rating flex gap-1" id="starRatingContainer">
                     <span class="star" onclick="window.updateRatingFromUI(1)">★</span>
                     <span class="star" onclick="window.updateRatingFromUI(2)">★</span>
@@ -293,12 +362,12 @@
                 </div>
                 <div class="flex gap-1 overflow-x-auto no-scrollbar p-3 bg-gray-50 border-b-4 border-black flex-nowrap" id="recordTabs">
                     <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button>
-                    <button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未評</button>
-                    <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5★</button>
-                    <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4★</button>
-                    <button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3★</button>
-                    <button onclick="window.changeRecordTab('star2')" class="tab-btn" data-tab="star2">2★</button>
-                    <button onclick="window.changeRecordTab('star1')" class="tab-btn" data-tab="star1">1★</button>
+                    <button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未標記</button>
+                    <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5 喜歡</button>
+                    <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4 喜歡</button>
+                    <button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3 喜歡</button>
+                    <button onclick="window.changeRecordTab('star2')" class="tab-btn" data-tab="star2">2 喜歡</button>
+                    <button onclick="window.changeRecordTab('star1')" class="tab-btn" data-tab="star1">1 喜歡</button>
                 </div>
                 <div id="favoriteList" class="p-4 overflow-y-auto space-y-3 flex-grow bg-white"></div>
             </div>
@@ -330,7 +399,8 @@
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        const POSITIVE_EMOJIS = ["🚀", "🏆", "💪", "🌟", "🌈", "💎", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁", "✨", "🏹", "🥳", "🙌", "🧗", "🌊", "🎨", "🧗‍♀️", "跑步", "火", "鴿子", "🏅"];
+        // 修正 Emoji 選項
+        const POSITIVE_EMOJIS = ["🚀", "🏆", "💪", "🌟", "🌈", "💎", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁", "✨", "🏹", "🥳", "🙌", "🧗", "🌊", "🎨", "🧗‍♀️", "🏃", "🔥", "🕊️", "🏅"];
 
         const THEMES = [
             { id: "jelly", name: "Q彈果凍" }, { id: "comic", name: "熱血漫畫" }, { id: "sticker", name: "可愛貼紙" },
@@ -344,10 +414,45 @@
 
         let gameData = {}, categoryProgress = {}, cardMetadata = {}, allCategoryItems = [];
         let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all';
+        let lastShakeTime = 0;
 
-        window.initInteraction = () => {
+        // 初始化互動（包含搖一搖權限）
+        window.initInteraction = async () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // iOS 搖一搖權限請求
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                try {
+                    const permissionState = await DeviceMotionEvent.requestPermission();
+                    if (permissionState === 'granted') window.addEventListener('devicemotion', handleShake, true);
+                } catch (e) { console.error(e); }
+            } else {
+                window.addEventListener('devicemotion', handleShake, true);
+            }
+        };
+
+        // 搖一搖邏輯
+        function handleShake(event) {
+            const acc = event.accelerationIncludingGravity;
+            if (!acc) return;
+            // 非常用力的閾值
+            const threshold = 25; 
+            const curTime = Date.now();
+            if ((curTime - lastShakeTime) > 2000) {
+                if (Math.abs(acc.x) > threshold || Math.abs(acc.y) > threshold || Math.abs(acc.z) > threshold) {
+                    lastShakeTime = curTime;
+                    window.shakeRandomCard();
+                }
+            }
+        }
+
+        window.shakeRandomCard = () => {
+            if (allCategoryItems.length === 0) return;
+            const randIdx = Math.floor(Math.random() * allCategoryItems.length);
+            const item = allCategoryItems[randIdx];
+            showToast("🌀 搖出好運勢！");
+            window.handleCardClick(item.cat, item.idx, randIdx);
         };
 
         window.toggleDropdown = (e) => { if (e) e.stopPropagation(); document.getElementById('dropdownOptions').classList.toggle('active'); };
@@ -395,7 +500,7 @@
                 window.randomStyle(true);
             } catch (err) { console.error(err); } 
             finally { 
-                setTimeout(() => { loading.style.display = 'none'; }, 2000);
+                setTimeout(() => { loading.style.display = 'none'; }, 2500);
             }
         };
 
@@ -581,7 +686,7 @@
         };
 
         window.resetAllGame = async () => {
-            if (!confirm("要重置所有紀錄與評分嗎？")) return;
+            if (!confirm("要重置所有紀錄與「喜歡」標記嗎？")) return;
             localStorage.removeItem(STORAGE_KEYS.PROGRESS);
             localStorage.removeItem(STORAGE_KEYS.METADATA);
             categoryProgress = {}; cardMetadata = {}; allCategoryItems = [];
@@ -591,7 +696,7 @@
         window.updateRatingFromUI = (s) => {
             const i = currentCardIndex; cardMetadata[i.text] = { rating: s, category: i.cat, flipTimestamp: Date.now() };
             localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
-            updateStarUI(s); showToast(`評分 ${s}★`);
+            updateStarUI(s); showToast(`標記了 ${s} 個喜歡`);
         };
 
         window.updateRatingFromFav = (text, cat, s) => {
@@ -690,7 +795,7 @@
                 const file = new File([blob], customFileName, { type: 'image/png' });
                 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-                const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪", "🏆", "火"];
+                const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪", "🏆", "🔥"];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
                 const shareText = `這是${name || '我'}翻的牌，發現這句話很經典，特別分享給您 ${randomEmoji}`;
 
