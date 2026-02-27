@@ -95,7 +95,7 @@
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
-        .custom-dropdown { position: relative; width: 120px; font-weight: 900; z-index: 50; }
+        .custom-dropdown { position: relative; width: 96px; font-weight: 900; z-index: 50; }
         .dropdown-trigger {
             background: #fff; border: 3px solid #000; padding: 0.45rem 0.6rem; border-radius: 10px;
             box-shadow: 3px 3px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
@@ -169,9 +169,9 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- 變身按鈕調整為兩行 -->
-                    <button onclick="window.randomStyle()" class="px-3 bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-xs leading-none h-[42px] flex flex-col justify-center items-center">
-                        <span>變</span><span>身</span>
+                    <!-- 修正：變身按鈕恢復為單行顯示 -->
+                    <button onclick="window.randomStyle()" class="w-[96px] bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-sm h-[42px] flex items-center justify-center">
+                        變身！
                     </button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
                         <div class="dropdown-trigger" onclick="window.toggleDropdown()">
@@ -274,7 +274,7 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <!-- 匯出模板：優化排版對齊 -->
+    <!-- 匯出模板 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; color:#000; z-index: -1; border: 60px solid #000;">
         <div id="exportInner" style="padding: 60px; position: relative; min-height: 800px; display: flex; flex-direction: column;">
             <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 30px; margin-bottom: 50px; overflow: visible;">
@@ -298,7 +298,6 @@
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        // 正能量 Emoji 池
         const POSITIVE_EMOJIS = ["🚀", "💰", "🏆", "💪", "🌟", "🌈", "💎", "📈", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁"];
 
         const THEMES = [
@@ -448,8 +447,6 @@
                         if (h && h !== '未分類') {
                             newData[h] = [];
                             for (let r = 1; r < rows.length; r++) if (rows[r][col]) newData[h].push(rows[r][col].trim());
-                            
-                            // 每個分類隨機分配一個正能量 Emoji
                             const randomEmoji = POSITIVE_EMOJIS[Math.floor(Math.random() * POSITIVE_EMOJIS.length)];
                             optionsContainer.appendChild(createItem(h, h, randomEmoji));
                         }
@@ -572,7 +569,7 @@
         };
 
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
-        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('flex', 'hidden'); };
+        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('hidden', 'flex'); };
         window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
@@ -598,7 +595,6 @@
             return `${dateStr} ${timeStr}`;
         }
 
-        // 強化：針對超長文字（>50字）更積極縮放，確保 3 行內顯示
         function getSmartFontSize(text) {
             const len = text.length;
             if (len <= 15) return "68px"; 
@@ -613,13 +609,13 @@
             const name = getSenderName();
             const smartSize = getSmartFontSize(i.text);
             document.getElementById('exportSenderInfo').textContent = `寄送人：${name || '安安'} | ${getCurrentFormattedTime()}`;
-            // 修正排版：文字上移、對齊左邊、縮小行高
+            // 修正匯出排版：移除 -webkit-line-clamp 以防止裁切，增加底部 Padding 確保筆畫完整呈現
             document.getElementById('exportCardsList').innerHTML = `
                 <div style="display:flex; align-items:flex-start; margin-bottom: 40px; padding-top: 10px;">
                     <div style="width: 25px; background: black; margin-right: 40px; align-self: stretch;"></div>
                     <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start;">
                         <div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 10px; margin-top: -5px;">[ ${i.cat} ]</div>
-                        <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; padding-bottom: 5px;">${i.text}</div>
+                        <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; word-break: break-all; padding-bottom: 20px;">${i.text}</div>
                     </div>
                 </div>`;
             captureAndShare(i.text);
@@ -640,7 +636,7 @@
                         <div style="width: 15px; background: black; margin-right: 35px; align-self: stretch;"></div>
                         <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start;">
                             <div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 8px; margin-top: -4px;">[ ${i.category} ]</div>
-                            <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; padding-bottom: 4px;">${i.text}</div>
+                            <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; word-break: break-all; padding-bottom: 15px;">${i.text}</div>
                         </div>
                     </div>`;
             });
