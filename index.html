@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="zh-TW">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G1449Z6L35"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-G1449Z6L35');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>改變生命未來式 Be A Better You</title>
@@ -357,7 +366,7 @@
                             <span class="mr-2">💻</span> 電腦版：加到書籤
                         </h3>
                         <div class="bg-gray-100 p-4 rounded-3xl border-2 border-black shadow-[4px_4px_0_#000] space-y-2">
-                            <p class="font-black">1. 點擊網址列右側的「☆」星星圖示</p>
+                            <p class="font-black">1. 點擊網址列 right side 的「☆」星星圖示</p>
                             <p class="font-black text-sm text-gray-600">或使用快速鍵：<span class="bg-white px-2 py-0.5 rounded border border-black">Ctrl + D</span> (Windows) / <span class="bg-white px-2 py-0.5 rounded border border-black">Cmd + D</span> (Mac)</p>
                         </div>
                     </section>
@@ -526,7 +535,6 @@
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
             loading.style.display = 'flex';
-            // 重新初始化 Session 計數
             sessionStorage.setItem(STORAGE_KEYS.SESSION_FLIP_COUNT, '0');
             try {
                 const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
@@ -716,7 +724,6 @@
             const info = currentCardIndex; if (!info) return;
             document.getElementById('answerOverlay').classList.replace('flex', 'hidden');
             
-            // 讀取並累計翻牌次數 (Session 級別)
             let count = Number(sessionStorage.getItem(STORAGE_KEYS.SESSION_FLIP_COUNT) || 0) + 1;
             sessionStorage.setItem(STORAGE_KEYS.SESSION_FLIP_COUNT, count.toString());
 
@@ -725,7 +732,6 @@
                 localStorage.setItem(STORAGE_KEYS.HIDDEN_DUDU, 'true');
                 renderCards();
             } else {
-                // 修正 Set 初始化邏輯
                 if (info.idx !== -1) {
                     if (!categoryProgress[info.cat]) categoryProgress[info.cat] = new Set();
                     if (!categoryProgress[info.cat].has(info.idx)) {
@@ -738,7 +744,6 @@
                 }
             }
             
-            // 教學彈窗時機：第一次翻牌，以及每 10 張 (10, 20, 30...)
             if (count === 1 || (count > 0 && count % 10 === 0)) {
                 setTimeout(() => {
                     document.getElementById('shakeTutorialModal').classList.replace('hidden', 'flex');
@@ -803,7 +808,7 @@
         }
         
         window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('hidden', 'flex'); };
-        window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
+        window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('hidden', 'flex');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
         function filterFavs(tab = 'all') {
@@ -886,7 +891,6 @@
             const textSnippet = cardText ? cardText.substring(0, 10) : "紀錄";
             const customFileName = name ? `${name} - ${textSnippet} - Be A Better You.png` : `${textSnippet} - Be A Better You.png`;
             try {
-                // 強制讓模板在畫面上渲染一次
                 temp.style.left = "0"; 
                 temp.style.zIndex = "10000";
                 temp.style.visibility = "visible";
@@ -946,17 +950,14 @@
         
         function updateStats() {
             let t = 0, d = 0;
-            // 遍歷 gameData 計算總數
             Object.keys(gameData).forEach(cat => {
                 const list = gameData[cat].filter(x => x !== MANDATORY_CARD);
                 t += list.length;
             });
-            // 遍歷已翻開記錄計算
             Object.keys(categoryProgress).forEach(cat => {
                 const set = categoryProgress[cat];
                 if (set) {
                     set.forEach(idx => {
-                        // idx 為 -1 代表杜杜龍卡，不列入計數
                         if (idx !== -1) d++;
                     });
                 }
