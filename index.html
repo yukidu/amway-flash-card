@@ -25,12 +25,15 @@
             --bg-size: 20px 20px;
         }
 
+        /* 載入畫面文字風格設計：彩虹漸層 */
         .loading-style-rainbow { 
             background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
             animation: rainbowMove 2s infinite linear;
             background-size: 200% auto;
+            position: relative;
+            z-index: 50;
         }
 
         @keyframes rainbowMove {
@@ -38,14 +41,49 @@
             100% { background-position: 200% center; }
         }
 
+        /* 巨大調色盤動畫 */
         @keyframes paletteFloat { 
-            0% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.3; } 
-            25% { transform: scale(1.2) rotate(3deg) translate(10px, -10px); opacity: 0.4; }
-            50% { transform: scale(1.3) rotate(-2deg) translate(-5px, 5px); opacity: 0.3; } 
-            75% { transform: scale(1.2) rotate(2deg) translate(10px, 10px); opacity: 0.4; }
-            100% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.3; } 
+            0% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.2; } 
+            25% { transform: scale(1.2) rotate(3deg) translate(10px, -10px); opacity: 0.25; }
+            50% { transform: scale(1.3) rotate(-2deg) translate(-5px, 5px); opacity: 0.2; } 
+            75% { transform: scale(1.2) rotate(2deg) translate(10px, 10px); opacity: 0.25; }
+            100% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.2; } 
         }
 
+        /* 旅行意象動畫 Keyframes */
+        @keyframes rotateEarth { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes flyPlane { 
+            0% { transform: translate(-100vw, 10vh) rotate(10deg); } 
+            100% { transform: translate(100vw, -20vh) rotate(10deg); } 
+        }
+        @keyframes sailShip { 
+            0% { transform: translateX(-120%); } 
+            100% { transform: translateX(120vw); } 
+        }
+        @keyframes driftCloud { 
+            0% { transform: translateX(-20vw); opacity: 0; } 
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateX(120vw); opacity: 0; } 
+        }
+        @keyframes jumpDolphin { 
+            0%, 100% { transform: translate(0, 0) rotate(0deg); } 
+            50% { transform: translate(50px, -100px) rotate(45deg); } 
+        }
+
+        /* 載入畫面層級 */
+        .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.2; z-index: 1; animation: paletteFloat 12s infinite ease-in-out; pointer-events: none; }
+        
+        /* 動畫元素容器 */
+        .travel-layer { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+        .anim-earth { position: absolute; top: 35%; left: 50%; font-size: 5rem; margin-left: -2.5rem; animation: rotateEarth 10s infinite linear; }
+        .anim-plane { position: absolute; top: 40%; left: 0; font-size: 3rem; animation: flyPlane 6s infinite linear; }
+        .anim-ship { position: absolute; top: 60%; left: 0; font-size: 4rem; animation: sailShip 15s infinite linear; }
+        .anim-cloud { position: absolute; font-size: 4rem; opacity: 0.6; }
+        .anim-dolphin { position: absolute; bottom: 15%; left: 20%; font-size: 3rem; animation: jumpDolphin 4s infinite ease-in-out; }
+
+        /* 20 種風格樣式保持不變 */
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
         body.theme-comic { --card-radius: 0; --card-rotate: -3deg; --card-border: 8px solid #000; --card-shadow: 15px 15px 0px #000; }
         body.theme-sticker { --card-radius: 2rem; --card-border: 10px solid #fff; --card-shadow: 0 0 0 4px #000, 8px 8px 15px rgba(0,0,0,0.2); }
@@ -67,111 +105,23 @@
         body.theme-cyber { --card-radius: 20px 0 20px 0; --card-border: 4px solid #000; --card-shadow: 5px 5px 0 #00FF00; }
         body.theme-love { --card-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; --card-border: 69px solid #FF69B4; }
 
-        @keyframes themeLabelPop {
-            0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.3) rotate(10deg); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); opacity: 0; }
-        }
-        #giantThemeName {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 5000; font-size: 15vw; font-weight: 900; color: #FF1493;
-            text-shadow: 8px 8px 0px #fff, -4px -4px 0px #fff, 4px -4px 0px #fff, -4px 4px 0px #fff;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
-            pointer-events: none; white-space: nowrap; display: none; font-style: italic;
-        }
-        #giantThemeName.active { display: block; animation: themeLabelPop 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-
-        @keyframes welcomePop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes welcomeBounce { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(1deg); } }
-        .animate-welcome { animation: welcomePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .highlight-welcome { animation: welcomeBounce 0.4s ease-in-out 2; }
-
-        body {
-            background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
-            color: var(--dark); margin: 0; padding: 0; 
-            transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-x: hidden;
-        }
-
-        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.5rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
-
-        #cardsGrid { display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem; grid-auto-rows: min-content; }
-        @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
-        @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
-
-        .card-container { perspective: 1000px; position: relative; width: 100%; aspect-ratio: 1; }
-        .card-inner {
-            position: absolute; width: 100%; height: 100%;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d; cursor: pointer; transform: rotate(var(--card-rotate));
-        }
-        .card-inner.is-flipped { transform: rotateY(180deg) rotate(var(--card-rotate)); }
-
-        .card-face {
-            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
-            border-radius: var(--card-radius); border: var(--card-border);
-            box-shadow: var(--card-shadow); overflow: hidden;
-            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
-        .card-back { background-color: white !important; transform: rotateY(180deg); }
-        .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
-        .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
-
-        .custom-dropdown { position: relative; width: 96px; font-weight: 900; z-index: 50; }
-        .dropdown-trigger {
-            background: #fff; border: 3px solid #000; padding: 0.45rem 0.6rem; border-radius: 10px;
-            box-shadow: 3px 3px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-            font-size: 0.95rem; white-space: nowrap; overflow: hidden; height: 42px;
-        }
-        .dropdown-options {
-            position: absolute; top: calc(100% + 5px); right: 0; width: 160px; background: #fff;
-            border: 3px solid #000; box-shadow: 6px 6px 0px #000; border-radius: 12px;
-            max-height: 300px; overflow-y: auto; display: none; padding: 5px 0;
-        }
-        .dropdown-options.active { display: block; }
-        .dropdown-item { padding: 10px; cursor: pointer; border-bottom: 2px solid #f0f0f0; font-size: 1rem; }
-        .dropdown-item:hover { background: #000; color: #fff; }
-
-        .stat-box { min-width: 60px; text-align: center; }
-        .star-rating .star { color: #ccc; cursor: pointer; font-size: 1.8rem; }
-        .star-rating .star.active { color: #FFD700; }
-
-        .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.3; z-index: -1; animation: paletteFloat 12s infinite ease-in-out; }
-        
+        /* 教學與紀錄視窗風格 */
         .modal-close-btn {
             position: absolute; top: -15px; right: -15px; width: 42px; height: 42px;
             background: black; color: white; border: 3px solid white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: 900;
             z-index: 1300; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
-        
+        .record-modal-container { position: relative; overflow: visible !important; }
+        .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.5rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
         #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; padding: 0.2rem 1rem; }
         #welcomeMsg { white-space: nowrap; font-weight: 900; display: inline-block; cursor: pointer; letter-spacing: -0.05em; }
-
-        .tab-btn {
-            padding: 0 0.6rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
-            white-space: nowrap; font-size: 0.7rem; transition: all 0.2s; background: white; color: black;
-            height: 34px; line-height: 30px; flex-shrink: 0; display: flex; align-items: center;
-        }
-        .tab-btn.active { background: black !important; color: white !important; }
-        
-        .edit-name-btn {
-            flex-shrink: 0; width: 32px; height: 32px; background: black; color: white;
-            border: 2px solid white; border-radius: 50%; font-size: 14px; display: flex;
-            align-items: center; justify-content: center; cursor: pointer; margin-left: 8px;
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .record-modal-container { position: relative; overflow: visible !important; }
     </style>
 </head>
 <body class="theme-jelly" onclick="window.initInteraction()">
     <div id="giantThemeName">風格</div>
 
+    <!-- 載入畫面：環遊世界意象 -->
     <div id="aiLoading" class="loading-overlay">
         <svg class="palette-bg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path d="M90,50 C90,72.1 72.1,90 50,90 C27.9,90 10,72.1 10,50 C10,27.9 27.9,10 40,10 C45,10 48,13 52,15 C56,17 60,15 65,12 C75,7 90,27.9 90,50 Z" fill="#F3E5AB" stroke="#000" stroke-width="0.5"/>
@@ -182,6 +132,18 @@
             <circle cx="60" cy="25" r="5" fill="#9b59b6"/>
             <ellipse cx="25" cy="18" rx="8" ry="4" fill="#fff" opacity="0.6"/>
         </svg>
+
+        <div class="travel-layer">
+            <div class="anim-cloud" style="top: 10%; animation: driftCloud 12s infinite linear;">☁️</div>
+            <div class="anim-cloud" style="top: 25%; animation: driftCloud 8s infinite linear 2s;">☁️</div>
+            <div class="anim-cloud" style="top: 50%; animation: driftCloud 15s infinite linear 1s;">☁️</div>
+            <div class="anim-earth">🌍</div>
+            <div class="anim-plane">✈️</div>
+            <div class="anim-ship">🚢</div>
+            <div class="anim-dolphin">🐬</div>
+            <div class="anim-dolphin" style="left: 70%; animation-delay: 1.5s;">🐬</div>
+        </div>
+
         <p id="loadingText" class="font-black text-3xl mt-4 px-6 text-center loading-style-rainbow">正在彩繪你的美麗人生</p>
     </div>
 
@@ -260,7 +222,7 @@
         </div>
     </div>
 
-    <!-- 教學視窗風格與紀錄視窗一致 -->
+    <!-- 教學視窗 -->
     <div id="installModal" onclick="window.closeInstallModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeInstallModal()">✕</div>
@@ -298,6 +260,7 @@
         </div>
     </div>
 
+    <!-- 答案 Overlay -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div id="answerContent" class="bg-white w-[92%] max-w-[400px] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
@@ -320,6 +283,7 @@
         </div>
     </div>
 
+    <!-- 紀錄 Modal -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
