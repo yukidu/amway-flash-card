@@ -20,7 +20,7 @@
             --bg-size: 20px 20px;
         }
 
-        /* 20 種可愛風格 */
+        /* 20 種風格 */
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
         body.theme-comic { --card-radius: 0; --card-rotate: -3deg; --card-border: 8px solid #000; --card-shadow: 15px 15px 0px #000; }
         body.theme-sticker { --card-radius: 2rem; --card-border: 10px solid #fff; --card-shadow: 0 0 0 4px #000, 8px 8px 15px rgba(0,0,0,0.2); }
@@ -169,7 +169,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="window.randomStyle()" class="px-4 bg-yellow-400 font-black rounded-lg border-2 border-black shadow-[2px_2px_0_#000] active:translate-y-0.5 text-sm h-[42px]">變身！✨</button>
+                    <button onclick="window.randomStyle()" class="px-4 bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-sm h-[42px]">變身！</button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
                         <div class="dropdown-trigger" onclick="window.toggleDropdown()">
                             <span id="dropdownLabel">🌟 全部</span>
@@ -222,7 +222,6 @@
         </div>
     </div>
 
-    <!-- 紀錄頁面視覺同步 -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
@@ -246,7 +245,6 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <!-- 匯出模板 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; color:#000; z-index: -1; border: 60px solid #000;">
         <div id="exportInner" style="padding: 60px; position: relative; min-height: 800px; display: flex; flex-direction: column;">
             <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 30px; margin-bottom: 50px; overflow: visible;">
@@ -283,7 +281,6 @@
         let gameData = {}, categoryProgress = {}, cardMetadata = {}, allCategoryItems = [];
         let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all', deferredPrompt = null;
 
-        // PWA 安裝邏輯
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -295,10 +292,7 @@
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') showToast("安裝中...");
                 deferredPrompt = null;
-            } else {
-                // 如果不支援 PWA 或已安裝，提醒加入書籤
-                showToast("點擊瀏覽器選單「加入主畫面」✨");
-            }
+            } else { showToast("點擊瀏覽器選單「加入主畫面」✨"); }
         };
 
         window.initInteraction = () => {
@@ -334,7 +328,14 @@
             loading.style.display = 'flex';
             try {
                 const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
-                if (name) updateWelcomeUI(name);
+                if (name) {
+                    updateWelcomeUI(name);
+                } else {
+                    // 第一次進入，自動跳出詢問姓名視窗 (維持此引導功能)
+                    setTimeout(() => {
+                        document.getElementById('nameModal').classList.remove('hidden');
+                    }, 1000);
+                }
                 const prog = localStorage.getItem(STORAGE_KEYS.PROGRESS);
                 if (prog) {
                     const data = JSON.parse(prog);
@@ -368,8 +369,7 @@
         function triggerWelcomeHighlight() {
             const m = document.getElementById('welcomeMsg');
             if (m && !document.getElementById('welcomeLine').classList.contains('hidden')) {
-                playSound();
-                m.classList.remove('highlight-welcome');
+                playSound(); m.classList.remove('highlight-welcome');
                 void m.offsetWidth; m.classList.add('highlight-welcome');
             }
         }
@@ -485,8 +485,7 @@
             let s = 45; t.style.fontSize = s + 'px';
             const maxH = c.clientHeight;
             while ((t.scrollHeight > maxH || t.offsetWidth > c.clientWidth) && s > 10) {
-                s -= 1;
-                t.style.fontSize = s + 'px';
+                s -= 1; t.style.fontSize = s + 'px';
             }
         }
 
@@ -503,9 +502,8 @@
             currentCardIndex = null;
         };
 
+        // 修正：進入紀錄頁面不再彈出詢問姓名
         window.openRecordModal = () => { 
-            const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
-            if (!name) { document.getElementById('nameModal').classList.remove('hidden'); return; }
             document.getElementById('recordModal').classList.replace('hidden', 'flex'); 
             filterFavs('all'); 
         };
@@ -515,10 +513,6 @@
             if (v) { 
                 localStorage.setItem(STORAGE_KEYS.USERNAME, v); updateWelcomeUI(v); 
                 document.getElementById('nameModal').classList.add('hidden'); 
-                if (document.getElementById('recordModal').classList.contains('hidden')) {
-                    document.getElementById('recordModal').classList.replace('hidden', 'flex');
-                    filterFavs('all');
-                }
             } 
         };
 
@@ -553,20 +547,9 @@
             if (tab === 'unrated') items = items.filter(i => !i.rating);
             else if (tab.startsWith('star')) items = items.filter(i => i.rating === parseInt(tab.replace('star','')));
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
-                const d = document.createElement('div'); 
-                d.className = "bg-gray-100 p-4 rounded-3xl border-2 border-black shadow-[4px_4px_0_#000]";
-                
-                let stars = ''; 
-                for (let n=1; n<=5; n++) {
-                    stars += `<span class="${n<=(i.rating||0)?'text-yellow-500':'text-gray-300'} cursor-pointer text-2xl px-1" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">★</span>`;
-                }
-                
-                d.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] font-black uppercase bg-white border border-black px-2 py-0.5 rounded-full">${i.category}</span>
-                        <div class="flex items-center">${stars}</div>
-                    </div>
-                    <p class="font-black text-base text-black leading-tight">${i.text}</p>`;
+                const d = document.createElement('div'); d.className = "bg-gray-100 p-4 rounded-3xl border-2 border-black shadow-[4px_4px_0_#000]";
+                let stars = ''; for (let n=1; n<=5; n++) stars += `<span class="${n<=(i.rating||0)?'text-yellow-500':'text-gray-300'} cursor-pointer text-2xl px-1" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">★</span>`;
+                d.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-[10px] font-black uppercase bg-white border border-black px-2 py-0.5 rounded-full">${i.category}</span><div class="flex items-center">${stars}</div></div><p class="font-black text-base text-black leading-tight">${i.text}</p>`;
                 list.appendChild(d);
             });
         }
@@ -580,16 +563,25 @@
             return `${dateStr} ${timeStr}`;
         }
 
+        // 智慧計算字體大小，確保控制在三行內
+        function getSmartFontSize(text) {
+            const len = text.length;
+            if (len <= 20) return "64px"; // 預設大一號字
+            if (len <= 45) return "52px"; // 二行~三行邊界
+            return "42px"; // 三行上限字體
+        }
+
         window.shareSingleCard = async () => {
             const i = currentCardIndex; if (!i) return;
             const name = getSenderName();
+            const smartSize = getSmartFontSize(i.text);
             document.getElementById('exportSenderInfo').textContent = `寄送人：${name || '安安'} | ${getCurrentFormattedTime()}`;
             document.getElementById('exportCardsList').innerHTML = `
                 <div style="display:flex; align-items:stretch; margin-bottom: 60px;">
                     <div style="width: 25px; background: black; margin-right: 40px; flex-shrink: 0;"></div>
-                    <div>
+                    <div style="flex-grow: 1;">
                         <div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${i.cat} ]</div>
-                        <div style="font-size: 52px; font-weight: 900; line-height: 1.3; color: #000;">${i.text}</div>
+                        <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.25; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all;">${i.text}</div>
                     </div>
                 </div>`;
             captureAndShare(i.text);
@@ -604,12 +596,13 @@
             else if (currentTab.startsWith('star')) items = items.filter(i => i.rating === parseInt(currentTab.replace('star','')));
             if(items.length === 0) { showToast("無內容可匯出"); return; }
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
+                const smartSize = getSmartFontSize(i.text);
                 listEl.innerHTML += `
                     <div style="display:flex; align-items:stretch; margin-bottom: 60px;">
                         <div style="width: 15px; background: black; margin-right: 35px; flex-shrink: 0;"></div>
                         <div style="flex-grow: 1;">
                             <div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 12px;">[ ${i.category} ]</div>
-                            <div style="font-size: 38px; font-weight: 900; line-height: 1.3; color: #000;">${i.text}</div>
+                            <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.25; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all;">${i.text}</div>
                         </div>
                     </div>`;
             });
@@ -626,15 +619,22 @@
             try {
                 temp.style.left = "0"; temp.style.zIndex = "10000";
                 await new Promise(r => setTimeout(r, 100));
-                const canvas = await html2canvas(temp, { 
-                    scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 5000
-                });
+                const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 5000 });
                 temp.style.left = "-5000px"; temp.style.zIndex = "-1";
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
                 const file = new File([blob], customFileName, { type: 'image/png' });
                 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+                const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪"];
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                const shareText = `這是${name || '我'}翻的牌，發現這句話很經典，特別分享給您 ${randomEmoji}`;
+
                 if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: '改變生命未來式' });
+                    await navigator.share({ 
+                        files: [file], 
+                        title: '改變生命未來式',
+                        text: shareText
+                    });
                 } else {
                     const l = document.createElement('a'); l.download = customFileName; l.href = canvas.toDataURL('image/png'); l.click();
                     showToast("已下載 💾");
