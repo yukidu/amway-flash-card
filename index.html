@@ -120,11 +120,10 @@
             position: absolute; top: -15px; right: -15px; width: 42px; height: 42px;
             background: black; color: white; border: 3px solid white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center; font-weight: 900;
-            z-index: 1100; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 1200; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         }
         
         #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; padding: 0.2rem 1rem; }
-        /* 字體緊湊，防止手機溢出 */
         #welcomeMsg { white-space: nowrap; font-weight: 900; display: inline-block; cursor: pointer; letter-spacing: -0.05em; }
 
         .tab-btn {
@@ -140,7 +139,6 @@
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* 紀錄彈窗陰影樣式修正，確保按鈕不被遮擋 */
         .record-modal-container { position: relative; overflow: visible !important; }
     </style>
 </head>
@@ -200,12 +198,12 @@
         </div>
     </div>
 
-    <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-md">
+    <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div id="answerContent" class="bg-white w-[92%] max-w-[400px] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
-            <div class="relative z-20 flex flex-col items-center w-full text-center flex-grow justify-center">
+            <div class="relative z-20 flex flex-col items-center w-full text-center flex-grow justify-center overflow-hidden">
                 <div id="answerCategoryTag" class="text-xs font-black uppercase mb-4 bg-black text-white px-3 py-1 rounded-full">分類</div>
-                <div id="textFitContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden py-4">
+                <div id="textFitContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden py-4 max-h-[35vh]">
                     <div id="overlayText" class="font-black leading-tight text-black w-full break-words text-center"></div>
                 </div>
                 <button onclick="window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">這句Line給朋友 📸</button>
@@ -225,7 +223,6 @@
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/70 z-[1000] hidden items-center justify-center p-6">
         <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
-            <!-- 內部內容改為 overflow-hidden 避免遮擋邊界按鈕 -->
             <div class="flex flex-col w-full h-full overflow-hidden rounded-[32px]">
                 <div class="p-6 bg-pink-300 border-b-4 border-black flex flex-col items-center gap-4 pt-10">
                     <button onclick="window.shareRecordAsImage()" class="bg-black text-white px-10 py-4 rounded-xl font-black scale-110 transform shadow-[4px_4px_0_#fff] active:scale-95 transition-transform">匯出圖片</button>
@@ -246,17 +243,16 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <!-- 匯出模板 -->
+    <!-- 匯出模板優化：修正標題裁切問題 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; color:#000; z-index: -1; border: 60px solid #000;">
         <div id="exportInner" style="padding: 60px; position: relative; min-height: 800px; display: flex; flex-direction: column;">
-            <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 40px; margin-bottom: 60px; overflow: hidden;">
-                <h1 style="font-size: 56px; font-weight: 900; margin: 0; letter-spacing: 2px; white-space: nowrap;">改變生命未來式 Be A Better You</h1>
-                <p id="exportSenderInfo" style="font-size: 28px; color: #444; font-weight: bold; margin: 20px 0 0 0; white-space: nowrap;"></p>
+            <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 30px; margin-bottom: 50px; overflow: visible;">
+                <!-- 調整標題大小與間距防止裁切 -->
+                <h1 style="font-size: 48px; font-weight: 900; margin: 0; letter-spacing: 1px; white-space: nowrap; line-height: 1.2;">改變生命未來式 Be A Better You</h1>
+                <p id="exportSenderInfo" style="font-size: 26px; color: #444; font-weight: bold; margin: 15px 0 0 0; white-space: nowrap;"></p>
             </div>
-            
             <div id="exportCardsList" style="flex-grow: 1;"></div>
-            
-            <div style="margin-top: 60px; padding-top: 30px; border-top: 4px solid #eee; display: flex; justify-content: flex-end; align-items: flex-end;">
+            <div style="margin-top: 50px; padding-top: 30px; border-top: 4px solid #eee; display: flex; justify-content: flex-end; align-items: flex-end;">
                 <div style="text-align: center;">
                     <img id="exportQRCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://yukidu.github.io/amway-flash-card" 
                          style="width: 120px; height: 120px; border: 4px solid #000; padding: 6px; background: #fff;" 
@@ -294,32 +290,21 @@
         window.closeDropdown = () => document.getElementById('dropdownOptions').classList.remove('active');
         window.addEventListener('click', (e) => { if (!document.getElementById('categoryDropdownContainer').contains(e.target)) window.closeDropdown(); });
 
-        // 生成 20 種隨機音效
         function playSound() {
             if (!audioCtx) return;
             const n = audioCtx.currentTime;
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
-            // 隨機波形
             const types = ['sine', 'square', 'sawtooth', 'triangle'];
             oscillator.type = types[Math.floor(Math.random() * types.length)];
-            
-            // 隨機頻率範圍 (從清脆到渾厚)
             const baseFreq = 200 + Math.random() * 800;
             oscillator.frequency.setValueAtTime(baseFreq, n);
-            
-            // 頻率滑動效果 (隨機向上或向下)
             const slideTo = Math.random() > 0.5 ? baseFreq * 1.5 : baseFreq * 0.5;
             oscillator.frequency.exponentialRampToValueAtTime(slideTo, n + 0.15);
-            
-            // 音量控制
             gainNode.gain.setValueAtTime(0.1, n);
             gainNode.gain.exponentialRampToValueAtTime(0.01, n + 0.15);
-            
             oscillator.start(n);
             oscillator.stop(n + 0.15);
         }
@@ -346,7 +331,7 @@
             const m = document.getElementById('welcomeMsg'), line = document.getElementById('welcomeLine');
             if (!m || line.classList.contains('hidden')) return;
             let s = 180; m.style.fontSize = s + 'px';
-            const targetW = line.clientWidth * 0.92; // 因右側按鈕，略微縮減可用寬度
+            const targetW = line.clientWidth * 0.92;
             while (m.offsetWidth > targetW && s > 10) { s -= 1; m.style.fontSize = s + 'px'; }
         }
 
@@ -363,7 +348,6 @@
         function triggerWelcomeHighlight() {
             const m = document.getElementById('welcomeMsg');
             if (m && !document.getElementById('welcomeLine').classList.contains('hidden')) {
-                // 此處觸發隨機音效
                 playSound();
                 m.classList.remove('highlight-welcome');
                 void m.offsetWidth; m.classList.add('highlight-welcome');
@@ -379,7 +363,7 @@
             document.documentElement.style.setProperty('--primary', `hsl(${h}, 95%, 75%)`);
             document.documentElement.style.setProperty('--bg', `hsl(${h}, 50%, 98%)`);
             if (!skip) {
-                playSound(); // 變身也使用隨機音效
+                playSound();
                 const g = document.getElementById('giantThemeName');
                 if (g) {
                     g.textContent = next.name; g.classList.remove('active');
@@ -471,17 +455,19 @@
                 currentCardIndex = { cat, idx, text, displayIdx };
                 document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
                 requestAnimationFrame(() => fitTextToContainer());
-                playSound(); // 翻牌音效
+                playSound();
             }, 350);
         };
 
         function fitTextToContainer() {
             const t = document.getElementById('overlayText'), c = document.getElementById('textFitContainer');
             if (!t || !c) return;
-            let s = 42; t.style.fontSize = s + 'px';
+            let s = 45; t.style.fontSize = s + 'px';
             const maxH = c.clientHeight;
-            // 強化縮小邏輯，確保高度適配且不留白
-            while (t.scrollHeight > maxH && s > 12) { s -= 1; t.style.fontSize = s + 'px'; }
+            while ((t.scrollHeight > maxH || t.offsetWidth > c.clientWidth) && s > 10) {
+                s -= 1;
+                t.style.fontSize = s + 'px';
+            }
         }
 
         window.closeAnswer = () => {
@@ -604,33 +590,62 @@
             showToast("生成圖片中...");
             const temp = document.getElementById('exportTemplate');
             const name = getSenderName();
-            
-            // 檔名格式化
             const textSnippet = cardText ? cardText.substring(0, 10) : "紀錄";
             const customFileName = name ? `${name} - ${textSnippet} - Be A Better You.png` : `${textSnippet} - Be A Better You.png`;
-
+            
             try {
-                temp.style.left = "0"; temp.style.zIndex = "10000";
-                const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: 'white', logging: false });
-                temp.style.left = "-5000px"; temp.style.zIndex = "-1";
+                // 確保模板暫時可見以便擷取
+                temp.style.left = "0";
+                temp.style.zIndex = "10000";
+                
+                // 等待一下確保 QR Code 圖片載入 (簡易延時)
+                await new Promise(r => setTimeout(r, 100));
+
+                const canvas = await html2canvas(temp, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: '#ffffff', 
+                    logging: false,
+                    imageTimeout: 5000
+                });
+                
+                temp.style.left = "-5000px";
+                temp.style.zIndex = "-1";
+                
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
                 const file = new File([blob], customFileName, { type: 'image/png' });
-
                 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
                 if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: '改變生命未來式' });
+                    // 手機版直接呼叫系統分享介面
+                    await navigator.share({ 
+                        files: [file], 
+                        title: '改變生命未來式' 
+                    });
                 } else {
+                    // 電腦版自動下載
                     const l = document.createElement('a'); 
                     l.download = customFileName; 
                     l.href = canvas.toDataURL('image/png'); 
                     l.click();
                     showToast("已下載 💾");
                 }
-            } catch (e) { showToast("生成失敗"); temp.style.left = "-5000px"; }
+            } catch (e) { 
+                showToast("生成失敗"); 
+                temp.style.left = "-5000px"; 
+                console.error(e);
+            }
         }
 
-        window.shareApp = () => { navigator.share?.({ title: '改變生命未來式', url: location.href }) || showToast("連結已複製"); };
+        window.shareApp = () => { 
+            const shareData = { title: '改變生命未來式', url: location.href };
+            if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+                navigator.share(shareData);
+            } else {
+                showToast("連結已複製"); 
+            }
+        };
+        
         function parseCSV(t) { let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0; for (let l of t) { if ('"' === l) { if (s && l === p) row[i] += l; s = !s; } else if (',' === l && s) l = row[++i] = ''; else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; } else row[i] += l; p = l; } return ret; }
         function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.opacity = '1'; setTimeout(() => t.style.opacity = '0', 2000); }
         function updateStats() {
@@ -642,7 +657,6 @@
             document.getElementById('statCompleted').textContent = d;
             document.getElementById('statRemaining').textContent = t - d;
         }
-
         window.initApp();
     </script>
 </body>
