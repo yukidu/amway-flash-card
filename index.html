@@ -45,26 +45,21 @@
         }
         @keyframes rainbowMove { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
 
-        @keyframes paletteFloat { 
-            0% { transform: scale(1.1) rotate(0deg); opacity: 0.2; } 
-            50% { transform: scale(1.25) rotate(3deg); opacity: 0.3; } 
-            100% { transform: scale(1.1) rotate(0deg); opacity: 0.2; } 
-        }
-
+        /* 高速開場動畫 */
         @keyframes earthRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes planeFly { 0% { transform: translate(-150%, 50%) rotate(15deg); } 100% { transform: translate(250%, -50%) rotate(15deg); } }
-        @keyframes cloudDrift { 0% { transform: translateX(-10vw); opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { transform: translateX(110vw); opacity: 0; } }
-        @keyframes shipSail { 0% { transform: translateX(-100%); } 100% { transform: translateX(110vw); } }
-        @keyframes dolphinJump { 0%, 100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(40px, -80px) rotate(45deg); } }
+        @keyframes planeFly { 0% { transform: translate(0, 0) rotate(15deg); } 50% { transform: translate(25vw, -10vh) rotate(25deg); } 100% { transform: translate(0, 0) rotate(15deg); } }
+        @keyframes cloudDrift { 0% { transform: translateX(5vw); opacity: 0.2; } 50% { opacity: 0.6; } 100% { transform: translateX(80vw); opacity: 0.2; } }
+        @keyframes shipSail { 0% { transform: translateX(5vw); } 100% { transform: translateX(75vw); } }
+        @keyframes dolphinJump { 0%, 100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(15px, -35px) rotate(25deg); } }
 
         .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.3; z-index: 1; animation: paletteFloat 15s infinite ease-in-out; }
+        .palette-bg { position: absolute; width: 120vw; height: 120vh; opacity: 0.3; z-index: 1; animation: paletteFloat 5s infinite ease-in-out; }
         .travel-box { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
-        .item-earth { position: absolute; top: 30%; left: 50%; font-size: 5rem; margin-left: -2.5rem; animation: earthRotate 12s infinite linear; filter: drop-shadow(0 0 20px rgba(0,0,0,0.1)); }
-        .item-plane { position: absolute; top: 20%; left: 10%; font-size: 3rem; animation: planeFly 8s infinite linear; }
-        .item-ship { position: absolute; bottom: 30%; left: 0; font-size: 4rem; animation: shipSail 20s infinite linear; }
-        .item-dolphin { position: absolute; bottom: 20%; left: 30%; font-size: 2.5rem; animation: dolphinJump 4s infinite ease-in-out; }
-        .item-cloud { position: absolute; font-size: 4rem; animation: cloudDrift 15s infinite linear; }
+        .item-earth { position: absolute; top: 35%; left: 50%; font-size: 5rem; margin-left: -2.5rem; animation: earthRotate 4s infinite linear; }
+        .item-plane { position: absolute; top: 20%; left: 15%; font-size: 3rem; animation: planeFly 3s infinite ease-in-out; }
+        .item-ship { position: absolute; bottom: 35%; left: 5%; font-size: 4rem; animation: shipSail 6s infinite alternate ease-in-out; }
+        .item-dolphin { position: absolute; bottom: 25%; left: 45%; font-size: 2.5rem; animation: dolphinJump 1.5s infinite ease-in-out; }
+        .item-cloud { position: absolute; font-size: 4rem; animation: cloudDrift 6s infinite alternate linear; }
 
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
         body.theme-comic { --card-radius: 0; --card-rotate: -3deg; --card-border: 8px solid #000; --card-shadow: 15px 15px 0px #000; }
@@ -101,141 +96,85 @@
         }
         #giantThemeName.active { display: block; animation: themeLabelPop 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        @keyframes welcomePop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        @keyframes welcomeBounce { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(1deg); } }
-        .animate-welcome { animation: welcomePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .highlight-welcome { animation: welcomeBounce 0.4s ease-in-out 2; }
-
         body {
             background-color: var(--bg); background-image: var(--bg-pattern); background-size: var(--bg-size);
-            color: var(--dark); margin: 0; padding: 0; 
-            transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-x: hidden;
+            color: var(--dark); margin: 0; padding: 0; transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden;
         }
 
         .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.5rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
-
         #cardsGrid { display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem; grid-auto-rows: min-content; }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
         @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
 
         .card-container { perspective: 1000px; position: relative; width: 100%; aspect-ratio: 1; }
-        .card-inner {
-            position: absolute; width: 100%; height: 100%;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d; cursor: pointer; transform: rotate(var(--card-rotate));
-        }
+        .card-inner { position: absolute; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-style: preserve-3d; cursor: pointer; transform: rotate(var(--card-rotate)); }
         .card-inner.is-flipped { transform: rotateY(180deg) rotate(var(--card-rotate)); }
 
-        .card-face {
-            position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-            backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
-            border-radius: var(--card-radius); border: var(--card-border);
-            box-shadow: var(--card-shadow); overflow: hidden;
-            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
+        .card-face { position: absolute; width: 100%; height: 100%; top: 0; left: 0; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: var(--card-radius); border: var(--card-border); box-shadow: var(--card-shadow); overflow: hidden; transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
         .card-back { background-color: white !important; transform: rotateY(180deg); }
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
-        .custom-dropdown { position: relative; width: 96px; font-weight: 900; z-index: 50; }
-        .dropdown-trigger {
-            background: #fff; border: 3px solid #000; padding: 0.45rem 0.6rem; border-radius: 10px;
-            box-shadow: 3px 3px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
-            font-size: 0.95rem; white-space: nowrap; overflow: hidden; height: 42px;
-        }
-        .dropdown-options {
-            position: absolute; top: calc(100% + 5px); right: 0; width: 160px; background: #fff;
-            border: 3px solid #000; box-shadow: 6px 6px 0px #000; border-radius: 12px;
-            max-height: 300px; overflow-y: auto; display: none; padding: 5px 0;
-        }
+        .modal-close-btn { position: absolute; top: -15px; right: -15px; width: 42px; height: 42px; background: black; color: white; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; z-index: 1300; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        
+        #duduPhotoContainer { width: 100%; display: none; flex-direction: column; align-items: center; margin-bottom: 15px; cursor: zoom-in; }
+        #duduRandomPhoto { max-width: 100%; max-height: 250px; border: 4px solid black; border-radius: 20px; box-shadow: 5px 5px 0px black; object-fit: contain; }
+        #duduTextLines { width: 95%; display: flex; flex-direction: column; gap: 4px; align-items: center; margin: 0 auto; }
+        .dudu-line { white-space: nowrap; font-weight: 900; line-height: 1.2; width: 100%; text-align: center; overflow: hidden; }
+
+        .custom-dropdown { position: relative; width: 110px; font-weight: 900; z-index: 50; }
+        .dropdown-trigger { background: #fff; border: 3px solid #000; padding: 0.45rem 0.6rem; border-radius: 10px; box-shadow: 3px 3px 0px #000; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 0.9rem; height: 42px; white-space: nowrap; overflow: hidden; }
+        .dropdown-options { position: absolute; top: calc(100% + 5px); right: 0; width: 160px; background: #fff; border: 3px solid #000; box-shadow: 6px 6px 0px #000; border-radius: 12px; max-height: 300px; overflow-y: auto; display: none; padding: 5px 0; }
         .dropdown-options.active { display: block; }
-        .dropdown-item { padding: 10px; cursor: pointer; border-bottom: 2px solid #f0f0f0; font-size: 1rem; }
+        .dropdown-item { padding: 10px; cursor: pointer; border-bottom: 2px solid #f0f0f0; }
         .dropdown-item:hover { background: #000; color: #fff; }
 
-        .stat-box { min-width: 60px; text-align: center; }
-        
-        .favorite-rating .heart { cursor: pointer; font-size: 1.8rem; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; filter: grayscale(1) opacity(0.2); transform: scale(0.9); }
-        .favorite-rating .heart.active { filter: grayscale(0) opacity(1); transform: scale(1.1); }
-
-        .modal-close-btn {
-            position: absolute; top: -15px; right: -15px; width: 42px; height: 42px;
-            background: black; color: white; border: 3px solid white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-weight: 900;
-            z-index: 1300; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        }
-        
-        #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; padding: 0.2rem 1rem; }
-        #welcomeMsg { white-space: nowrap; font-weight: 900; display: inline-block; cursor: pointer; letter-spacing: -0.05em; }
-
-        .tab-btn {
-            padding: 0 0.6rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
-            white-space: nowrap; font-size: 0.7rem; transition: all 0.2s; background: white; color: black;
-            height: 34px; line-height: 30px; flex-shrink: 0; display: flex; align-items: center;
-        }
+        .tab-btn { padding: 0 0.6rem; font-weight: 900; border: 2px solid black; border-radius: 99px; font-size: 0.7rem; transition: all 0.2s; background: white; height: 34px; display: flex; align-items: center; }
         .tab-btn.active { background: black !important; color: white !important; }
         
-        .edit-name-btn {
-            flex-shrink: 0; width: 32px; height: 32px; background: black; color: white;
-            border: 2px solid white; border-radius: 50%; font-size: 14px; display: flex;
-            align-items: center; justify-content: center; cursor: pointer; margin-left: 8px;
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .record-modal-container { position: relative; overflow: visible !important; }
-        
-        .toast-highlight {
-            font-size: 1.25rem !important;
-            padding: 1rem 2rem !important;
-            background: #FFD700 !important;
-            color: black !important;
-            border: 3px solid black;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        .aesthetic-text {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            line-height: 1.6;
-        }
-
-        @keyframes phoneShake { 0% { transform: rotate(0deg); } 10% { transform: rotate(15deg); } 20% { transform: rotate(-15deg); } 30% { transform: rotate(15deg); } 40% { transform: rotate(-15deg); } 50% { transform: rotate(0deg); } 100% { transform: rotate(0deg); } }
+        .aesthetic-text { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        @keyframes phoneShake { 0% { transform: rotate(0deg); } 10% { transform: rotate(15deg); } 20% { transform: rotate(-15deg); } 50% { transform: rotate(0deg); } }
         .animate-shake { animation: phoneShake 1s infinite ease-in-out; display: inline-block; font-size: 8rem; }
 
-        @keyframes duduVanishEffect {
-            0% { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
-            100% { opacity: 0; transform: scale(0.1) rotate(45deg); filter: blur(10px); }
-        }
-        .dudu-vanish { animation: duduVanishEffect 1.2s forwards cubic-bezier(0.55, 0.055, 0.675, 0.19); }
+        /* 首頁歡迎詞置中放大 */
+        #welcomeLine { display: none; width: 100%; max-width: 100%; padding: 0.5rem 1rem; align-items: center; justify-content: center; overflow: hidden; gap: 8px; position: relative; }
+        #welcomeMsg { flex: 1; font-weight: 900; font-size: clamp(1.25rem, 5vw, 3.2rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1; text-align: center; margin: 0 auto; letter-spacing: -0.02em; }
+        .reset-name-btn { flex-shrink: 0; width: 42px; height: 42px; background: black; color: white; border-radius: 50%; font-size: 18px; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
 
-        /* 相片牆樣式 */
-        .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 10px; }
-        .photo-item { width: 100%; aspect-ratio: 1; object-fit: cover; border: 4px solid #000; border-radius: 12px; box-shadow: 4px 4px 0px #000; cursor: pointer; transition: transform 0.2s; }
-        .photo-item:hover { transform: scale(1.03); }
-
-        /* 杜杜龍答案卡優化樣式 */
-        #duduPhotoContainer { width: 100%; display: none; flex-direction: column; align-items: center; margin-bottom: 15px; }
-        #duduRandomPhoto { max-width: 100%; max-height: 250px; border: 4px solid black; border-radius: 20px; box-shadow: 5px 5px 0px black; object-fit: contain; }
-        
-        /* 杜杜龍文字縮小限制 2 行 */
-        .dudu-text-small {
-            font-size: 1.1rem !important;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.4 !important;
-            text-align: center;
-            width: 90%;
-            margin: 0 auto;
+        /* 文字絕對置中佈局徹底修正 */
+        #textFitContainer { 
+            width: 100%; 
+            height: 100%; 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            overflow: hidden; 
+            padding: 0; 
+            position: relative; 
+            min-height: 200px;
         }
+        #overlayText { 
+            width: 100%; 
+            max-width: 100%; 
+            text-align: center; 
+            margin: 0 auto; 
+            padding: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            line-height: 1.35; 
+            word-wrap: break-word; 
+            overflow-wrap: break-word;
+            flex-grow: 1;
+        }
+
+        /* 照片全螢幕放大視窗 */
+        #photoZoomOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; align-items: center; justify-content: center; cursor: zoom-out; }
+        #photoZoomOverlay img { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="theme-jelly" onclick="window.initInteraction()">
@@ -244,52 +183,29 @@
     <div id="aiLoading" class="loading-overlay">
         <svg class="palette-bg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path d="M90,50 C90,72.1 72.1,90 50,90 C27.9,90 10,72.1 10,50 C10,27.9 27.9,10 40,10 C45,10 48,13 52,15 C56,17 60,15 65,12 C75,7 90,27.9 90,50 Z" fill="#F3E5AB" stroke="#000" stroke-width="0.5"/>
-            <circle cx="30" cy="35" r="5" fill="#FF4444"/>
-            <circle cx="35" cy="65" r="5" fill="#4A90E2"/>
-            <circle cx="65" cy="75" r="5" fill="#FFD700"/>
-            <circle cx="80" cy="45" r="5" fill="#2ecc71"/>
-            <circle cx="60" cy="25" r="5" fill="#9b59b6"/>
-            <ellipse cx="25" cy="18" rx="8" ry="4" fill="#fff" opacity="0.6"/>
+            <circle cx="30" cy="35" r="5" fill="#FF4444"/><circle cx="35" cy="65" r="5" fill="#4A90E2"/><circle cx="65" cy="75" r="5" fill="#FFD700"/><circle cx="80" cy="45" r="5" fill="#2ecc71"/><circle cx="60" cy="25" r="5" fill="#9b59b6"/><ellipse cx="25" cy="18" rx="8" ry="4" fill="#fff" opacity="0.6"/>
         </svg>
-
         <div class="travel-box">
-            <div class="item-earth">🌍</div>
-            <div class="item-plane">✈️</div>
-            <div class="item-ship">🚢</div>
-            <div class="item-dolphin">🐬</div>
-            <div class="item-cloud" style="top:10%; animation-delay: 0s;">☁️</div>
-            <div class="item-cloud" style="top:25%; animation-delay: 4s;">☁️</div>
-            <div class="item-cloud" style="top:50%; animation-delay: 2s;">☁️</div>
+            <div class="item-earth">🌍</div><div class="item-plane">✈️</div><div class="item-ship">🚢</div><div class="item-dolphin">🐬</div><div class="item-cloud" style="top:15%; animation-delay: 0s;">☁️</div><div class="item-cloud" style="top:25%; animation-delay: 2s;">☁️</div>
         </div>
-        <p id="loadingText" class="font-black text-3xl mt-4 px-6 text-center loading-style-rainbow">正在彩繪你的美麗人生</p>
+        <p class="font-black text-3xl mt-4 px-6 text-center loading-style-rainbow">正在彩繪你的美麗人生</p>
     </div>
 
     <nav class="sticky-nav">
         <div class="max-w-6xl mx-auto px-4">
-            <div id="welcomeLine" class="hidden">
-                <p id="welcomeMsg" onclick="window.editName()"></p>
-                <button class="edit-name-btn" onclick="window.editName()">✎</button>
+            <div id="welcomeLine">
+                <p id="welcomeMsg"></p>
+                <button class="reset-name-btn" onclick="window.resetName()">✎</button>
             </div>
             <div class="flex items-center justify-between gap-2 py-1">
                 <div class="flex items-center gap-2">
-                    <div class="stat-box">
-                        <p class="text-[8px] font-black opacity-50 uppercase">翻開</p>
-                        <p id="statCompleted" class="text-base font-black">0</p>
-                    </div>
-                    <div class="stat-box">
-                        <p class="text-[8px] font-black opacity-50 uppercase">剩餘</p>
-                        <p id="statRemaining" class="text-base font-black">0</p>
-                    </div>
+                    <div class="text-center min-w-[50px]"><p class="text-[8px] font-black opacity-50 uppercase">翻開</p><p id="statCompleted" class="text-base font-black">0</p></div>
+                    <div class="text-center min-w-[50px]"><p class="text-[8px] font-black opacity-50 uppercase">剩餘</p><p id="statRemaining" class="text-base font-black">0</p></div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="transformBtn" onclick="window.randomStyle()" class="w-[96px] bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-sm h-[42px] flex items-center justify-center">
-                        變身！
-                    </button>
+                    <button onclick="window.randomStyle()" class="w-[96px] bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-sm h-[42px]">變身！</button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
-                        <div class="dropdown-trigger" onclick="window.toggleDropdown()">
-                            <span id="dropdownLabel">🌟 全部</span>
-                            <span class="text-[8px]">▼</span>
-                        </div>
+                        <div class="dropdown-trigger" onclick="window.toggleDropdown()"><span id="dropdownLabel">🌟 全部</span><span class="text-[8px]">▼</span></div>
                         <div class="dropdown-options no-scrollbar" id="dropdownOptions"></div>
                     </div>
                 </div>
@@ -299,101 +215,127 @@
 
     <div class="max-w-6xl mx-auto px-4 py-6">
         <main id="cardsGrid"></main>
-        <footer class="mt-8 mb-24 flex flex-row flex-nowrap justify-center gap-2 px-1">
+        <footer class="mt-8 mb-24 flex flex-row flex-nowrap justify-center gap-2">
             <button onclick="window.openRecordModal()" class="flex-1 bg-pink-400 text-white py-4 font-black border-4 border-black shadow-[4px_4px_0px_#000] rounded-2xl text-sm">紀錄</button>
-            <button onclick="window.openPhotoModal()" class="flex-1 bg-yellow-400 text-black py-4 font-black border-4 border-black shadow-[4px_4px_0px_#000] rounded-2xl text-sm">相片</button>
             <button onclick="window.shareApp()" class="flex-1 bg-cyan-400 text-white py-4 font-black border-4 border-black shadow-[4px_4px_0px_#000] rounded-2xl text-sm">分享</button>
             <button onclick="window.openInstallModal()" class="flex-1 bg-emerald-400 text-white py-4 font-black border-4 border-black shadow-[4px_4px_0px_#000] rounded-2xl text-sm">安裝</button>
-            <button onclick="window.resetAllGame()" class="flex-1 bg-red-400 text-white py-4 font-black border-4 border-black shadow-[4px_4px_0px_#000] rounded-2xl text-sm">重置</button>
+            <button id="resetGameBtn" onclick="window.resetAllGame()" class="flex-1 bg-red-400 text-white py-4 font-black border-4 border-black shadow-[4px_4px_0px_#000] rounded-2xl text-sm">重置</button>
         </footer>
     </div>
 
-    <!-- 答案 Overlay -->
+    <!-- 照片放大視窗 -->
+    <div id="photoZoomOverlay" onclick="this.style.display='none'">
+        <img id="zoomedImg" src="" alt="Full Screen Photo">
+    </div>
+
+    <!-- 答案 Overlay (點任意處關閉) -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
-        <div id="answerContent" class="bg-white w-[92%] max-w-[400px] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
+        <div id="answerContent" class="bg-white w-[92%] max-w-[400px] border-8 border-black flex flex-col items-center justify-center p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
             <div class="relative z-20 flex flex-col items-center w-full text-center flex-grow justify-center overflow-hidden">
                 <div id="answerCategoryTag" class="text-xs font-black uppercase mb-4 bg-black text-white px-3 py-1 rounded-full">分類</div>
-                
-                <!-- 杜杜龍照片顯示區域 -->
-                <div id="duduPhotoContainer">
-                    <img id="duduRandomPhoto" src="" alt="Dudu Surprise">
+                <div id="duduPhotoContainer" onclick="event.stopPropagation(); window.openZoom(document.getElementById('duduRandomPhoto').src)"><img id="duduRandomPhoto" src="" alt="Photo"></div>
+                <div id="textFitContainer">
+                    <div id="overlayText" class="font-black text-black"></div>
+                    <div id="duduTextLines" class="hidden"></div>
                 </div>
-
-                <div id="textFitContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden py-4 max-h-[35vh]">
-                    <div id="overlayText" class="font-black leading-tight text-black w-full break-words text-center"></div>
-                </div>
-                <button id="shareSingleCardBtn" onclick="window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">這句Line給朋友 📸</button>
+                <button id="shareSingleCardBtn" onclick="event.stopPropagation(); window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">這句Line給朋友 📸</button>
             </div>
-            <div id="ratingSection" class="w-full flex flex-col items-center gap-2 mt-6">
-                <p class="font-black text-gray-400 text-[10px] uppercase">標記你的喜歡程度</p>
-                <div class="favorite-rating flex gap-2" id="starRatingContainer">
-                    <span class="heart" onclick="window.updateRatingFromUI(1)">❤️</span>
-                    <span class="heart" onclick="window.updateRatingFromUI(2)">❤️</span>
-                    <span class="heart" onclick="window.updateRatingFromUI(3)">❤️</span>
-                </div>
-            </div>
+            <div id="ratingSection" class="w-full flex flex-col items-center gap-2 mt-6" onclick="event.stopPropagation()"><div class="flex gap-2" id="starRatingContainer"><span class="cursor-pointer text-2xl opacity-20 grayscale" onclick="window.updateRatingFromUI(1)">❤️</span><span class="cursor-pointer text-2xl opacity-20 grayscale" onclick="window.updateRatingFromUI(2)">❤️</span><span class="cursor-pointer text-2xl opacity-20 grayscale" onclick="window.updateRatingFromUI(3)">❤️</span></div></div>
         </div>
     </div>
 
-    <!-- 其他 Modal (姓名、安裝、教學、紀錄、相片) 保留 -->
-    <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden flex items-center justify-center p-6 backdrop-blur-xl">
-        <div class="bg-white border-8 border-black p-8 w-full max-w-md rounded-[40px] shadow-[15px_15px_0px_#FFD700] max-h-[90vh] overflow-y-auto no-scrollbar">
-            <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
-            <input type="text" id="userNameInput" placeholder="輸入名字..." class="w-full border-4 border-black p-4 text-xl font-black rounded-2xl mb-6 outline-none">
-            <button onclick="window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl rounded-2xl shadow-[5px_5px_0px_#888] mb-8">出發！</button>
-            <div class="border-t-4 border-dashed border-gray-300 pt-6">
-                <p class="text-pink-500 font-black text-lg mb-4 flex items-center"><span class="mr-2">💡</span> Line 使用者必看：</p>
-                <div class="space-y-4 text-gray-600 font-bold text-sm">
-                    <p>為了正常使用「照片分享金句」功能，請依照以下步驟切換至外部瀏覽器：</p>
-                    <div class="flex gap-3"><div class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-black">1</div><p>點擊 Line 視窗右上角的「⋮」或「⋯」選單</p></div>
-                    <div class="flex gap-3"><div class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-black">2</div><p>選擇「使用預設瀏覽器開啟」</p></div>
+    <!-- 匯出模板 -->
+    <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:800px; background: #fff; border: 40px solid #000; visibility: hidden; z-index: -1;">
+        <div style="padding: 50px; display: flex; flex-direction: column; min-height: 700px; background: #fff;">
+            <h1 style="font-size: 42px; font-weight: 900; margin: 0; text-align:center; color: #000;">改變生命未來式 Be A Better You</h1>
+            <p id="exportSenderInfo" style="font-size: 20px; color: #333; text-align:center; font-weight: bold; margin-top: 10px;"></p>
+            <div style="height: 6px; background: #000; margin: 30px 0;"></div>
+            <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 40px;">
+                <div id="exportCategory" style="font-size: 28px; color: #666; font-weight: 900; margin-bottom: 20px;"></div>
+                <div style="display: flex; align-items: stretch;">
+                    <div style="width: 12px; background: #000; margin-right: 25px;"></div>
+                    <div id="exportQuote" style="font-size: 52px; font-weight: 900; color: #000; line-height: 1.3; text-align: justify;"></div>
                 </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 40px; border-top: 2px solid #eee; padding-top: 30px;">
+                <div style="text-align: center;"><img id="exportQR" src="" style="width: 140px; height: 140px; border: 2px solid #000; padding: 5px;"><p style="font-size: 20px; font-weight: 900; margin-top: 10px;">我也要抽卡</p></div>
             </div>
         </div>
     </div>
 
-    <div id="photoModal" onclick="window.closePhotoModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
-        <div class="bg-white border-8 border-black w-[95%] max-w-[600px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative overflow-hidden" onclick="event.stopPropagation()">
-            <div class="modal-close-btn" onclick="window.closePhotoModal()">✕</div>
-            <div class="p-8 bg-yellow-300 border-b-4 border-black text-center pt-10"><h2 class="text-3xl font-black italic">精彩時刻 📸</h2></div>
-            <div id="photoContainer" class="p-4 overflow-y-auto bg-white flex-grow no-scrollbar"><div class="photo-grid" id="photoGrid"></div><div id="photoEmptyState" class="text-center py-20 text-gray-400 font-bold hidden">目前還沒有照片喔！</div></div>
+    <!-- 姓名輸入視窗 (點任意處關閉) -->
+    <div id="nameModal" onclick="window.closeNameModal()" class="fixed inset-0 bg-black/90 z-[2000] hidden flex items-center justify-center p-6 backdrop-blur-xl">
+        <div class="bg-white border-8 border-black p-8 w-full max-w-md rounded-[40px] shadow-[15px_15px_0px_#FFD700] text-center">
+            <div class="mb-6 space-y-3">
+                <p class="text-red-600 font-black text-2xl italic">💡 LINE 抽卡重要教學</p>
+                <p class="text-lg font-black leading-tight bg-yellow-200 py-3 px-4 rounded-2xl border-2 border-yellow-400">LINE 需用瀏覽器開啟<br>才能儲存進度和使用完整功能</p>
+                <div class="flex justify-center gap-12 pt-2">
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl mb-1">🍎</span>
+                        <span class="text-xs font-black bg-gray-100 px-2 py-1 rounded-md">分享 ➔ Safari</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-3xl mb-1">🤖</span>
+                        <span class="text-xs font-black bg-gray-100 px-2 py-1 rounded-md">⋯ ➔ 瀏覽器</span>
+                    </div>
+                </div>
+            </div>
+            <hr class="border-4 border-dashed border-gray-100 mb-6">
+            <h2 class="text-3xl font-black italic mb-4 text-left">你是誰？🌟</h2>
+            <input type="text" id="userNameInput" onclick="event.stopPropagation()" placeholder="輸入名字..." class="w-full border-4 border-black p-4 text-xl font-black rounded-2xl mb-6 outline-none">
+            <button onclick="event.stopPropagation(); window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl rounded-2xl mb-4">出發！</button>
+            <p class="text-gray-400 text-[10px] font-bold">※ 瀏覽器開啟才能儲存您的翻牌進度喔！</p>
         </div>
     </div>
 
-    <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
-        <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
+    <!-- 紀錄視窗 (點任意處關閉) -->
+    <div id="recordModal" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md" onclick="window.closeRecordModal()">
+        <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
             <div class="flex flex-col w-full h-full overflow-hidden rounded-[42px]">
-                <div class="p-6 bg-pink-300 border-b-4 border-black flex flex-col items-center gap-4 pt-10"><button onclick="window.shareRecordAsImage()" class="bg-black text-white px-10 py-4 rounded-xl font-black scale-110 shadow-[4px_4px_0_#fff]">匯出圖片</button></div>
-                <div class="flex gap-1 overflow-x-auto no-scrollbar p-3 bg-gray-50 border-b-4 border-black flex-nowrap" id="recordTabs"><button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button><button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未標記</button><button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3 喜歡</button></div>
-                <div id="favoriteList" class="p-4 overflow-y-auto space-y-3 flex-grow bg-white"></div>
+                <div class="p-6 bg-pink-300 border-b-4 border-black flex justify-center pt-10"><button onclick="event.stopPropagation(); window.shareRecordAsImage()" class="bg-black text-white px-10 py-4 rounded-xl font-black">匯出圖片</button></div>
+                <div class="flex gap-1 p-3 bg-gray-50 border-b-4 border-black overflow-x-auto no-scrollbar" onclick="event.stopPropagation()"><button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button><button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未標記</button><button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3 喜歡</button></div>
+                <div id="favoriteList" class="p-4 overflow-y-auto space-y-3 flex-grow no-scrollbar"></div>
             </div>
         </div>
     </div>
 
-    <div id="shakeTutorialModal" onclick="window.closeShakeTutorial()" class="fixed inset-0 bg-black/40 z-[3000] hidden items-center justify-center p-6 backdrop-blur-lg">
-        <div class="flex flex-col items-center text-center text-white space-y-8" onclick="event.stopPropagation()"><div class="animate-shake">📱</div><div><h2 class="text-4xl font-black mb-4">小撇步！💡</h2><p class="text-xl font-bold opacity-90">用力「搖一搖」手機也能隨機抽牌喔！</p></div><button onclick="window.closeShakeTutorial()" class="bg-white text-black px-12 py-4 rounded-full font-black text-xl shadow-2xl active:scale-95 transition-transform">我知道了！</button></div>
+    <!-- 安裝教學視窗 (點任意處關閉) -->
+    <div id="installModal" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md" onclick="window.closeInstallModal()">
+        <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative">
+            <div class="modal-close-btn" onclick="window.closeInstallModal()">✕</div>
+            <div class="p-8 bg-emerald-300 border-b-4 border-black text-center pt-10 rounded-t-[42px] font-black text-3xl italic">安裝教學 📲</div>
+            <div class="p-8 space-y-8 overflow-y-auto bg-white flex-grow rounded-b-[42px] no-scrollbar">
+                <section><h3 class="text-xl font-black mb-4 flex items-center text-pink-600">📱 手機版：建立捷徑</h3><div class="bg-gray-100 p-4 rounded-3xl border-2 border-black space-y-2 font-black italic"><p class="text-emerald-700">iPhone (Safari) - 分享 ➔ 加入主畫面</p><p class="text-orange-700">Android (Chrome) - 選單 ➔ 安裝應用程式</p></div></section>
+            </div>
+        </div>
     </div>
 
-    <div id="installModal" onclick="window.closeInstallModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md"><div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative" onclick="event.stopPropagation()"><div class="modal-close-btn" onclick="window.closeInstallModal()">✕</div><div class="p-8 bg-emerald-300 border-b-4 border-black text-center pt-10 rounded-t-[42px]"><h2 class="text-3xl font-black italic">安裝教學 📲</h2></div><div class="p-8 space-y-8 overflow-y-auto bg-white flex-grow rounded-b-[42px]"><section><h3 class="text-xl font-black mb-4 flex items-center text-pink-600"><span class="mr-2">📱</span> 手機版：建立捷徑</h3><div class="bg-gray-100 p-4 rounded-3xl border-2 border-black shadow-[4px_4px_0_#000] space-y-4"><p class="font-black text-emerald-700 italic">iPhone (Safari) - 分享 ➔ 加入主畫面</p><p class="font-black text-orange-700 italic">Android (Chrome) - 選單 ➔ 安裝應用程式</p></div></section></div></div></div>
+    <!-- 搖一搖教學彈窗 (點任意處關閉) -->
+    <div id="shakeTutorialModal" class="fixed inset-0 bg-black/60 z-[3000] hidden items-center justify-center p-6 backdrop-blur-lg" onclick="window.closeShakeTutorial()">
+        <div class="bg-white border-8 border-black p-10 rounded-[40px] flex flex-col items-center text-center space-y-8 relative shadow-2xl">
+            <div class="modal-close-btn" onclick="window.closeShakeTutorial()">✕</div>
+            <div class="animate-shake text-8xl">📱</div>
+            <div>
+                <h2 class="text-4xl font-black mb-4">小撇步！💡</h2>
+                <p class="text-xl font-bold text-gray-700">用力「搖一搖」手機<br>也能隨機抽牌喔！</p>
+            </div>
+            <button onclick="window.closeShakeTutorial()" class="bg-black text-white px-12 py-4 rounded-full font-black text-xl shadow-2xl active:scale-95 transition-transform">我知道了！</button>
+        </div>
+    </div>
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
-    <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; border: 60px solid #000; visibility: hidden; z-index: -1;"><div id="exportInner" style="padding: 60px; min-height: 800px; display: flex; flex-direction: column;"><h1 style="font-size: 48px; font-weight: 900; margin: 0; text-align:center;">改變生命未來式 Be A Better You</h1><p id="exportSenderInfo" style="font-size: 26px; color: #444; text-align:center;"></p><div id="exportCardsList" style="flex-grow: 1; margin-top: 50px;"></div></div></div>
 
     <script>
-        const STORAGE_KEYS = { PROGRESS: 'better_you_progress_v3', METADATA: 'better_you_metadata_v3', USERNAME: 'better_you_user_name', SESSION_FLIP_COUNT: 'session_flip_count' };
-        const MANDATORY_CARD = "程式與視覺設計 ver1.1 - 寰宇杜杜龍 2026.2.27";
+        const STORAGE_KEYS = { PROGRESS: 'better_you_progress_v3', METADATA: 'better_you_metadata_v3', USERNAME: 'better_you_user_name', SESSION_FLIP_COUNT: 'session_flip_count', DUDU_INDEX_QUEUE: 'dudu_photo_queue_v4' };
+        const MANDATORY_CARD = "程式與視覺設計 ver1.2\n寰宇杜杜龍 2026.2.27\n安麗獎勵海外旅遊照片";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
         const CATEGORY_EMOJI_POOL = ["🌈", "🎨", "🧩", "🏮", "💎", "🔋", "💡", "🔮", "🧸", "🎈", "🎀", "🎊", "🎐", "🎋", "🧿", "🍀", "🍎", "☀️", "🚀", "🌻", "💪", "🏆", "🔥", "🤝", "⚡"];
-
-        // 【杜杜龍驚喜照片清單】
-        // 請將 Google 雲端硬碟資料夾內的照片 ID 填入下方陣列中
-        const DUDU_PHOTOS = [
-            "1x56C2B4qX2w7V8U-rA0ZpT8Y4uN1m9O", // 範例 ID，請替換
-            "1ZD_zS3pL-uA7vY0B7wX-m8O2pL3q4r", // 範例 ID
-            // 請依照此格式繼續填入資料夾內其他照片的 ID...
-        ];
+        
+        let gameData = {}, categoryProgress = {}, cardMetadata = {}, duduPhotos = [];
+        let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all';
+        let lastShakeTime = 0, duduTemporaryHidden = false;
 
         const THEMES = [
             { id: "jelly", name: "Q彈果凍" }, { id: "comic", name: "熱血漫畫" }, { id: "sticker", name: "可愛貼紙" },
@@ -404,13 +346,6 @@
             { id: "notebook", name: "手繪筆記" }, { id: "stamp", name: "冒險郵票" }, { id: "bubble", name: "夢幻泡泡" },
             { id: "cyber", name: "未來科技" }, { id: "love", name: "粉紅愛心" }
         ];
-
-        const MY_PHOTOS = []; // 底部相片牆用的網址清單
-
-        let gameData = {}, categoryProgress = {}, cardMetadata = {}, allCategoryItems = [];
-        let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all';
-        let lastShakeTime = 0;
-        let duduTemporaryHidden = false;
 
         window.randomStyle = (skip) => {
             const next = THEMES[Math.floor(Math.random() * THEMES.length)];
@@ -448,7 +383,7 @@
             if (!audioCtx) return; const n = audioCtx.currentTime; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
             if (type === 'dudu') { osc.type = 'sine'; osc.frequency.setValueAtTime(440, n); osc.frequency.exponentialRampToValueAtTime(1760, n + 1.2); gain.gain.setValueAtTime(0.2, n); gain.gain.linearRampToValueAtTime(0, n + 1.2); osc.start(n); osc.stop(n + 1.2); }
-            else { osc.type = ['sine', 'triangle'][Math.floor(Math.random()*2)]; osc.frequency.setValueAtTime(300 + Math.random()*500, n); gain.gain.setValueAtTime(0.1, n); gain.gain.exponentialRampToValueAtTime(0.01, n + 0.15); osc.start(n); osc.stop(n + 0.15); }
+            else { osc.type = 'sine'; osc.frequency.setValueAtTime(400, n); gain.gain.setValueAtTime(0.1, n); gain.gain.exponentialRampToValueAtTime(0.01, n + 0.1); osc.start(n); osc.stop(n + 0.1); }
         }
 
         window.initApp = async () => {
@@ -456,95 +391,114 @@
             sessionStorage.setItem(STORAGE_KEYS.SESSION_FLIP_COUNT, '0');
             try {
                 const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
-                if (name) updateWelcomeUI(name); else setTimeout(() => document.getElementById('nameModal').classList.replace('hidden', 'flex'), 1000);
+                if (name) updateWelcomeUI(name); else setTimeout(() => document.getElementById('nameModal').classList.remove('hidden'), 500);
                 const prog = localStorage.getItem(STORAGE_KEYS.PROGRESS);
                 if (prog) { const d = JSON.parse(prog); Object.keys(d).forEach(c => categoryProgress[c] = new Set(d[c])); }
                 cardMetadata = JSON.parse(localStorage.getItem(STORAGE_KEYS.METADATA) || '{}');
                 await autoImport(); window.randomStyle(true);
-            } catch (err) {} finally { setTimeout(() => loading.style.display = 'none', 2500); }
+            } catch (err) {} finally { setTimeout(() => loading.style.display = 'none', 1000); }
         };
 
-        function updateWelcomeUI(name) { const line = document.getElementById('welcomeLine'), m = document.getElementById('welcomeMsg'); if (name && line && m) { m.textContent = `歡迎 ${name} 一起改變生命未來式！`; line.classList.remove('hidden'); line.classList.add('animate-welcome'); } }
+        function updateWelcomeUI(name) { 
+            const line = document.getElementById('welcomeLine'), m = document.getElementById('welcomeMsg'); 
+            if (name && line && m) { m.textContent = `歡迎 ${name} 一起改變生命未來式！`; line.style.display = 'flex'; } 
+        }
 
         async function autoImport() {
             try {
-                const res = await fetch(GOOGLE_SHEET_CSV_URL); const csv = await res.text(); const rows = parseCSV(csv), newData = {};
+                const res = await fetch(GOOGLE_SHEET_CSV_URL); const csv = await res.text(); const rows = parseCSV(csv), newData = {}, photoData = [];
                 if (rows.length > 0) {
                     const headers = rows[0].map(h => h?.trim() || "");
                     const options = document.getElementById('dropdownOptions'); options.innerHTML = '';
                     options.appendChild(createCatItem('all', '全部', '🌟'));
                     let shuffled = [...CATEGORY_EMOJI_POOL].sort(() => Math.random() - 0.5);
-                    headers.forEach((h, col) => { if (h && h !== '未分類') { newData[h] = []; for (let r = 1; r < rows.length; r++) if (rows[r][col]) newData[h].push(rows[r][col].trim()); options.appendChild(createCatItem(h, h, shuffled.pop() || "✨")); } });
-                    gameData = newData; window.switchCategory('all');
+                    headers.forEach((h, col) => {
+                        if (col === 1) { for (let r = 1; r < rows.length; r++) { let val = rows[r][col] ? rows[r][col].trim() : ""; if (val) photoData.push(val); } }
+                        else if (col > 1 && h && h !== '未分類') { newData[h] = []; for (let r = 1; r < rows.length; r++) if (rows[r][col]) newData[h].push(rows[r][col].trim()); options.appendChild(createCatItem(h, h, shuffled.pop() || "✨")); }
+                    });
+                    gameData = newData; duduPhotos = photoData; window.switchCategory('all');
                 }
             } catch (e) { showToast("連線異常"); }
         }
 
         function createCatItem(val, label, emoji) {
-            const div = document.createElement('div'); div.className = `dropdown-item ${currentCategory === val ? 'font-black bg-gray-100' : ''}`;
-            div.textContent = `${emoji} ${label}`; div.onclick = (e) => { e.stopPropagation(); window.switchCategory(val); window.closeDropdown(); };
-            return div;
+            const div = document.createElement('div'); div.className = `dropdown-item font-black ${currentCategory === val ? 'bg-gray-100' : ''}`;
+            div.textContent = `${emoji} ${label}`; div.onclick = (e) => { e.stopPropagation(); window.switchCategory(val); window.closeDropdown(); }; return div;
         }
 
         window.switchCategory = (cat) => { currentCategory = cat; document.getElementById('dropdownLabel').textContent = cat === 'all' ? '🌟 全部' : cat; renderCards(); updateStats(); };
 
         function renderCards() {
             const grid = document.getElementById('cardsGrid'); grid.innerHTML = ''; let items = [];
-            if (currentCategory === 'all') { Object.keys(gameData).forEach(cat => { gameData[cat].forEach((txt, idx) => items.push({ cat, idx, text: txt })); }); items.sort(() => Math.random() - 0.5); }
-            else { gameData[currentCategory].forEach((txt, idx) => items.push({ cat: currentCategory, idx, text: txt })); }
-            if (!duduTemporaryHidden && Math.random() < 0.3) { items.splice(Math.floor(Math.random() * items.length), 0, { cat: '宇宙指引', idx: -1, text: MANDATORY_CARD, isDudu: true }); }
+            if (currentCategory === 'all') { Object.keys(gameData).forEach(cat => { gameData[cat].forEach((txt, idx) => items.push({ cat, idx, text: txt, isDudu: false })); }); items.sort(() => Math.random() - 0.5); }
+            else { gameData[currentCategory].forEach((txt, idx) => items.push({ cat: currentCategory, idx, text: txt, isDudu: false })); }
+            if (!duduTemporaryHidden && Math.random() < 0.6) { items.splice(Math.floor(Math.random() * items.length), 0, { cat: '宇宙指引', idx: -1, text: MANDATORY_CARD, isDudu: true }); }
             items.forEach((item, i) => {
-                const isD = item.isDudu, done = !isD && categoryProgress[item.cat]?.has(item.idx);
+                const done = !item.isDudu && categoryProgress[item.cat]?.has(item.idx);
                 const c = document.createElement('div'); c.className = `card-container ${done ? 'card-completed' : ''}`;
-                if (isD) c.id = 'dudu-card-container';
-                c.innerHTML = `<div class="card-inner" id="card-${item.cat}-${item.idx}-${i}"><div class="card-face card-front"><div class="card-emoji-bg">${isD ? '🐉' : (done ? '👑' : '💎')}</div><span class="card-number-text text-xl font-black ${isD ? 'hidden' : ''}">${i + 1}</span></div><div class="card-face card-back"><div class="card-emoji-bg">👑</div></div></div>`;
+                if (item.isDudu) c.id = 'dudu-card-container';
+                c.innerHTML = `<div class="card-inner" id="card-${i}"><div class="card-face card-front"><div class="card-emoji-bg">${item.isDudu ? '🐉' : (done ? '👑' : '💎')}</div><span class="text-xl font-black ${item.isDudu ? 'hidden' : ''}">${i + 1}</span></div><div class="card-face card-back"><div class="card-emoji-bg">👑</div></div></div>`;
                 c.onclick = () => handleCardClick(item, i); grid.appendChild(c);
             });
         }
 
         function handleCardClick(item, displayIdx) {
-            const el = document.getElementById(`card-${item.cat}-${item.idx}-${displayIdx}`); if (el) el.classList.add('is-flipped');
+            const el = document.getElementById(`card-${displayIdx}`); if (el) el.classList.add('is-flipped');
             setTimeout(() => {
-                const isD = item.isDudu, ot = document.getElementById('overlayText'), pc = document.getElementById('duduPhotoContainer'), dp = document.getElementById('duduRandomPhoto');
-                ot.textContent = item.text;
+                const ot = document.getElementById('overlayText'), dt = document.getElementById('duduTextLines'), pc = document.getElementById('duduPhotoContainer'), dp = document.getElementById('duduRandomPhoto');
+                ot.textContent = ""; ot.classList.remove('hidden'); dt.innerHTML = ""; dt.classList.add('hidden'); pc.style.display = 'none';
                 document.getElementById('answerCategoryTag').textContent = item.cat;
-                
-                if (isD) {
-                    ot.classList.add('aesthetic-text', 'dudu-text-small');
-                    pc.style.display = 'flex';
-                    // 隨機挑選一張照片顯示
-                    const randomId = DUDU_PHOTOS[Math.floor(Math.random() * DUDU_PHOTOS.length)];
-                    dp.src = `https://drive.google.com/uc?id=${randomId}`;
-                    dp.onerror = () => { dp.src = "https://placehold.co/400x300?text=Happy+Dudu"; };
-                } else {
-                    ot.classList.remove('aesthetic-text', 'dudu-text-small');
-                    pc.style.display = 'none';
-                }
-                
-                document.getElementById('ratingSection').style.display = isD ? 'none' : 'flex';
-                document.getElementById('shareSingleCardBtn').style.display = isD ? 'none' : 'block';
+                if (item.isDudu) {
+                    ot.classList.add('hidden'); dt.classList.remove('hidden'); pc.style.display = 'flex';
+                    const lines = item.text.split('\n'); dt.innerHTML = lines.map(l => `<div class="dudu-line aesthetic-text">${l}</div>`).join('');
+                    let queue = []; try { queue = JSON.parse(localStorage.getItem(STORAGE_KEYS.DUDU_INDEX_QUEUE) || '[]'); } catch(e) { queue = []; }
+                    if (queue.length === 0 || queue.some(idx => idx >= duduPhotos.length)) {
+                        queue = duduPhotos.map((_, i) => i);
+                        for (let i = queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [queue[i], queue[j]] = [queue[j], queue[i]]; }
+                    }
+                    const photoIdx = queue.shift(); localStorage.setItem(STORAGE_KEYS.DUDU_INDEX_QUEUE, JSON.stringify(queue));
+                    const rawVal = duduPhotos[photoIdx] || "";
+                    if (rawVal) {
+                        let finalUrl = rawVal;
+                        if (rawVal.includes('drive.google.com')) { const idMatch = rawVal.match(/[-\w]{25,}/); if (idMatch) finalUrl = `https://drive.google.com/thumbnail?id=${idMatch[0]}&sz=w1000`; }
+                        else if (!rawVal.includes('http')) { finalUrl = `https://drive.google.com/thumbnail?id=${rawVal}&sz=w1000`; }
+                        dp.src = finalUrl;
+                    } else { dp.src = "https://placehold.co/400x300?text=Check+Sheet+B"; }
+                    dp.onerror = () => { dp.src = "https://placehold.co/400x300?text=Photo+Unavailable"; };
+                    requestAnimationFrame(() => adjustDuduTextSize());
+                } else { ot.textContent = item.text; requestAnimationFrame(() => fitTextToContainer()); }
+                document.getElementById('ratingSection').style.display = item.isDudu ? 'none' : 'flex';
+                document.getElementById('shareSingleCardBtn').style.display = item.isDudu ? 'none' : 'block';
                 updateStarUI(cardMetadata[item.text]?.rating || 0);
                 currentCardIndex = { ...item, displayIdx };
                 document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
-                if (!isD) requestAnimationFrame(() => fitTextToContainer());
                 playSound();
             }, 350);
         }
 
-        function fitTextToContainer() {
-            const t = document.getElementById('overlayText'), c = document.getElementById('textFitContainer'); if (!t || !c) return;
-            let s = 45; t.style.fontSize = s + 'px'; const maxH = c.clientHeight;
-            while ((t.scrollHeight > maxH || t.offsetWidth > c.clientWidth) && s > 10) { s -= 1; t.style.fontSize = s + 'px'; }
+        function adjustDuduTextSize() {
+            const lines = document.querySelectorAll('.dudu-line'), containerWidth = document.getElementById('duduTextLines').clientWidth;
+            lines.forEach(el => { let size = 32; el.style.fontSize = size + 'px'; while (el.scrollWidth > containerWidth && size > 10) { size -= 1; el.style.fontSize = size + 'px'; } });
         }
+
+        function fitTextToContainer() {
+            const t = document.getElementById('overlayText'), c = document.getElementById('textFitContainer'); 
+            if (!t || !c || t.classList.contains('hidden')) return;
+            let s = 45; t.style.fontSize = s + 'px'; 
+            const maxH = c.clientHeight, maxW = c.clientWidth;
+            while ((t.scrollHeight > maxH || t.scrollWidth > maxW) && s > 8) { 
+                s -= 1; t.style.fontSize = s + 'px'; 
+            }
+        }
+
+        window.openZoom = (src) => { const z = document.getElementById('photoZoomOverlay'), i = document.getElementById('zoomedImg'); i.src = src; z.style.display = 'flex'; };
 
         window.closeAnswer = () => {
             const info = currentCardIndex; if (!info) return; document.getElementById('answerOverlay').classList.replace('flex', 'hidden');
             let count = Number(sessionStorage.getItem(STORAGE_KEYS.SESSION_FLIP_COUNT) || 0) + 1;
             sessionStorage.setItem(STORAGE_KEYS.SESSION_FLIP_COUNT, count.toString());
-            if (info.isDudu) {
-                duduTemporaryHidden = true; playSound('dudu'); const duduEl = document.getElementById('dudu-card-container');
-                if (duduEl) { duduEl.classList.add('dudu-vanish'); setTimeout(() => { duduEl.style.visibility = 'hidden'; duduTemporaryHidden = false; }, 1200); }
-            } else {
+            if (info.isDudu) { duduTemporaryHidden = true; playSound('dudu'); const duduEl = document.getElementById('dudu-card-container'); if (duduEl) { duduEl.style.opacity = '0'; setTimeout(() => { duduTemporaryHidden = false; renderCards(); }, 1000); } }
+            else {
                 if (info.idx !== -1) {
                     if (!categoryProgress[info.cat]) categoryProgress[info.cat] = new Set();
                     categoryProgress[info.cat].add(info.idx);
@@ -554,52 +508,56 @@
                 }
                 renderCards();
             }
-            if (count === 1 || Math.random() < 0.01) setTimeout(() => document.getElementById('shakeTutorialModal').classList.replace('hidden', 'flex'), 300);
+            if (count === 1) setTimeout(() => document.getElementById('shakeTutorialModal').classList.remove('hidden'), 300);
             currentCardIndex = null;
         };
 
-        window.openPhotoModal = () => {
-            document.getElementById('photoModal').classList.replace('hidden', 'flex');
-            const grid = document.getElementById('photoGrid'), empty = document.getElementById('photoEmptyState');
-            grid.innerHTML = '';
-            if (MY_PHOTOS.length === 0) empty.classList.remove('hidden');
-            else { empty.classList.add('hidden'); MY_PHOTOS.forEach(url => { const img = document.createElement('img'); img.src = url; img.className = 'photo-item'; img.onclick = () => window.open(url, '_blank'); grid.appendChild(img); }); }
+        window.shareSingleCard = async () => {
+            const i = currentCardIndex; if (!i) return; showToast("生成圖片中..."); 
+            const temp = document.getElementById('exportTemplate'), now = new Date(), ts = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${localStorage.getItem(STORAGE_KEYS.USERNAME) || '好友'} | ${ts}`;
+            document.getElementById('exportCategory').textContent = `[ ${i.cat} ]`; document.getElementById('exportQuote').textContent = i.text;
+            document.getElementById('exportQR').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}`;
+            temp.style.visibility = 'visible'; temp.style.left = '0'; 
+            await new Promise(r => setTimeout(r, 800));
+            const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }); 
+            temp.style.visibility = 'hidden'; temp.style.left = '-5000px';
+            const blob = await new Promise(r => canvas.toBlob(r)); 
+            if (navigator.share) { try { await navigator.share({ files: [new File([blob], "BetterYou.png", { type: 'image/png' })], text: "分享金句" }); } catch (e) { triggerDownload(blob); } }
+            else { triggerDownload(blob); }
         };
 
-        window.closePhotoModal = () => document.getElementById('photoModal').classList.replace('flex', 'hidden');
-        window.closeShakeTutorial = () => document.getElementById('shakeTutorialModal').classList.replace('flex', 'hidden');
+        function triggerDownload(blob) { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'BetterYou.png'; a.click(); showToast("圖片已下載到電腦 📥"); URL.revokeObjectURL(url); }
+        window.saveUserName = () => { const v = document.getElementById('userNameInput').value.trim(); if (v) { localStorage.setItem(STORAGE_KEYS.USERNAME, v); updateWelcomeUI(v); document.getElementById('nameModal').classList.add('hidden'); showToast(`你好 ${v}！ ✨`); } else showToast("請輸入名字喔！"); };
+        window.resetName = () => { localStorage.removeItem(STORAGE_KEYS.USERNAME); window.location.reload(); };
+        
+        window.closeShakeTutorial = () => document.getElementById('shakeTutorialModal').classList.add('hidden');
+        window.closeNameModal = () => document.getElementById('nameModal').classList.add('hidden');
         window.openRecordModal = () => { document.getElementById('recordModal').classList.replace('hidden', 'flex'); filterFavs('all'); };
-        window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('hidden', 'flex');
-        window.openInstallModal = () => document.getElementById('installModal').classList.replace('hidden', 'flex');
-        window.closeInstallModal = () => document.getElementById('installModal').classList.replace('hidden', 'flex');
-        window.saveUserName = () => { const v = document.getElementById('userNameInput').value.trim(); if (v) { localStorage.setItem(STORAGE_KEYS.USERNAME, v); updateWelcomeUI(v); document.getElementById('nameModal').classList.replace('hidden', 'flex'); } };
-        window.resetAllGame = async () => { if (!confirm("要重置所有紀錄嗎？")) return; localStorage.clear(); categoryProgress = {}; cardMetadata = {}; duduTemporaryHidden = false; await window.initApp(); showToast("已重置 🫧"); };
-        window.updateRatingFromUI = (s) => { const i = currentCardIndex; if (!i) return; cardMetadata[i.text] = { rating: s, category: i.cat, flipTimestamp: Date.now() }; localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata)); updateStarUI(s); showToast("標記完成！❤️", true); };
-        function updateStarUI(s) { document.querySelectorAll('#starRatingContainer .heart').forEach((el, i) => el.classList.toggle('active', i < s)); }
-        window.updateRatingFromFav = (text, cat, s) => { cardMetadata[text] = { rating: s, category: cat, flipTimestamp: Date.now() }; localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata)); filterFavs(currentTab); };
-        window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
+        window.closeRecordModal = () => document.getElementById('recordModal').classList.add('hidden');
+        window.openInstallModal = () => { document.getElementById('installModal').classList.replace('hidden', 'flex'); };
+        window.closeInstallModal = () => { document.getElementById('installModal').classList.add('hidden'); };
+        
+        window.resetAllGame = () => { 
+            if (!confirm("確定要重置進度並接收新的宇宙能量嗎？")) return; 
+            localStorage.clear(); sessionStorage.clear(); 
+            showToast("✨ 正在接收新的宇宙能量... 🫧", true); 
+            setTimeout(() => window.location.reload(), 1500); 
+        };
 
+        window.updateRatingFromUI = (s) => { const i = currentCardIndex; if (!i) return; cardMetadata[i.text] = { rating: s, category: i.cat, flipTimestamp: Date.now() }; localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata)); updateStarUI(s); showToast("標記完成！❤️", true); };
+        function updateStarUI(s) { document.querySelectorAll('#starRatingContainer span').forEach((el, i) => { el.style.opacity = i < s ? '1' : '0.2'; el.style.filter = i < s ? 'grayscale(0)' : 'grayscale(1)'; }); }
+        window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
         function filterFavs(tab = 'all') {
             const list = document.getElementById('favoriteList'); list.innerHTML = ''; let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
-            if (tab === 'unrated') items = items.filter(i => !i.rating); else if (tab.startsWith('star')) items = items.filter(i => i.rating === parseInt(tab.replace('star','')));
+            if (tab === 'unrated') items = items.filter(i => !i.rating); else if (tab === 'star3') items = items.filter(i => i.rating === 3);
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
                 const d = document.createElement('div'); d.className = "bg-gray-100 p-4 rounded-3xl border-2 border-black shadow-[4px_4px_0_#000]";
-                let h = ''; for (let n=1; n<=3; n++) h += `<span class="heart ${n<=(i.rating||0)?'active':''}" onclick="window.updateRatingFromFav('${i.text.replace(/'/g,"\\'")}', '${i.category}', ${n})">❤️</span>`;
-                d.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-[10px] font-black uppercase bg-white border border-black px-2 py-0.5 rounded-full">${i.category}</span><div class="favorite-rating">${h}</div></div><p class="font-black text-black leading-tight">${i.text}</p>`; list.appendChild(d);
+                d.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="text-[10px] font-black uppercase bg-white border border-black px-2 py-0.5 rounded-full">${i.category}</span><div class="text-xs">❤️ ${i.rating || 0}</div></div><p class="font-black text-black leading-tight text-center">${i.text}</p>`; list.appendChild(d);
             });
         }
-
-        window.shareSingleCard = async () => {
-            const i = currentCardIndex; if (!i) return; showToast("生成圖片中..."); const temp = document.getElementById('exportTemplate');
-            document.getElementById('exportSenderInfo').textContent = `寄送人：${localStorage.getItem(STORAGE_KEYS.USERNAME) || '好友'} | ${new Date().toLocaleString()}`;
-            document.getElementById('exportCardsList').innerHTML = `<div style="font-size: 32px; font-weight: 900;">[ ${i.cat} ]</div><div style="font-size: 48px; font-weight: 900; margin-top:20px;">${i.text}</div>`;
-            temp.style.visibility = 'visible'; temp.style.left = '0'; const canvas = await html2canvas(temp, { scale: 2 }); temp.style.visibility = 'hidden'; temp.style.left = '-5000px';
-            const blob = await new Promise(r => canvas.toBlob(r)); const file = new File([blob], "BetterYou.png", { type: 'image/png' });
-            if (navigator.share) await navigator.share({ files: [file], text: "分享這句經典給你！" }); else showToast("環境不支援分享");
-        };
-
         function parseCSV(t) { let p='', row=[''], ret=[row], i=0, r=0, s=!0; for (let l of t) { if ('"'===l) { if (s&&l===p) row[i]+=l; s=!s; } else if (','===l&&s) l=row[++i]=''; else if ('\n'===l&&s) { if ('\r'===p) row[i]=row[i].slice(0,-1); row=ret[++r]=[l=row[i=0]='']; } else row[i]+=l; p=l; } return ret; }
-        function showToast(m, h=false) { const t=document.getElementById('toast'); t.innerHTML=m; t.className=`fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] transition-all ${h?'toast-highlight':''}`; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0', 2000); }
+        function showToast(m, h=false) { const t=document.getElementById('toast'); t.innerHTML=m; t.className=`fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] transition-all ${h?'bg-yellow-400 text-black':''}`; t.style.opacity='1'; setTimeout(()=>t.style.opacity='0', 2500); }
         function updateStats() { let t=0, d=0; Object.keys(gameData).forEach(c => t += gameData[c].length); Object.keys(categoryProgress).forEach(c => d += categoryProgress[c].size); document.getElementById('statCompleted').textContent = d; document.getElementById('statRemaining').textContent = Math.max(0, t - d); }
         window.initApp();
     </script>
