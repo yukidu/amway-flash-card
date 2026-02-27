@@ -169,7 +169,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- 修正：變身按鈕恢復為單行顯示 -->
                     <button onclick="window.randomStyle()" class="w-[96px] bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-sm h-[42px] flex items-center justify-center">
                         變身！
                     </button>
@@ -195,7 +194,6 @@
         </footer>
     </div>
 
-    <!-- 姓名視窗與教學 -->
     <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden flex items-center justify-center p-6 backdrop-blur-xl">
         <div class="bg-white border-8 border-black p-8 w-full max-w-md rounded-[40px] shadow-[15px_15px_0px_#FFD700] max-h-[90vh] overflow-y-auto no-scrollbar">
             <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
@@ -227,7 +225,6 @@
         </div>
     </div>
 
-    <!-- 答案 Overlay -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div id="answerContent" class="bg-white w-[92%] max-w-[400px] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
@@ -250,7 +247,6 @@
         </div>
     </div>
 
-    <!-- 紀錄 Modal -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
@@ -274,7 +270,6 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <!-- 匯出模板 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; color:#000; z-index: -1; border: 60px solid #000;">
         <div id="exportInner" style="padding: 60px; position: relative; min-height: 800px; display: flex; flex-direction: column;">
             <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 30px; margin-bottom: 50px; overflow: visible;">
@@ -298,7 +293,8 @@
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        const POSITIVE_EMOJIS = ["🚀", "💰", "🏆", "💪", "🌟", "🌈", "💎", "📈", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁"];
+        // 正能量 Emoji 池 (移除財富相關圖案，增加更多樣化的積極圖案)
+        const POSITIVE_EMOJIS = ["🚀", "🏆", "💪", "🌟", "🌈", "💎", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁", "✨", "🏹", "🥳", "🙌", "🧗", "🌊", "🎨", "🧗‍♀️", "🏃", "🔥", "🕊️", "🏅"];
 
         const THEMES = [
             { id: "jelly", name: "Q彈果凍" }, { id: "comic", name: "熱血漫畫" }, { id: "sticker", name: "可愛貼紙" },
@@ -433,6 +429,9 @@
                     const optionsContainer = document.getElementById('dropdownOptions');
                     optionsContainer.innerHTML = '';
                     
+                    // 隨機洗牌 Emoji 池，確保不重複分配
+                    let emojiPool = [...POSITIVE_EMOJIS].sort(() => Math.random() - 0.5);
+
                     const createItem = (val, label, emoji) => {
                         const div = document.createElement('div');
                         div.className = `dropdown-item ${currentCategory === val ? 'font-black bg-gray-100' : ''}`;
@@ -447,8 +446,10 @@
                         if (h && h !== '未分類') {
                             newData[h] = [];
                             for (let r = 1; r < rows.length; r++) if (rows[r][col]) newData[h].push(rows[r][col].trim());
-                            const randomEmoji = POSITIVE_EMOJIS[Math.floor(Math.random() * POSITIVE_EMOJIS.length)];
-                            optionsContainer.appendChild(createItem(h, h, randomEmoji));
+                            
+                            // 每個分類從池中取出一個不重複的 Emoji
+                            const emoji = emojiPool.length > 0 ? emojiPool.pop() : "✨";
+                            optionsContainer.appendChild(createItem(h, h, emoji));
                         }
                     });
                     
@@ -609,13 +610,13 @@
             const name = getSenderName();
             const smartSize = getSmartFontSize(i.text);
             document.getElementById('exportSenderInfo').textContent = `寄送人：${name || '安安'} | ${getCurrentFormattedTime()}`;
-            // 修正匯出排版：移除 -webkit-line-clamp 以防止裁切，增加底部 Padding 確保筆畫完整呈現
+            // 修正匯出排版：增加底部 Padding 與穩定行高，移除裁剪限制
             document.getElementById('exportCardsList').innerHTML = `
                 <div style="display:flex; align-items:flex-start; margin-bottom: 40px; padding-top: 10px;">
                     <div style="width: 25px; background: black; margin-right: 40px; align-self: stretch;"></div>
                     <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start;">
                         <div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 10px; margin-top: -5px;">[ ${i.cat} ]</div>
-                        <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; word-break: break-all; padding-bottom: 20px;">${i.text}</div>
+                        <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; word-break: break-all; padding-bottom: 30px; overflow: visible;">${i.text}</div>
                     </div>
                 </div>`;
             captureAndShare(i.text);
@@ -636,7 +637,7 @@
                         <div style="width: 15px; background: black; margin-right: 35px; align-self: stretch;"></div>
                         <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start;">
                             <div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 8px; margin-top: -4px;">[ ${i.category} ]</div>
-                            <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; word-break: break-all; padding-bottom: 15px;">${i.text}</div>
+                            <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; word-break: break-all; padding-bottom: 25px; overflow: visible;">${i.text}</div>
                         </div>
                     </div>`;
             });
