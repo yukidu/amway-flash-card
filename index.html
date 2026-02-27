@@ -169,7 +169,10 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="window.randomStyle()" class="px-4 bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-sm h-[42px]">變身！</button>
+                    <!-- 變身按鈕調整為兩行 -->
+                    <button onclick="window.randomStyle()" class="px-3 bg-yellow-400 font-black rounded-[10px] border-[3px] border-black shadow-[3px_3px_0px_#000] active:translate-y-0.5 text-xs leading-none h-[42px] flex flex-col justify-center items-center">
+                        <span>變</span><span>身</span>
+                    </button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
                         <div class="dropdown-trigger" onclick="window.toggleDropdown()">
                             <span id="dropdownLabel">🌟 全部</span>
@@ -192,14 +195,13 @@
         </footer>
     </div>
 
-    <!-- 修正：姓名視窗加入外部瀏覽器開啟教學 -->
+    <!-- 姓名視窗與教學 -->
     <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden flex items-center justify-center p-6 backdrop-blur-xl">
         <div class="bg-white border-8 border-black p-8 w-full max-w-md rounded-[40px] shadow-[15px_15px_0px_#FFD700] max-h-[90vh] overflow-y-auto no-scrollbar">
             <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
             <input type="text" id="userNameInput" placeholder="輸入名字..." class="w-full border-4 border-black p-4 text-xl font-black rounded-2xl mb-6 outline-none">
             <button onclick="window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl rounded-2xl shadow-[5px_5px_0px_#888] mb-8">出發！</button>
             
-            <!-- 教學區塊 -->
             <div class="border-t-4 border-dashed border-gray-300 pt-6">
                 <p class="text-pink-500 font-black text-lg mb-4 flex items-center">
                     <span class="mr-2">💡</span> Line 使用者必看：
@@ -225,6 +227,7 @@
         </div>
     </div>
 
+    <!-- 答案 Overlay -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div id="answerContent" class="bg-white w-[92%] max-w-[400px] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
@@ -247,6 +250,7 @@
         </div>
     </div>
 
+    <!-- 紀錄 Modal -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
@@ -270,6 +274,7 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
+    <!-- 匯出模板：優化排版對齊 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; color:#000; z-index: -1; border: 60px solid #000;">
         <div id="exportInner" style="padding: 60px; position: relative; min-height: 800px; display: flex; flex-direction: column;">
             <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 30px; margin-bottom: 50px; overflow: visible;">
@@ -292,6 +297,9 @@
         const STORAGE_KEYS = { PROGRESS: 'better_you_progress_v3', METADATA: 'better_you_metadata_v3', USERNAME: 'better_you_user_name' };
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
+
+        // 正能量 Emoji 池
+        const POSITIVE_EMOJIS = ["🚀", "💰", "🏆", "💪", "🌟", "🌈", "💎", "📈", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁"];
 
         const THEMES = [
             { id: "jelly", name: "Q彈果凍" }, { id: "comic", name: "熱血漫畫" }, { id: "sticker", name: "可愛貼紙" },
@@ -423,28 +431,32 @@
                 const rows = parseCSV(csv), newData = {};
                 if (rows.length > 0) {
                     const headers = rows[0].map(h => h?.trim() || "");
+                    const optionsContainer = document.getElementById('dropdownOptions');
+                    optionsContainer.innerHTML = '';
+                    
+                    const createItem = (val, label, emoji) => {
+                        const div = document.createElement('div');
+                        div.className = `dropdown-item ${currentCategory === val ? 'font-black bg-gray-100' : ''}`;
+                        div.textContent = `${emoji} ${label}`;
+                        div.onclick = (e) => { e.stopPropagation(); window.switchCategory(val); window.closeDropdown(); };
+                        return div;
+                    };
+
+                    optionsContainer.appendChild(createItem('all', '全部', '🌟'));
+
                     headers.forEach((h, col) => {
                         if (h && h !== '未分類') {
                             newData[h] = [];
                             for (let r = 1; r < rows.length; r++) if (rows[r][col]) newData[h].push(rows[r][col].trim());
+                            
+                            // 每個分類隨機分配一個正能量 Emoji
+                            const randomEmoji = POSITIVE_EMOJIS[Math.floor(Math.random() * POSITIVE_EMOJIS.length)];
+                            optionsContainer.appendChild(createItem(h, h, randomEmoji));
                         }
                     });
+                    
                     gameData = newData;
                     Object.keys(gameData).forEach(cat => { if (!gameData[cat].includes(MANDATORY_CARD)) gameData[cat].push(MANDATORY_CARD); });
-                    const optionsContainer = document.getElementById('dropdownOptions');
-                    optionsContainer.innerHTML = '';
-                    const createItem = (val, label) => {
-                        const div = document.createElement('div');
-                        div.className = `dropdown-item ${currentCategory === val ? 'font-black bg-gray-100' : ''}`;
-                        div.textContent = label;
-                        div.onclick = (e) => { e.stopPropagation(); window.switchCategory(val); window.closeDropdown(); };
-                        return div;
-                    };
-                    optionsContainer.appendChild(createItem('all', '🌟 全部'));
-                    Object.keys(gameData).forEach(cat => {
-                        if (!categoryProgress[cat]) categoryProgress[cat] = new Set();
-                        optionsContainer.appendChild(createItem(cat, cat));
-                    });
                     allCategoryItems = [];
                     window.switchCategory('all');
                 }
@@ -560,7 +572,7 @@
         };
 
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
-        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('hidden', 'flex'); };
+        window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('flex', 'hidden'); };
         window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
@@ -586,11 +598,14 @@
             return `${dateStr} ${timeStr}`;
         }
 
+        // 強化：針對超長文字（>50字）更積極縮放，確保 3 行內顯示
         function getSmartFontSize(text) {
             const len = text.length;
-            if (len <= 20) return "64px"; 
-            if (len <= 45) return "52px"; 
-            return "42px"; 
+            if (len <= 15) return "68px"; 
+            if (len <= 30) return "58px"; 
+            if (len <= 50) return "48px"; 
+            if (len <= 70) return "38px";
+            return "32px"; 
         }
 
         window.shareSingleCard = async () => {
@@ -598,12 +613,13 @@
             const name = getSenderName();
             const smartSize = getSmartFontSize(i.text);
             document.getElementById('exportSenderInfo').textContent = `寄送人：${name || '安安'} | ${getCurrentFormattedTime()}`;
+            // 修正排版：文字上移、對齊左邊、縮小行高
             document.getElementById('exportCardsList').innerHTML = `
-                <div style="display:flex; align-items:stretch; margin-bottom: 60px;">
-                    <div style="width: 25px; background: black; margin-right: 40px; flex-shrink: 0;"></div>
-                    <div style="flex-grow: 1;">
-                        <div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${i.cat} ]</div>
-                        <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.25; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all;">${i.text}</div>
+                <div style="display:flex; align-items:flex-start; margin-bottom: 40px; padding-top: 10px;">
+                    <div style="width: 25px; background: black; margin-right: 40px; align-self: stretch;"></div>
+                    <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start;">
+                        <div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 10px; margin-top: -5px;">[ ${i.cat} ]</div>
+                        <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; padding-bottom: 5px;">${i.text}</div>
                     </div>
                 </div>`;
             captureAndShare(i.text);
@@ -620,11 +636,11 @@
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
                 const smartSize = getSmartFontSize(i.text);
                 listEl.innerHTML += `
-                    <div style="display:flex; align-items:stretch; margin-bottom: 60px;">
-                        <div style="width: 15px; background: black; margin-right: 35px; flex-shrink: 0;"></div>
-                        <div style="flex-grow: 1;">
-                            <div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 12px;">[ ${i.category} ]</div>
-                            <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.25; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all;">${i.text}</div>
+                    <div style="display:flex; align-items:flex-start; margin-bottom: 40px; padding-top: 5px;">
+                        <div style="width: 15px; background: black; margin-right: 35px; align-self: stretch;"></div>
+                        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-start;">
+                            <div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 8px; margin-top: -4px;">[ ${i.category} ]</div>
+                            <div style="font-size: ${smartSize}; font-weight: 900; line-height: 1.15; color: #000; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; padding-bottom: 4px;">${i.text}</div>
                         </div>
                     </div>`;
             });
@@ -647,7 +663,7 @@
                 const file = new File([blob], customFileName, { type: 'image/png' });
                 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-                const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪"];
+                const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪", "🏆", "🔥"];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
                 const shareText = `這是${name || '我'}翻的牌，發現這句話很經典，特別分享給您 ${randomEmoji}`;
 
