@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 修改 Line 連結預覽文字 -->
     <title>改變生命未來式 Be A Better You</title>
+    <meta name="description" content="要因夢想而忙碌、勿因忙碌而忘記夢想">
+    <meta property="og:title" content="改變生命未來式 Be A Better You">
+    <meta property="og:description" content="要因夢想而忙碌、勿因忙碌而忘記夢想">
+    <meta property="og:type" content="website">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -20,22 +26,27 @@
             --bg-size: 20px 20px;
         }
 
-        /* 載入畫面文字風格設計 (10種) */
-        .loading-style-1 { font-family: 'PingFang TC', sans-serif; text-shadow: 3px 3px 0px #FFD700, 6px 6px 0px #FF4444; }
-        .loading-style-2 { background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: rainbow 2s infinite; }
-        .loading-style-3 { color: #fff; text-shadow: 0 0 10px #FF69B4, 0 0 20px #FF69B4, 0 0 40px #FF1493; animation: blink 1s infinite; }
-        .loading-style-4 { letter-spacing: 0.5rem; font-style: italic; border-bottom: 5px solid #000; padding-bottom: 5px; }
-        .loading-style-5 { transform: perspective(500px) rotateX(25deg); color: #4A90E2; font-weight: 900; }
-        .loading-style-6 { font-family: cursive; font-size: 2.5rem; color: #8B4513; transform: rotate(-3deg); }
-        .loading-style-7 { color: #000; -webkit-text-stroke: 1.5px #FFD700; filter: drop-shadow(4px 4px 0px #000); }
-        .loading-style-8 { animation: wave 1.5s infinite ease-in-out; display: inline-block; color: #2ecc71; }
-        .loading-style-9 { background: #000; color: #fff; padding: 10px 20px; border-radius: 50px; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .loading-style-10 { font-variant: small-caps; text-decoration: underline double #FFD700; color: #333; }
+        /* 載入畫面文字風格設計：僅保留彩虹漸層 */
+        .loading-style-rainbow { 
+            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            animation: rainbowMove 2s infinite linear;
+            background-size: 200% auto;
+        }
 
-        @keyframes rainbow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        @keyframes wave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes paletteRotate { 0% { transform: scale(1.2) rotate(0deg); opacity: 0.3; } 50% { transform: scale(1.3) rotate(10deg); opacity: 0.5; } 100% { transform: scale(1.2) rotate(0deg); opacity: 0.3; } }
+        @keyframes rainbowMove {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes paletteFloat { 
+            0% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.3; } 
+            25% { transform: scale(1.2) rotate(3deg) translate(10px, -10px); opacity: 0.4; }
+            50% { transform: scale(1.3) rotate(-2deg) translate(-5px, 5px); opacity: 0.3; } 
+            75% { transform: scale(1.2) rotate(2deg) translate(10px, 10px); opacity: 0.4; }
+            100% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.3; } 
+        }
 
         /* 20 種風格 */
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
@@ -108,7 +119,7 @@
         }
 
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
-        .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 3rem; }
+        .card-back { background-color: white !important; transform: rotateY(180deg); }
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
@@ -131,9 +142,9 @@
         .star-rating .star { color: #ccc; cursor: pointer; font-size: 1.8rem; }
         .star-rating .star.active { color: #FFD700; }
 
-        /* 載入畫面修正：調色盤佔滿螢幕 */
+        /* 載入畫面：調色盤佔滿螢幕 */
         .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
-        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.3; z-index: -1; animation: paletteRotate 10s infinite ease-in-out; }
+        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.3; z-index: -1; animation: paletteFloat 12s infinite ease-in-out; }
         
         .modal-close-btn {
             position: absolute; top: -15px; right: -15px; width: 42px; height: 42px;
@@ -166,7 +177,7 @@
     <div id="giantThemeName">風格</div>
 
     <div id="aiLoading" class="loading-overlay">
-        <!-- 巨大佔滿螢幕的調色盤 SVG -->
+        <!-- 巨大動態調色盤 SVG -->
         <svg class="palette-bg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path d="M90,50 C90,72.1 72.1,90 50,90 C27.9,90 10,72.1 10,50 C10,27.9 27.9,10 40,10 C45,10 48,13 52,15 C56,17 60,15 65,12 C75,7 90,27.9 90,50 Z" fill="#F3E5AB" stroke="#000" stroke-width="0.5"/>
             <circle cx="30" cy="35" r="5" fill="#FF4444"/>
@@ -176,7 +187,7 @@
             <circle cx="60" cy="25" r="5" fill="#9b59b6"/>
             <ellipse cx="25" cy="18" rx="8" ry="4" fill="#fff" opacity="0.6"/>
         </svg>
-        <p id="loadingText" class="font-black text-3xl mt-4 px-6 text-center">正在彩繪你的美力人生</p>
+        <p id="loadingText" class="font-black text-3xl mt-4 px-6 text-center loading-style-rainbow">正在彩繪你的美麗人生</p>
     </div>
 
     <nav class="sticky-nav">
@@ -381,12 +392,7 @@
 
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
-            const loadingText = document.getElementById('loadingText');
-            
-            // 隨機抽選 10 種設計風格
-            const randomStyleNum = Math.floor(Math.random() * 10) + 1;
-            loadingText.className = `font-black text-3xl mt-4 px-6 text-center loading-style-${randomStyleNum}`;
-            
+            // 直接應用彩虹風格載入
             loading.style.display = 'flex';
             try {
                 const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
@@ -407,8 +413,7 @@
                 window.randomStyle(true);
             } catch (err) { console.error(err); } 
             finally { 
-                // 延長載入畫面時間以便觀察設計
-                setTimeout(() => { loading.style.display = 'none'; }, 1800);
+                setTimeout(() => { loading.style.display = 'none'; }, 2000);
             }
         };
 
@@ -526,7 +531,10 @@
                             <div class="card-emoji-bg">${isD ? '🐉' : '💎'}</div>
                             <span class="card-number-text text-xl font-black ${isD ? 'hidden' : ''}">${i + 1}</span>
                         </div>
-                        <div class="card-face card-back">👑</div>
+                        <div class="card-face card-back">
+                            <div class="card-emoji-bg">👑</div>
+                            <span class="card-number-text text-xl font-black ${isD ? 'hidden' : ''}">${i + 1}</span>
+                        </div>
                     </div>`;
                 c.onclick = () => window.handleCardClick(item.cat, item.idx, i); grid.appendChild(c);
             });
@@ -605,6 +613,7 @@
 
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
         window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('hidden', 'flex'); };
+        window.closeRecordModal = () => document.getElementById('answerOverlay').classList.replace('flex', 'hidden'); // 這裡修正了一個潛在的跳轉錯誤
         window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
