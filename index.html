@@ -20,6 +20,23 @@
             --bg-size: 20px 20px;
         }
 
+        /* 載入畫面文字風格設計 (10種) */
+        .loading-style-1 { font-family: 'PingFang TC', sans-serif; text-shadow: 3px 3px 0px #FFD700, 6px 6px 0px #FF4444; }
+        .loading-style-2 { background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: rainbow 2s infinite; }
+        .loading-style-3 { color: #fff; text-shadow: 0 0 10px #FF69B4, 0 0 20px #FF69B4, 0 0 40px #FF1493; animation: blink 1s infinite; }
+        .loading-style-4 { letter-spacing: 0.5rem; font-style: italic; border-bottom: 5px solid #000; padding-bottom: 5px; }
+        .loading-style-5 { transform: perspective(500px) rotateX(25deg); color: #4A90E2; font-weight: 900; }
+        .loading-style-6 { font-family: cursive; font-size: 2.5rem; color: #8B4513; transform: rotate(-3deg); }
+        .loading-style-7 { color: #000; -webkit-text-stroke: 1.5px #FFD700; filter: drop-shadow(4px 4px 0px #000); }
+        .loading-style-8 { animation: wave 1.5s infinite ease-in-out; display: inline-block; color: #2ecc71; }
+        .loading-style-9 { background: #000; color: #fff; padding: 10px 20px; border-radius: 50px; transform: scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .loading-style-10 { font-variant: small-caps; text-decoration: underline double #FFD700; color: #333; }
+
+        @keyframes rainbow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        @keyframes wave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes paletteRotate { 0% { transform: scale(1.2) rotate(0deg); opacity: 0.3; } 50% { transform: scale(1.3) rotate(10deg); opacity: 0.5; } 100% { transform: scale(1.2) rotate(0deg); opacity: 0.3; } }
+
         /* 20 種風格 */
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
         body.theme-comic { --card-radius: 0; --card-rotate: -3deg; --card-border: 8px solid #000; --card-shadow: 15px 15px 0px #000; }
@@ -114,7 +131,9 @@
         .star-rating .star { color: #ccc; cursor: pointer; font-size: 1.8rem; }
         .star-rating .star.active { color: #FFD700; }
 
-        .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        /* 載入畫面修正：調色盤佔滿螢幕 */
+        .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+        .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.3; z-index: -1; animation: paletteRotate 10s infinite ease-in-out; }
         
         .modal-close-btn {
             position: absolute; top: -15px; right: -15px; width: 42px; height: 42px;
@@ -147,8 +166,17 @@
     <div id="giantThemeName">風格</div>
 
     <div id="aiLoading" class="loading-overlay">
-        <div class="animate-bounce text-6xl">💎</div>
-        <p class="font-black text-2xl mt-4">正在彩繪世界...</p>
+        <!-- 巨大佔滿螢幕的調色盤 SVG -->
+        <svg class="palette-bg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M90,50 C90,72.1 72.1,90 50,90 C27.9,90 10,72.1 10,50 C10,27.9 27.9,10 40,10 C45,10 48,13 52,15 C56,17 60,15 65,12 C75,7 90,27.9 90,50 Z" fill="#F3E5AB" stroke="#000" stroke-width="0.5"/>
+            <circle cx="30" cy="35" r="5" fill="#FF4444"/>
+            <circle cx="35" cy="65" r="5" fill="#4A90E2"/>
+            <circle cx="65" cy="75" r="5" fill="#FFD700"/>
+            <circle cx="80" cy="45" r="5" fill="#2ecc71"/>
+            <circle cx="60" cy="25" r="5" fill="#9b59b6"/>
+            <ellipse cx="25" cy="18" rx="8" ry="4" fill="#fff" opacity="0.6"/>
+        </svg>
+        <p id="loadingText" class="font-black text-3xl mt-4 px-6 text-center">正在彩繪你的美力人生</p>
     </div>
 
     <nav class="sticky-nav">
@@ -194,6 +222,7 @@
         </footer>
     </div>
 
+    <!-- 姓名視窗與教學 -->
     <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden flex items-center justify-center p-6 backdrop-blur-xl">
         <div class="bg-white border-8 border-black p-8 w-full max-w-md rounded-[40px] shadow-[15px_15px_0px_#FFD700] max-h-[90vh] overflow-y-auto no-scrollbar">
             <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
@@ -293,8 +322,7 @@
         const MANDATORY_CARD = "安麗解答之書程式與視覺設計ver1.0 - 寰宇杜杜龍創辦人白金 2026.2.26";
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1HufZqMwvvZh735nBMvKnDDI-BnZMUuYmFTA0_3B2lCE/export?format=csv";
 
-        // 正能量 Emoji 池 (移除財富相關圖案，增加更多樣化的積極圖案)
-        const POSITIVE_EMOJIS = ["🚀", "🏆", "💪", "🌟", "🌈", "💎", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁", "✨", "🏹", "🥳", "🙌", "🧗", "🌊", "🎨", "🧗‍♀️", "🏃", "🔥", "🕊️", "🏅"];
+        const POSITIVE_EMOJIS = ["🚀", "🏆", "💪", "🌟", "🌈", "💎", "🎊", "🥇", "👑", "🔥", "☀️", "🌻", "🍀", "🎯", "⚡", "🤝", "🎈", "🎁", "✨", "🏹", "🥳", "🙌", "🧗", "🌊", "🎨", "🧗‍♀️", "跑步", "火", "鴿子", "🏅"];
 
         const THEMES = [
             { id: "jelly", name: "Q彈果凍" }, { id: "comic", name: "熱血漫畫" }, { id: "sticker", name: "可愛貼紙" },
@@ -353,6 +381,12 @@
 
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
+            const loadingText = document.getElementById('loadingText');
+            
+            // 隨機抽選 10 種設計風格
+            const randomStyleNum = Math.floor(Math.random() * 10) + 1;
+            loadingText.className = `font-black text-3xl mt-4 px-6 text-center loading-style-${randomStyleNum}`;
+            
             loading.style.display = 'flex';
             try {
                 const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
@@ -372,7 +406,10 @@
                 await autoImport();
                 window.randomStyle(true);
             } catch (err) { console.error(err); } 
-            finally { loading.style.display = 'none'; }
+            finally { 
+                // 延長載入畫面時間以便觀察設計
+                setTimeout(() => { loading.style.display = 'none'; }, 1800);
+            }
         };
 
         function fitWelcomeText() {
@@ -429,7 +466,6 @@
                     const optionsContainer = document.getElementById('dropdownOptions');
                     optionsContainer.innerHTML = '';
                     
-                    // 隨機洗牌 Emoji 池，確保不重複分配
                     let emojiPool = [...POSITIVE_EMOJIS].sort(() => Math.random() - 0.5);
 
                     const createItem = (val, label, emoji) => {
@@ -446,8 +482,6 @@
                         if (h && h !== '未分類') {
                             newData[h] = [];
                             for (let r = 1; r < rows.length; r++) if (rows[r][col]) newData[h].push(rows[r][col].trim());
-                            
-                            // 每個分類從池中取出一個不重複的 Emoji
                             const emoji = emojiPool.length > 0 ? emojiPool.pop() : "✨";
                             optionsContainer.appendChild(createItem(h, h, emoji));
                         }
@@ -610,7 +644,6 @@
             const name = getSenderName();
             const smartSize = getSmartFontSize(i.text);
             document.getElementById('exportSenderInfo').textContent = `寄送人：${name || '安安'} | ${getCurrentFormattedTime()}`;
-            // 修正匯出排版：增加底部 Padding 與穩定行高，移除裁剪限制
             document.getElementById('exportCardsList').innerHTML = `
                 <div style="display:flex; align-items:flex-start; margin-bottom: 40px; padding-top: 10px;">
                     <div style="width: 25px; background: black; margin-right: 40px; align-self: stretch;"></div>
@@ -660,7 +693,7 @@
                 const file = new File([blob], customFileName, { type: 'image/png' });
                 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-                const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪", "🏆", "🔥"];
+                const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪", "🏆", "火"];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
                 const shareText = `這是${name || '我'}翻的牌，發現這句話很經典，特別分享給您 ${randomEmoji}`;
 
