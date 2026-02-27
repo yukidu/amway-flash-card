@@ -42,7 +42,6 @@
         body.theme-cyber { --card-radius: 20px 0 20px 0; --card-border: 4px solid #000; --card-shadow: 5px 5px 0 #00FF00; }
         body.theme-love { --card-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; --card-border: 69px solid #FF69B4; }
 
-        /* 變換風格特效 */
         @keyframes themeLabelPop {
             0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); opacity: 0; }
             50% { transform: translate(-50%, -50%) scale(1.3) rotate(10deg); opacity: 1; }
@@ -50,22 +49,15 @@
         }
         #giantThemeName {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 5000; font-size: 15vw; font-weight: 900; 
-            color: #FF1493; /* 深粉紅 */
+            z-index: 5000; font-size: 15vw; font-weight: 900; color: #FF1493;
             text-shadow: 8px 8px 0px #fff, -4px -4px 0px #fff, 4px -4px 0px #fff, -4px 4px 0px #fff;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
             pointer-events: none; white-space: nowrap; display: none; font-style: italic;
         }
         #giantThemeName.active { display: block; animation: themeLabelPop 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-        @keyframes welcomePop {
-            0% { transform: scale(0.8); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes welcomeBounce {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            50% { transform: translateY(-8px) rotate(1deg); }
-        }
+        @keyframes welcomePop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes welcomeBounce { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-8px) rotate(1deg); } }
         .animate-welcome { animation: welcomePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .highlight-welcome { animation: welcomeBounce 0.4s ease-in-out 2; }
 
@@ -78,10 +70,7 @@
 
         .sticky-nav { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 0.5rem 0; border-bottom: 3px solid #000; transition: all 0.5s ease; }
 
-        #cardsGrid { 
-            display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem;
-            grid-auto-rows: min-content;
-        }
+        #cardsGrid { display: grid; gap: 1rem; width: 100%; grid-template-columns: repeat(3, 1fr); padding: 1rem; grid-auto-rows: min-content; }
         @media (min-width: 768px) { #cardsGrid { grid-template-columns: repeat(6, 1fr); } }
         @media (min-width: 1024px) { #cardsGrid { grid-template-columns: repeat(7, 1fr); } }
 
@@ -89,8 +78,7 @@
         .card-inner {
             position: absolute; width: 100%; height: 100%;
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            transform-style: preserve-3d; cursor: pointer;
-            transform: rotate(var(--card-rotate));
+            transform-style: preserve-3d; cursor: pointer; transform: rotate(var(--card-rotate));
         }
         .card-inner.is-flipped { transform: rotateY(180deg) rotate(var(--card-rotate)); }
 
@@ -104,11 +92,9 @@
 
         .card-front { background-color: var(--primary); color: #000; font-weight: 900; }
         .card-back { background-color: white !important; transform: rotateY(180deg); font-size: 3rem; }
-
         .card-emoji-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 3.8rem; opacity: 0.55; pointer-events: none; }
         .card-completed .card-front { background-color: #eee !important; opacity: 0.6; filter: grayscale(1); }
 
-        /* 下拉選單 */
         .custom-dropdown { position: relative; width: 120px; font-weight: 900; z-index: 50; }
         .dropdown-trigger {
             background: #fff; border: 3px solid #000; padding: 0.45rem 0.6rem; border-radius: 10px;
@@ -164,12 +150,10 @@
 
     <nav class="sticky-nav">
         <div class="max-w-6xl mx-auto px-4">
-            <!-- 第一行：超大歡迎詞 -->
             <div id="welcomeLine" class="hidden">
                 <p id="welcomeMsg" onclick="window.editName()"></p>
                 <button class="edit-name-btn" onclick="window.editName()">✎</button>
             </div>
-            <!-- 第二行：功能列 -->
             <div class="flex items-center justify-between gap-2 py-1">
                 <div class="flex items-center gap-2">
                     <div class="stat-box">
@@ -181,7 +165,6 @@
                         <p id="statRemaining" class="text-base font-black">0</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center gap-2">
                     <button onclick="window.randomStyle()" class="px-4 bg-yellow-400 font-black rounded-lg border-2 border-black shadow-[2px_2px_0_#000] active:translate-y-0.5 text-sm h-[42px]">變身！✨</button>
                     <div class="custom-dropdown" id="categoryDropdownContainer">
@@ -205,26 +188,24 @@
         </footer>
     </div>
 
-    <!-- 姓名輸入視窗 -->
     <div id="nameModal" class="fixed inset-0 bg-black/90 z-[2000] hidden items-center justify-center p-6 backdrop-blur-xl">
         <div class="bg-white border-8 border-black p-8 w-full max-w-sm rounded-[40px] shadow-[15px_15px_0px_#FFD700]">
             <h2 class="text-3xl font-black italic mb-4">你是誰？🌟</h2>
-            <p class="text-sm font-bold mb-4">輸入名字開始探索旅程</p>
             <input type="text" id="userNameInput" placeholder="輸入名字..." class="w-full border-4 border-black p-4 text-xl font-black rounded-2xl mb-6 outline-none">
             <button onclick="window.saveUserName()" class="w-full bg-black text-white p-4 font-black text-xl rounded-2xl shadow-[5px_5px_0px_#888]">出發！</button>
         </div>
     </div>
 
-    <!-- 答案彈窗 -->
+    <!-- 視窗寬度縮小，與邊界保持距離 -->
     <div id="answerOverlay" onclick="window.closeAnswer()" class="fixed inset-0 bg-black/80 z-[999] hidden items-center justify-center p-6 backdrop-blur-md">
-        <div id="answerContent" class="bg-white w-full max-w-sm min-h-[45vh] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
+        <div id="answerContent" class="bg-white w-[92%] max-w-[400px] border-8 border-black flex flex-col items-center justify-between p-8 relative shadow-[15px_15px_0px_white] rounded-[50px]" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeAnswer()">✕</div>
             <div class="relative z-20 flex flex-col items-center w-full text-center flex-grow justify-center">
                 <div id="answerCategoryTag" class="text-xs font-black uppercase mb-4 bg-black text-white px-3 py-1 rounded-full">分類</div>
                 <div id="textFitContainer" class="w-full flex-grow flex items-center justify-center overflow-hidden py-4">
                     <div id="overlayText" class="font-black leading-tight text-black w-full break-words text-center"></div>
                 </div>
-                <button onclick="window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">分享此卡 📸</button>
+                <button onclick="window.shareSingleCard()" class="bg-black text-white px-8 py-4 font-black text-base rounded-2xl mt-4 scale-110">這句Line給朋友 📸</button>
             </div>
             <div id="ratingSection" class="w-full flex flex-col items-center gap-2 mt-6">
                 <div class="star-rating flex gap-1" id="starRatingContainer">
@@ -238,11 +219,10 @@
         </div>
     </div>
 
-    <!-- 紀錄頁面 -->
+    <!-- 視窗寬度縮小，與邊界保持距離 -->
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/70 z-[1000] hidden items-center justify-center p-6">
-        <div class="bg-white border-8 border-black w-full max-w-md max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden relative" onclick="event.stopPropagation()">
+        <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden relative" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
-            
             <div class="p-6 bg-pink-300 border-b-4 border-black flex flex-col items-center gap-4 pt-10">
                 <button onclick="window.shareRecordAsImage()" class="bg-black text-white px-10 py-4 rounded-xl font-black scale-110 transform shadow-[4px_4px_0_#fff] active:scale-95 transition-transform">匯出圖片</button>
             </div>
@@ -261,14 +241,24 @@
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background:white; font-family:'PingFang TC', sans-serif; color:black; z-index: -1;">
-        <div id="exportInner" style="padding: 60px;">
-            <div style="text-align:center;">
-                <h1 style="font-size: 48px; font-weight: 900; margin: 0; letter-spacing: 2px;">改變生命未來式 Be A Better You</h1>
-                <p id="exportSenderInfo" style="font-size: 28px; color: #666; font-weight: bold; margin: 20px 0 30px 0;">寄送人：安安 | 2026年02月27日</p>
+    <!-- 匯出模板優化：回歸左側粗黑線，加回英文標語 -->
+    <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; color:#000; z-index: -1; border: 20px solid #000;">
+        <div id="exportInner" style="padding: 60px; position: relative; min-height: 800px; display: flex; flex-direction: column;">
+            <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 40px; margin-bottom: 60px;">
+                <h1 style="font-size: 56px; font-weight: 900; margin: 0; letter-spacing: 2px;">改變生命未來式 Be A Better You</h1>
+                <p id="exportSenderInfo" style="font-size: 28px; color: #444; font-weight: bold; margin: 20px 0 0 0;"></p>
             </div>
-            <div style="height: 6px; background: black; width: 100%; margin-bottom: 80px;"></div>
-            <div id="exportCardsList"></div>
+            
+            <div id="exportCardsList" style="flex-grow: 1;"></div>
+            
+            <div style="margin-top: 60px; padding-top: 30px; border-top: 4px solid #eee; display: flex; justify-content: flex-end; align-items: flex-end;">
+                <div style="text-align: center;">
+                    <img id="exportQRCode" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://yukidu.github.io/amway-flash-card" 
+                         style="width: 120px; height: 120px; border: 4px solid #000; padding: 6px; background: #fff;" 
+                         onerror="this.style.display='none'">
+                    <div style="font-size: 20px; font-weight: 900; margin-top: 8px; color: #000;">我也要抽卡</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -335,13 +325,9 @@
         function fitWelcomeText() {
             const m = document.getElementById('welcomeMsg'), line = document.getElementById('welcomeLine');
             if (!m || line.classList.contains('hidden')) return;
-            let s = 180; // 極大起跳
-            m.style.fontSize = s + 'px';
+            let s = 180; m.style.fontSize = s + 'px';
             const targetW = line.clientWidth * 0.95;
-            while (m.offsetWidth > targetW && s > 10) {
-                s -= 1;
-                m.style.fontSize = s + 'px';
-            }
+            while (m.offsetWidth > targetW && s > 10) { s -= 1; m.style.fontSize = s + 'px'; }
         }
 
         function updateWelcomeUI(name) {
@@ -357,10 +343,8 @@
         function triggerWelcomeHighlight() {
             const m = document.getElementById('welcomeMsg');
             if (m && !document.getElementById('welcomeLine').classList.contains('hidden')) {
-                playSound('cute');
-                m.classList.remove('highlight-welcome');
-                void m.offsetWidth;
-                m.classList.add('highlight-welcome');
+                playSound('cute'); m.classList.remove('highlight-welcome');
+                void m.offsetWidth; m.classList.add('highlight-welcome');
             }
         }
 
@@ -376,10 +360,8 @@
                 playSound('cute');
                 const g = document.getElementById('giantThemeName');
                 if (g) {
-                    g.textContent = next.name; 
-                    g.classList.remove('active');
-                    void g.offsetWidth;
-                    g.classList.add('active');
+                    g.textContent = next.name; g.classList.remove('active');
+                    void g.offsetWidth; g.classList.add('active');
                 }
             }
         };
@@ -422,9 +404,7 @@
         window.switchCategory = (cat) => { 
             currentCategory = cat; 
             document.getElementById('dropdownLabel').textContent = cat === 'all' ? '🌟 全部' : cat;
-            renderCards(); 
-            updateStats();
-            triggerWelcomeHighlight();
+            renderCards(); updateStats(); triggerWelcomeHighlight();
         };
 
         function renderCards() {
@@ -436,8 +416,7 @@
                         gameData[cat].forEach((txt, idx) => { if (txt !== MANDATORY_CARD) items.push({ cat, idx, text: txt }); });
                     });
                     items.push({ cat: '宇宙指引', idx: -1, text: MANDATORY_CARD });
-                    items.sort(() => Math.random() - 0.5);
-                    allCategoryItems = items;
+                    items.sort(() => Math.random() - 0.5); allCategoryItems = items;
                 }
                 items = allCategoryItems;
             } else {
@@ -455,8 +434,7 @@
                         </div>
                         <div class="card-face card-back">👑</div>
                     </div>`;
-                c.onclick = () => window.handleCardClick(item.cat, item.idx, i);
-                grid.appendChild(c);
+                c.onclick = () => window.handleCardClick(item.cat, item.idx, i); grid.appendChild(c);
             });
         }
 
@@ -478,8 +456,7 @@
         function fitTextToContainer() {
             const t = document.getElementById('overlayText'), c = document.getElementById('textFitContainer');
             if (!t || !c) return;
-            let s = 42; 
-            t.style.fontSize = s + 'px';
+            let s = 42; t.style.fontSize = s + 'px';
             const maxH = c.clientHeight;
             while (t.scrollHeight > maxH && s > 12) { s -= 1; t.style.fontSize = s + 'px'; }
         }
@@ -507,8 +484,7 @@
         window.saveUserName = () => { 
             const v = document.getElementById('userNameInput').value.trim(); 
             if (v) { 
-                localStorage.setItem(STORAGE_KEYS.USERNAME, v); 
-                updateWelcomeUI(v); 
+                localStorage.setItem(STORAGE_KEYS.USERNAME, v); updateWelcomeUI(v); 
                 document.getElementById('nameModal').classList.add('hidden'); 
                 if (document.getElementById('recordModal').classList.contains('hidden')) {
                     document.getElementById('recordModal').classList.replace('hidden', 'flex');
@@ -522,8 +498,7 @@
             localStorage.removeItem(STORAGE_KEYS.PROGRESS);
             localStorage.removeItem(STORAGE_KEYS.METADATA);
             categoryProgress = {}; cardMetadata = {}; allCategoryItems = [];
-            await window.initApp();
-            showToast("已重置 🫧");
+            await window.initApp(); showToast("已重置 🫧");
         };
 
         window.updateRatingFromUI = (s) => {
@@ -558,24 +533,44 @@
 
         const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME) || "安安";
 
+        function getCurrentFormattedTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            const timeStr = now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+            return `${dateStr} ${timeStr}`;
+        }
+
         window.shareSingleCard = async () => {
-            const info = currentCardIndex; if (!info) return;
-            const time = new Date().toLocaleDateString('zh-TW');
-            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
-            document.getElementById('exportCardsList').innerHTML = `<div style="display:flex; align-items:flex-start;"><div style="width: 15px; height: 160px; background: black; margin-right: 30px;"></div><div><div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${info.cat} ]</div><div style="font-size: 52px; font-weight: 900; line-height: 1.3;">${info.text}</div></div></div>`;
+            const i = currentCardIndex; if (!i) return;
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${getCurrentFormattedTime()}`;
+            document.getElementById('exportCardsList').innerHTML = `
+                <div style="display:flex; align-items:flex-start; margin-bottom: 60px;">
+                    <div style="width: 25px; height: 160px; background: black; margin-right: 40px;"></div>
+                    <div>
+                        <div style="font-size: 28px; color: #666; font-weight: bold; margin-bottom: 20px;">[ ${i.cat} ]</div>
+                        <div style="font-size: 52px; font-weight: 900; line-height: 1.3; color: #000;">${i.text}</div>
+                    </div>
+                </div>`;
             captureAndShare();
         };
 
         window.shareRecordAsImage = async () => {
-            const time = new Date().toLocaleDateString('zh-TW');
-            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${time}`;
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${getCurrentFormattedTime()}`;
             const listEl = document.getElementById('exportCardsList'); listEl.innerHTML = '';
             let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
             if (currentTab === 'unrated') items = items.filter(i => !i.rating);
             else if (currentTab.startsWith('star')) items = items.filter(i => i.rating === parseInt(currentTab.replace('star','')));
             if(items.length === 0) { showToast("無內容可匯出"); return; }
+            
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
-                listEl.innerHTML += `<div style="display:flex; align-items:flex-start; margin-bottom: 60px;"><div style="width: 12px; height: 120px; background: black; margin-right: 25px;"></div><div><div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 10px;">[ ${i.category} ]</div><div style="font-size: 38px; font-weight: 900; line-height: 1.3;">${i.text}</div></div></div>`;
+                listEl.innerHTML += `
+                    <div style="display:flex; align-items:flex-start; margin-bottom: 60px;">
+                        <div style="width: 15px; height: 110px; background: black; margin-right: 35px;"></div>
+                        <div style="flex-grow: 1;">
+                            <div style="font-size: 20px; color: #666; font-weight: bold; margin-bottom: 12px;">[ ${i.category} ]</div>
+                            <div style="font-size: 38px; font-weight: 900; line-height: 1.3; color: #000;">${i.text}</div>
+                        </div>
+                    </div>`;
             });
             captureAndShare();
         };
@@ -588,14 +583,14 @@
                 const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: 'white', logging: false });
                 temp.style.left = "-5000px"; temp.style.zIndex = "-1";
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-                const file = new File([blob], 'BetterYou.png', { type: 'image/png' });
-                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                const file = new File([blob], 'BeABetterYou.png', { type: 'image/png' });
+
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+                if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({ files: [file], title: '改變生命未來式' });
                 } else {
-                    const l = document.createElement('a'); 
-                    l.download = 'BeABetterYou.png'; 
-                    l.href = canvas.toDataURL('image/png'); 
-                    l.click();
+                    const l = document.createElement('a'); l.download = 'BeABetterYou.png'; l.href = canvas.toDataURL('image/png'); l.click();
                     showToast("已下載 💾");
                 }
             } catch (e) { showToast("生成失敗"); temp.style.left = "-5000px"; }
