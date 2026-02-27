@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 修改 Line 連結預覽文字 -->
     <title>改變生命未來式 Be A Better You</title>
     <meta name="description" content="要因夢想而忙碌、勿因忙碌而忘記夢想">
     <meta property="og:title" content="改變生命未來式 Be A Better You">
@@ -26,7 +25,6 @@
             --bg-size: 20px 20px;
         }
 
-        /* 載入畫面文字風格設計：僅保留彩虹漸層 */
         .loading-style-rainbow { 
             background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); 
             -webkit-background-clip: text; 
@@ -48,7 +46,6 @@
             100% { transform: scale(1.1) rotate(0deg) translate(0, 0); opacity: 0.3; } 
         }
 
-        /* 20 種風格 */
         body.theme-jelly { --card-radius: 40% 60% 70% 30% / 40% 50% 60% 40%; --card-border: 6px solid #fff; --card-shadow: 0 10px 25px rgba(255,100,200,0.3); }
         body.theme-comic { --card-radius: 0; --card-rotate: -3deg; --card-border: 8px solid #000; --card-shadow: 15px 15px 0px #000; }
         body.theme-sticker { --card-radius: 2rem; --card-border: 10px solid #fff; --card-shadow: 0 0 0 4px #000, 8px 8px 15px rgba(0,0,0,0.2); }
@@ -142,7 +139,6 @@
         .star-rating .star { color: #ccc; cursor: pointer; font-size: 1.8rem; }
         .star-rating .star.active { color: #FFD700; }
 
-        /* 載入畫面：調色盤佔滿螢幕 */
         .loading-overlay { position: fixed; inset: 0; background: #fff; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .palette-bg { position: absolute; width: 150vw; height: 150vh; opacity: 0.3; z-index: -1; animation: paletteFloat 12s infinite ease-in-out; }
         
@@ -177,7 +173,6 @@
     <div id="giantThemeName">風格</div>
 
     <div id="aiLoading" class="loading-overlay">
-        <!-- 巨大動態調色盤 SVG -->
         <svg class="palette-bg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path d="M90,50 C90,72.1 72.1,90 50,90 C27.9,90 10,72.1 10,50 C10,27.9 27.9,10 40,10 C45,10 48,13 52,15 C56,17 60,15 65,12 C75,7 90,27.9 90,50 Z" fill="#F3E5AB" stroke="#000" stroke-width="0.5"/>
             <circle cx="30" cy="35" r="5" fill="#FF4444"/>
@@ -228,7 +223,7 @@
         <footer class="mt-8 mb-24 flex flex-row flex-nowrap justify-center gap-3 px-2">
             <button onclick="window.openRecordModal()" class="flex-1 bg-pink-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">紀錄</button>
             <button onclick="window.shareApp()" class="flex-1 bg-cyan-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">分享</button>
-            <button id="installBtn" onclick="window.installPWA()" class="flex-1 bg-emerald-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">安裝</button>
+            <button onclick="window.openInstallModal()" class="flex-1 bg-emerald-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">安裝</button>
             <button onclick="window.resetAllGame()" class="flex-1 bg-red-400 text-white py-4 font-black border-4 border-black shadow-[6px_6px_0px_#000] rounded-2xl text-base">重置</button>
         </footer>
     </div>
@@ -260,6 +255,44 @@
                         <div class="flex-shrink-0 w-6 h-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-black">3</div>
                         <p class="text-gray-700 font-black text-sm pt-0.5">即可盡情分享精美金句照片給朋友！✨</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 教學視窗風格與紀錄視窗一致 -->
+    <div id="installModal" onclick="window.closeInstallModal()" class="fixed inset-0 bg-black/80 z-[1000] hidden items-center justify-center p-6 backdrop-blur-md">
+        <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[50px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
+            <div class="modal-close-btn" onclick="window.closeInstallModal()">✕</div>
+            <div class="flex flex-col w-full h-full overflow-hidden rounded-[42px]">
+                <div class="p-8 bg-emerald-300 border-b-4 border-black text-center pt-10">
+                    <h2 class="text-3xl font-black italic">安裝教學 📲</h2>
+                </div>
+                <div class="p-8 space-y-8 overflow-y-auto bg-white flex-grow">
+                    <section>
+                        <h3 class="text-xl font-black mb-4 flex items-center text-blue-600">
+                            <span class="mr-2">💻</span> 電腦版：加到書籤
+                        </h3>
+                        <div class="bg-gray-100 p-4 rounded-3xl border-2 border-black shadow-[4px_4px_0_#000] space-y-2">
+                            <p class="font-black">1. 點擊網址列右側的「☆」星星圖示</p>
+                            <p class="font-black text-sm text-gray-600">或使用快速鍵：<span class="bg-white px-2 py-0.5 rounded border border-black">Ctrl + D</span> (Windows) / <span class="bg-white px-2 py-0.5 rounded border border-black">Cmd + D</span> (Mac)</p>
+                        </div>
+                    </section>
+                    <section>
+                        <h3 class="text-xl font-black mb-4 flex items-center text-pink-600">
+                            <span class="mr-2">📱</span> 手機版：建立捷徑
+                        </h3>
+                        <div class="bg-gray-100 p-4 rounded-3xl border-2 border-black shadow-[4px_4px_0_#000] space-y-4">
+                            <div>
+                                <p class="font-black text-emerald-700 italic">iPhone (Safari)</p>
+                                <p class="text-sm font-bold">點擊底部的「分享」圖示 ➔ 選擇「加入主畫面」</p>
+                            </div>
+                            <div class="border-t-2 border-dashed border-gray-400 pt-2">
+                                <p class="font-black text-orange-700 italic">Android (Chrome)</p>
+                                <p class="text-sm font-bold">點擊右上角「⋮」選單 ➔ 選擇「安裝應用程式」或「新增至主螢幕」</p>
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -346,21 +379,7 @@
         ];
 
         let gameData = {}, categoryProgress = {}, cardMetadata = {}, allCategoryItems = [];
-        let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all', deferredPrompt = null;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
-        window.installPWA = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') showToast("安裝中...");
-                deferredPrompt = null;
-            } else { showToast("點擊瀏覽器選單「加入主畫面」✨"); }
-        };
+        let currentCategory = 'all', currentCardIndex = null, audioCtx = null, currentTab = 'all';
 
         window.initInteraction = () => {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -392,7 +411,6 @@
 
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
-            // 直接應用彩虹風格載入
             loading.style.display = 'flex';
             try {
                 const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
@@ -583,6 +601,13 @@
             filterFavs('all'); 
         };
 
+        window.openInstallModal = () => {
+            document.getElementById('installModal').classList.replace('hidden', 'flex');
+            playSound();
+        };
+
+        window.closeInstallModal = () => document.getElementById('installModal').classList.replace('flex', 'hidden');
+
         window.saveUserName = () => { 
             const v = document.getElementById('userNameInput').value.trim(); 
             if (v) { 
@@ -613,7 +638,6 @@
 
         function updateStarUI(s) { document.querySelectorAll('.star').forEach((el, i) => el.classList.toggle('active', i < s)); }
         window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('hidden', 'flex'); };
-        window.closeRecordModal = () => document.getElementById('answerOverlay').classList.replace('flex', 'hidden'); // 這裡修正了一個潛在的跳轉錯誤
         window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
