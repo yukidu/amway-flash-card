@@ -157,7 +157,7 @@
 
         .stat-box { min-width: 60px; text-align: center; }
         
-        /* 喜歡標記 (愛心) 樣式 - 已區分已評分與未評分 */
+        /* 喜歡標記 (愛心) 樣式 - 區分已評分與未評分 */
         .favorite-rating .heart { cursor: pointer; font-size: 1.8rem; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: inline-block; filter: grayscale(1) opacity(0.2); transform: scale(0.9); }
         .favorite-rating .heart.active { filter: grayscale(0) opacity(1); transform: scale(1.1); }
 
@@ -526,7 +526,7 @@
         window.initApp = async () => {
             const loading = document.getElementById('aiLoading');
             loading.style.display = 'flex';
-            // 初始化本次 Session 的翻牌計數
+            // 重新初始化 Session 計數
             sessionStorage.setItem(STORAGE_KEYS.SESSION_FLIP_COUNT, '0');
             try {
                 const name = localStorage.getItem(STORAGE_KEYS.USERNAME);
@@ -716,8 +716,8 @@
             const info = currentCardIndex; if (!info) return;
             document.getElementById('answerOverlay').classList.replace('flex', 'hidden');
             
-            // 累計翻牌次數
-            let count = Number(sessionStorage.getItem(STORAGE_KEYS.SESSION_FLIP_COUNT)) + 1;
+            // 讀取並累計翻牌次數 (Session 級別)
+            let count = Number(sessionStorage.getItem(STORAGE_KEYS.SESSION_FLIP_COUNT) || 0) + 1;
             sessionStorage.setItem(STORAGE_KEYS.SESSION_FLIP_COUNT, count.toString());
 
             if (info.text === MANDATORY_CARD) {
@@ -725,17 +725,21 @@
                 localStorage.setItem(STORAGE_KEYS.HIDDEN_DUDU, 'true');
                 renderCards();
             } else {
-                if (info.idx !== -1 && !categoryProgress[info.cat]?.has(info.idx)) {
-                    categoryProgress[info.cat].add(info.idx);
-                    if (!cardMetadata[info.text]) cardMetadata[info.text] = { category: info.cat, flipTimestamp: Date.now(), rating: 0 };
-                    localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(Object.keys(categoryProgress).reduce((acc,k)=>{acc[k]=Array.from(categoryProgress[k]);return acc;},{})));
-                    localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
-                    renderCards(); updateStats();
+                // 修正 Set 初始化邏輯
+                if (info.idx !== -1) {
+                    if (!categoryProgress[info.cat]) categoryProgress[info.cat] = new Set();
+                    if (!categoryProgress[info.cat].has(info.idx)) {
+                        categoryProgress[info.cat].add(info.idx);
+                        if (!cardMetadata[info.text]) cardMetadata[info.text] = { category: info.cat, flipTimestamp: Date.now(), rating: 0 };
+                        localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(Object.keys(categoryProgress).reduce((acc,k)=>{acc[k]=Array.from(categoryProgress[k]);return acc;},{})));
+                        localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
+                        renderCards(); updateStats();
+                    }
                 }
             }
             
-            // 顯示教學時機：第一次翻牌之後顯示，未來每翻 10 張牌顯示
-            if (count === 1 || count % 10 === 0) {
+            // 教學彈窗時機：第一次翻牌，以及每 10 張 (10, 20, 30...)
+            if (count === 1 || (count > 0 && count % 10 === 0)) {
                 setTimeout(() => {
                     document.getElementById('shakeTutorialModal').classList.replace('hidden', 'flex');
                 }, 300);
@@ -778,7 +782,9 @@
         };
 
         window.updateRatingFromUI = (s) => {
-            const i = currentCardIndex; cardMetadata[i.text] = { rating: s, category: i.cat, flipTimestamp: Date.now() };
+            const i = currentCardIndex;
+            if (!i) return;
+            cardMetadata[i.text] = { rating: s, category: i.cat, flipTimestamp: Date.now() };
             localStorage.setItem(STORAGE_KEYS.METADATA, JSON.stringify(cardMetadata));
             updateStarUI(s); 
             showToast("標記完成！<br>下方紀錄頁可查看", true);
@@ -797,7 +803,7 @@
         }
         
         window.editName = () => { document.getElementById('userNameInput').value = localStorage.getItem(STORAGE_KEYS.USERNAME)||""; document.getElementById('nameModal').classList.replace('hidden', 'flex'); };
-        window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('hidden', 'flex');
+        window.closeRecordModal = () => document.getElementById('recordModal').classList.replace('flex', 'hidden');
         window.changeRecordTab = (t) => { currentTab = t; document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === t)); filterFavs(t); };
 
         function filterFavs(tab = 'all') {
@@ -880,23 +886,45 @@
             const textSnippet = cardText ? cardText.substring(0, 10) : "紀錄";
             const customFileName = name ? `${name} - ${textSnippet} - Be A Better You.png` : `${textSnippet} - Be A Better You.png`;
             try {
-                temp.style.left = "0"; temp.style.zIndex = "10000";
-                await new Promise(r => setTimeout(r, 100));
-                const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 5000 });
-                temp.style.left = "-5000px"; temp.style.zIndex = "-1";
+                // 強制讓模板在畫面上渲染一次
+                temp.style.left = "0"; 
+                temp.style.zIndex = "10000";
+                temp.style.visibility = "visible";
+                await new Promise(r => setTimeout(r, 200));
+                
+                const canvas = await html2canvas(temp, { 
+                    scale: 2, 
+                    useCORS: true, 
+                    backgroundColor: '#ffffff', 
+                    logging: false,
+                    allowTaint: true
+                });
+                
+                temp.style.left = "-5000px"; 
+                temp.style.zIndex = "-1";
+                temp.style.visibility = "hidden";
+                
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
                 const file = new File([blob], customFileName, { type: 'image/png' });
                 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
                 const emojis = ["🌟", "✨", "💎", "🌈", "🍀", "🍎", "☀️", "🚀", "🌻", "💪", "🏆", "🔥"];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
                 const shareText = `這是${name || '我'}翻的牌，發現這句話很經典，特別分享給您 ${randomEmoji}`;
+                
                 if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({ files: [file], title: '改變生命未來式', text: shareText });
                 } else {
-                    const l = document.createElement('a'); l.download = customFileName; l.href = canvas.toDataURL('image/png'); l.click();
+                    const l = document.createElement('a'); 
+                    l.download = customFileName; 
+                    l.href = canvas.toDataURL('image/png'); 
+                    l.click();
                     showToast("已下載 💾");
                 }
-            } catch (e) { showToast("生成失敗"); temp.style.left = "-5000px"; }
+            } catch (e) { 
+                console.error(e);
+                showToast("生成失敗"); 
+                temp.style.left = "-5000px"; 
+            }
         }
 
         window.shareApp = () => { 
@@ -907,6 +935,7 @@
         };
         
         function parseCSV(t) { let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0; for (let l of t) { if ('"' === l) { if (s && l === p) row[i] += l; s = !s; } else if (',' === l && s) l = row[++i] = ''; else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = row[i = 0] = '']; } else row[i] += l; p = l; } return ret; }
+        
         function showToast(m, isHighlight = false) { 
             const t = document.getElementById('toast'); 
             t.innerHTML = m; 
@@ -914,14 +943,26 @@
             t.style.opacity = '1'; 
             setTimeout(() => t.style.opacity = '0', isHighlight ? 3500 : 2000); 
         }
+        
         function updateStats() {
             let t = 0, d = 0;
+            // 遍歷 gameData 計算總數
             Object.keys(gameData).forEach(cat => {
-                const list = gameData[cat].filter(x => x !== MANDATORY_CARD); t += list.length;
-                if (categoryProgress[cat]) gameData[cat].forEach((txt, i) => { if (txt !== MANDATORY_CARD && categoryProgress[cat].has(i)) d++; });
+                const list = gameData[cat].filter(x => x !== MANDATORY_CARD);
+                t += list.length;
+            });
+            // 遍歷已翻開記錄計算
+            Object.keys(categoryProgress).forEach(cat => {
+                const set = categoryProgress[cat];
+                if (set) {
+                    set.forEach(idx => {
+                        // idx 為 -1 代表杜杜龍卡，不列入計數
+                        if (idx !== -1) d++;
+                    });
+                }
             });
             document.getElementById('statCompleted').textContent = d;
-            document.getElementById('statRemaining').textContent = t - d;
+            document.getElementById('statRemaining').textContent = Math.max(0, t - d);
         }
         window.initApp();
     </script>
