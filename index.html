@@ -124,7 +124,8 @@
         }
         
         #welcomeLine { width: 100%; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; padding: 0.2rem 1rem; }
-        #welcomeMsg { white-space: nowrap; font-weight: 900; display: inline-block; cursor: pointer; }
+        /* 字體緊湊，防止手機溢出 */
+        #welcomeMsg { white-space: nowrap; font-weight: 900; display: inline-block; cursor: pointer; letter-spacing: -0.05em; }
 
         .tab-btn {
             padding: 0.3rem 0.6rem; font-weight: 900; border: 2px solid black; border-radius: 99px;
@@ -138,6 +139,9 @@
             align-items: center; justify-content: center; cursor: pointer; margin-left: 8px;
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
+
+        /* 紀錄彈窗陰影樣式修正，確保按鈕不被遮擋 */
+        .record-modal-container { position: relative; overflow: visible !important; }
     </style>
 </head>
 <body class="theme-jelly" onclick="window.initInteraction()">
@@ -219,27 +223,30 @@
     </div>
 
     <div id="recordModal" onclick="window.closeRecordModal()" class="fixed inset-0 bg-black/70 z-[1000] hidden items-center justify-center p-6">
-        <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] overflow-hidden relative" onclick="event.stopPropagation()">
+        <div class="bg-white border-8 border-black w-[92%] max-w-[500px] max-h-[85vh] flex flex-col rounded-[40px] shadow-[15px_15px_0px_white] relative record-modal-container" onclick="event.stopPropagation()">
             <div class="modal-close-btn" onclick="window.closeRecordModal()">✕</div>
-            <div class="p-6 bg-pink-300 border-b-4 border-black flex flex-col items-center gap-4 pt-10">
-                <button onclick="window.shareRecordAsImage()" class="bg-black text-white px-10 py-4 rounded-xl font-black scale-110 transform shadow-[4px_4px_0_#fff] active:scale-95 transition-transform">匯出圖片</button>
+            <!-- 內部內容改為 overflow-hidden 避免遮擋邊界按鈕 -->
+            <div class="flex flex-col w-full h-full overflow-hidden rounded-[32px]">
+                <div class="p-6 bg-pink-300 border-b-4 border-black flex flex-col items-center gap-4 pt-10">
+                    <button onclick="window.shareRecordAsImage()" class="bg-black text-white px-10 py-4 rounded-xl font-black scale-110 transform shadow-[4px_4px_0_#fff] active:scale-95 transition-transform">匯出圖片</button>
+                </div>
+                <div class="flex gap-1 overflow-x-auto no-scrollbar p-3 bg-gray-50 border-b-4 border-black" id="recordTabs">
+                    <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button>
+                    <button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未評</button>
+                    <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5★</button>
+                    <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4★</button>
+                    <button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3★</button>
+                    <button onclick="window.changeRecordTab('star2')" class="tab-btn" data-tab="star2">2★</button>
+                    <button onclick="window.changeRecordTab('star1')" class="tab-btn" data-tab="star1">1★</button>
+                </div>
+                <div id="favoriteList" class="p-4 overflow-y-auto space-y-3 flex-grow bg-white"></div>
             </div>
-            <div class="flex gap-1 overflow-x-auto no-scrollbar p-3 bg-gray-50 border-b-4 border-black" id="recordTabs">
-                <button onclick="window.changeRecordTab('all')" class="tab-btn active" data-tab="all">全部</button>
-                <button onclick="window.changeRecordTab('unrated')" class="tab-btn" data-tab="unrated">未評</button>
-                <button onclick="window.changeRecordTab('star5')" class="tab-btn" data-tab="star5">5★</button>
-                <button onclick="window.changeRecordTab('star4')" class="tab-btn" data-tab="star4">4★</button>
-                <button onclick="window.changeRecordTab('star3')" class="tab-btn" data-tab="star3">3★</button>
-                <button onclick="window.changeRecordTab('star2')" class="tab-btn" data-tab="star2">2★</button>
-                <button onclick="window.changeRecordTab('star1')" class="tab-btn" data-tab="star1">1★</button>
-            </div>
-            <div id="favoriteList" class="p-4 overflow-y-auto space-y-3 flex-grow bg-white"></div>
         </div>
     </div>
 
     <div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 font-black rounded-full shadow-2xl z-[3000] opacity-0 pointer-events-none transition-all"></div>
 
-    <!-- 匯出模板優化：黑邊框加粗 3 倍，標題不換行 -->
+    <!-- 匯出模板 -->
     <div id="exportTemplate" style="position:fixed; top:0; left:-5000px; width:1000px; background: #fff; font-family:'PingFang TC', 'Microsoft JhengHei', sans-serif; color:#000; z-index: -1; border: 60px solid #000;">
         <div id="exportInner" style="padding: 60px; position: relative; min-height: 800px; display: flex; flex-direction: column;">
             <div style="text-align:center; border-bottom: 8px solid #000; padding-bottom: 40px; margin-bottom: 60px; overflow: hidden;">
@@ -287,19 +294,34 @@
         window.closeDropdown = () => document.getElementById('dropdownOptions').classList.remove('active');
         window.addEventListener('click', (e) => { if (!document.getElementById('categoryDropdownContainer').contains(e.target)) window.closeDropdown(); });
 
-        function playSound(type) {
+        // 生成 20 種隨機音效
+        function playSound() {
             if (!audioCtx) return;
-            const o = audioCtx.createOscillator(), g = audioCtx.createGain(), n = audioCtx.currentTime;
-            o.connect(g); g.connect(audioCtx.destination);
-            if (type === 'cute') {
-                o.type = 'sine'; o.frequency.setValueAtTime(440, n); o.frequency.exponentialRampToValueAtTime(880, n + 0.1);
-                g.gain.setValueAtTime(0.1, n); g.gain.exponentialRampToValueAtTime(0.01, n + 0.15);
-                o.start(n); o.stop(n + 0.15);
-            } else if (type === 'pop') {
-                o.type = 'square'; o.frequency.setValueAtTime(300, n);
-                g.gain.setValueAtTime(0.05, n); g.gain.exponentialRampToValueAtTime(0.01, n + 0.1);
-                o.start(n); o.stop(n + 0.1);
-            }
+            const n = audioCtx.currentTime;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            // 隨機波形
+            const types = ['sine', 'square', 'sawtooth', 'triangle'];
+            oscillator.type = types[Math.floor(Math.random() * types.length)];
+            
+            // 隨機頻率範圍 (從清脆到渾厚)
+            const baseFreq = 200 + Math.random() * 800;
+            oscillator.frequency.setValueAtTime(baseFreq, n);
+            
+            // 頻率滑動效果 (隨機向上或向下)
+            const slideTo = Math.random() > 0.5 ? baseFreq * 1.5 : baseFreq * 0.5;
+            oscillator.frequency.exponentialRampToValueAtTime(slideTo, n + 0.15);
+            
+            // 音量控制
+            gainNode.gain.setValueAtTime(0.1, n);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, n + 0.15);
+            
+            oscillator.start(n);
+            oscillator.stop(n + 0.15);
         }
 
         window.initApp = async () => {
@@ -324,7 +346,7 @@
             const m = document.getElementById('welcomeMsg'), line = document.getElementById('welcomeLine');
             if (!m || line.classList.contains('hidden')) return;
             let s = 180; m.style.fontSize = s + 'px';
-            const targetW = line.clientWidth * 0.95;
+            const targetW = line.clientWidth * 0.92; // 因右側按鈕，略微縮減可用寬度
             while (m.offsetWidth > targetW && s > 10) { s -= 1; m.style.fontSize = s + 'px'; }
         }
 
@@ -341,7 +363,9 @@
         function triggerWelcomeHighlight() {
             const m = document.getElementById('welcomeMsg');
             if (m && !document.getElementById('welcomeLine').classList.contains('hidden')) {
-                playSound('cute'); m.classList.remove('highlight-welcome');
+                // 此處觸發隨機音效
+                playSound();
+                m.classList.remove('highlight-welcome');
                 void m.offsetWidth; m.classList.add('highlight-welcome');
             }
         }
@@ -355,7 +379,7 @@
             document.documentElement.style.setProperty('--primary', `hsl(${h}, 95%, 75%)`);
             document.documentElement.style.setProperty('--bg', `hsl(${h}, 50%, 98%)`);
             if (!skip) {
-                playSound('cute');
+                playSound(); // 變身也使用隨機音效
                 const g = document.getElementById('giantThemeName');
                 if (g) {
                     g.textContent = next.name; g.classList.remove('active');
@@ -447,7 +471,7 @@
                 currentCardIndex = { cat, idx, text, displayIdx };
                 document.getElementById('answerOverlay').classList.replace('hidden', 'flex');
                 requestAnimationFrame(() => fitTextToContainer());
-                playSound('pop');
+                playSound(); // 翻牌音效
             }, 350);
         };
 
@@ -456,6 +480,7 @@
             if (!t || !c) return;
             let s = 42; t.style.fontSize = s + 'px';
             const maxH = c.clientHeight;
+            // 強化縮小邏輯，確保高度適配且不留白
             while (t.scrollHeight > maxH && s > 12) { s -= 1; t.style.fontSize = s + 'px'; }
         }
 
@@ -529,7 +554,7 @@
             });
         }
 
-        const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME) || "安安";
+        const getSenderName = () => localStorage.getItem(STORAGE_KEYS.USERNAME);
 
         function getCurrentFormattedTime() {
             const now = new Date();
@@ -540,8 +565,8 @@
 
         window.shareSingleCard = async () => {
             const i = currentCardIndex; if (!i) return;
-            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${getCurrentFormattedTime()}`;
-            // 優化黑線：使用 align-items: stretch 自動調整高度
+            const name = getSenderName();
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${name || '安安'} | ${getCurrentFormattedTime()}`;
             document.getElementById('exportCardsList').innerHTML = `
                 <div style="display:flex; align-items:stretch; margin-bottom: 60px;">
                     <div style="width: 25px; background: black; margin-right: 40px; flex-shrink: 0;"></div>
@@ -550,11 +575,12 @@
                         <div style="font-size: 52px; font-weight: 900; line-height: 1.3; color: #000;">${i.text}</div>
                     </div>
                 </div>`;
-            captureAndShare();
+            captureAndShare(i.text);
         };
 
         window.shareRecordAsImage = async () => {
-            document.getElementById('exportSenderInfo').textContent = `寄送人：${getSenderName()} | ${getCurrentFormattedTime()}`;
+            const name = getSenderName();
+            document.getElementById('exportSenderInfo').textContent = `寄送人：${name || '安安'} | ${getCurrentFormattedTime()}`;
             const listEl = document.getElementById('exportCardsList'); listEl.innerHTML = '';
             let items = Object.keys(cardMetadata).map(t => ({ text: t, ...cardMetadata[t] })).filter(i => i.text !== MANDATORY_CARD);
             if (currentTab === 'unrated') items = items.filter(i => !i.rating);
@@ -562,7 +588,6 @@
             if(items.length === 0) { showToast("無內容可匯出"); return; }
             
             items.sort((a,b) => b.flipTimestamp - a.flipTimestamp).forEach(i => {
-                // 優化黑線：使用 align-items: stretch 自動調整高度，確保寬度固定且對齊
                 listEl.innerHTML += `
                     <div style="display:flex; align-items:stretch; margin-bottom: 60px;">
                         <div style="width: 15px; background: black; margin-right: 35px; flex-shrink: 0;"></div>
@@ -572,25 +597,34 @@
                         </div>
                     </div>`;
             });
-            captureAndShare();
+            captureAndShare(items[0].text);
         };
 
-        async function captureAndShare() {
+        async function captureAndShare(cardText) {
             showToast("生成圖片中...");
             const temp = document.getElementById('exportTemplate');
+            const name = getSenderName();
+            
+            // 檔名格式化
+            const textSnippet = cardText ? cardText.substring(0, 10) : "紀錄";
+            const customFileName = name ? `${name} - ${textSnippet} - Be A Better You.png` : `${textSnippet} - Be A Better You.png`;
+
             try {
                 temp.style.left = "0"; temp.style.zIndex = "10000";
                 const canvas = await html2canvas(temp, { scale: 2, useCORS: true, backgroundColor: 'white', logging: false });
                 temp.style.left = "-5000px"; temp.style.zIndex = "-1";
                 const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-                const file = new File([blob], 'BeABetterYou.png', { type: 'image/png' });
+                const file = new File([blob], customFileName, { type: 'image/png' });
 
                 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
                 if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({ files: [file], title: '改變生命未來式' });
                 } else {
-                    const l = document.createElement('a'); l.download = 'BeABetterYou.png'; l.href = canvas.toDataURL('image/png'); l.click();
+                    const l = document.createElement('a'); 
+                    l.download = customFileName; 
+                    l.href = canvas.toDataURL('image/png'); 
+                    l.click();
                     showToast("已下載 💾");
                 }
             } catch (e) { showToast("生成失敗"); temp.style.left = "-5000px"; }
